@@ -4,6 +4,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -25,6 +26,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   // QueryClientProvider makes TanStack Query available to all child components.
   // Any component can now use useQuery() to fetch and cache data.
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </ThemeProvider>
   );
 }

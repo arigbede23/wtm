@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={outfit.variable}>
+    <html lang="en" className={outfit.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         {/* Providers wraps the app with TanStack Query for data fetching */}
         <Providers>

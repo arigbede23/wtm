@@ -5,14 +5,19 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { useTheme } from "next-themes";
+import { Search, X, Sun, Moon } from "lucide-react";
 import { NotificationBell } from "@/components/social/NotificationBell";
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => setMounted(true), []);
 
   // Focus input when search opens
   useEffect(() => {
@@ -66,7 +71,7 @@ export function Header() {
               <span className="text-gray-900 dark:text-white">wtm</span>
               <span className="text-brand-600">?</span>
             </h1>
-            {/* Search + Notification buttons */}
+            {/* Search + Theme toggle + Notification buttons */}
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -74,6 +79,14 @@ export function Header() {
               >
                 <Search className="h-5 w-5" />
               </button>
+              {mounted && (
+                <button
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                >
+                  {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                </button>
+              )}
               <NotificationBell />
             </div>
           </>

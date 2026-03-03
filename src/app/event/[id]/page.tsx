@@ -20,17 +20,18 @@ import { createClient } from "@supabase/supabase-js";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 
-// Create a Supabase client for server-side data fetching
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export default async function EventDetailPage({
   params,
 }: {
   params: { id: string }; // id comes from the [id] folder name in the URL
 }) {
+  // Create the Supabase client inside the function (not at module level)
+  // so it only runs at request time, not during the build step.
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   // Fetch the event by ID, including RSVP count
   const { data: event, error } = await supabase
     .from("events")

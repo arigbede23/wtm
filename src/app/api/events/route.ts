@@ -10,13 +10,14 @@ import { createClient } from "@supabase/supabase-js";
 // We need this because the data changes (new events, RSVPs, etc.).
 export const dynamic = "force-dynamic";
 
-// Create a Supabase client for querying the database
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export async function GET() {
+  // Create the Supabase client inside the function (not at module level)
+  // so it only runs at request time, not during the build step.
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   try {
     // Query events from Supabase:
     // - Select all event fields plus a count of RSVPs

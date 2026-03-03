@@ -2,8 +2,10 @@
 // GET  /api/sync — called by Vercel Cron every 6 hours
 // POST /api/sync — manual trigger
 // Both require Authorization: Bearer <CRON_SECRET>
+// Uses Supabase REST API (HTTP) for database writes.
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { fetchTicketmasterEvents } from "@/lib/sync/ticketmaster";
 import { fetchEventbriteEvents } from "@/lib/sync/eventbrite";
@@ -21,19 +23,18 @@ function isAuthorized(request: NextRequest): boolean {
   return auth === `Bearer ${secret}`;
 }
 
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  // Use service role key if available, otherwise fall back to anon key
+  // (anon key requires an RLS policy allowing sync inserts)
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  return createClient(url, key);
+}
+
 async function handleSync() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json(
-      { error: "Missing SUPABASE_SERVICE_ROLE_KEY configuration" },
-      { status: 500 }
-    );
-  }
-
-  // Use service role client to bypass RLS
-  const supabase = createClient(supabaseUrl, serviceRoleKey);
+  const supabase = getSupabaseClient();
 
   // Fetch from both APIs in parallel
   const [tmEvents, ebEvents] = await Promise.all([
@@ -49,8 +50,10 @@ async function handleSync() {
   for (let i = 0; i < allEvents.length; i += BATCH_SIZE) {
     const batch = allEvents.slice(i, i + BATCH_SIZE);
 
+    const now = new Date().toISOString();
     const { error } = await supabase.from("events").upsert(
       batch.map((ev: NormalizedEvent) => ({
+        id: randomUUID(),
         source: ev.source,
         externalId: ev.externalId,
         title: ev.title,
@@ -68,8 +71,10 @@ async function handleSync() {
         price: ev.price,
         url: ev.url,
         status: ev.status,
+        createdAt: now,
+        updatedAt: now,
       })),
-      { onConflict: "source,externalId" }
+      { onConflict: "source,externalId", ignoreDuplicates: false }
     );
 
     if (error) {

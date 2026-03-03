@@ -1,3 +1,6 @@
+// Create Event Page — placeholder for the event creation form (Phase 3).
+// Will have a multi-step form with image upload and map pin location.
+
 export default function CreatePage() {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center">

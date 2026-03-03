@@ -1,3 +1,8 @@
+// Supabase Server Client
+// Use this in Server Components, Server Actions, and Route Handlers.
+// It reads auth cookies from the request headers (not the browser).
+// Docs: https://supabase.com/docs/guides/auth/server-side/nextjs
+
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
@@ -8,6 +13,7 @@ export function createClient() {
 
   return createServerClient(url, key, {
     cookies: {
+      // These methods let Supabase read/write auth session cookies
       get(name: string) {
         return cookieStore.get(name)?.value;
       },
@@ -15,14 +21,15 @@ export function createClient() {
         try {
           cookieStore.set({ name, value, ...options });
         } catch {
-          // Ignored in Server Components
+          // set() fails in Server Components (read-only) — that's fine, we ignore it.
+          // It works in Route Handlers and Server Actions.
         }
       },
       remove(name: string, options: CookieOptions) {
         try {
           cookieStore.set({ name, value: "", ...options });
         } catch {
-          // Ignored in Server Components
+          // Same as above — safe to ignore in Server Components
         }
       },
     },

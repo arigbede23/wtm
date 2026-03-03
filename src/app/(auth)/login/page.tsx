@@ -1,3 +1,6 @@
+// Login Page — email/password sign-in form.
+// On success, redirects to the feed. On error, shows an error message.
+
 "use client";
 
 import { useState } from "react";
@@ -6,29 +9,34 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const { signIn } = useAuth();
-  const router = useRouter();
+  const router = useRouter(); // For programmatic navigation
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault();  // Prevent the default form page reload
     setError("");
     setLoading(true);
 
+    // Call Supabase sign in
     const { error } = await signIn(email, password);
     if (error) {
       setError(error.message);
       setLoading(false);
     } else {
+      // Success — go to the feed
       router.push("/feed");
     }
   };
 
   return (
     <div className="w-full max-w-sm">
+      {/* Logo */}
       <div className="text-center">
         <h1 className="text-3xl font-bold">
           <span className="text-brand-600">wtm</span>
@@ -38,12 +46,14 @@ export default function LoginPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {/* Error message banner */}
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">
             {error}
           </div>
         )}
 
+        {/* Email field */}
         <div>
           <label
             htmlFor="email"
@@ -62,6 +72,7 @@ export default function LoginPage() {
           />
         </div>
 
+        {/* Password field */}
         <div>
           <label
             htmlFor="password"
@@ -80,6 +91,7 @@ export default function LoginPage() {
           />
         </div>
 
+        {/* Submit button — disabled while loading to prevent double-clicks */}
         <button
           type="submit"
           disabled={loading}
@@ -89,6 +101,7 @@ export default function LoginPage() {
         </button>
       </form>
 
+      {/* Link to sign up page */}
       <p className="mt-6 text-center text-sm text-gray-500">
         Don&apos;t have an account?{" "}
         <Link

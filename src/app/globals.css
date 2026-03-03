@@ -1,59 +1,77 @@
+/* Global Styles — this file is imported in layout.tsx and applies to every page.
+   It sets up Tailwind CSS, defines color theme variables, and adds a few custom utilities. */
+
+/* These three directives inject Tailwind's generated CSS:
+   - @tailwind base:       Reset styles + CSS variable defaults
+   - @tailwind components: Reusable component classes (like .container)
+   - @tailwind utilities:  All the utility classes (flex, p-4, text-sm, etc.) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* @layer base puts these styles in Tailwind's "base" layer, which means they
+   have the lowest specificity and can be overridden by component/utility classes.
+   This is the shadcn/ui theming pattern — colors are defined as CSS variables
+   using HSL values (hue, saturation%, lightness%). Components reference these
+   variables so the entire color scheme can be swapped by changing the values here. */
 @layer base {
+  /* Light mode colors (default) */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --primary: 230 89% 62%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    --background: 0 0% 100%;           /* White */
+    --foreground: 222.2 84% 4.9%;      /* Near-black for text */
+    --card: 0 0% 100%;                 /* Card background (white) */
+    --card-foreground: 222.2 84% 4.9%; /* Card text color */
+    --primary: 230 89% 62%;            /* Brand blue — matches brand-600 in tailwind.config */
+    --primary-foreground: 210 40% 98%; /* Text on primary-colored backgrounds */
+    --secondary: 210 40% 96.1%;        /* Light gray for secondary elements */
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+    --muted: 210 40% 96.1%;            /* Muted/disabled backgrounds */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Muted text (gray) */
+    --accent: 210 40% 96.1%;           /* Accent highlights */
     --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84.2% 60.2%;      /* Red for errors/delete actions */
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --ring: 230 89% 62%;
-    --radius: 0.75rem;
+    --border: 214.3 31.8% 91.4%;       /* Light border color */
+    --ring: 230 89% 62%;               /* Focus ring color (matches primary) */
+    --radius: 0.75rem;                 /* Default border radius (12px) */
   }
 
+  /* Dark mode colors — activated when <html class="dark"> is set.
+     Same variable names, different values for a dark theme. */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 222.2 84% 4.9%;      /* Near-black background */
+    --foreground: 210 40% 98%;          /* Near-white text */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --primary: 230 89% 62%;
+    --primary: 230 89% 62%;             /* Brand blue stays the same */
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217.2 32.6% 17.5%;    /* Dark gray */
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 30.6%;      /* Darker red in dark mode */
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
+    --border: 217.2 32.6% 17.5%;       /* Dark border */
     --ring: 230 89% 62%;
   }
 }
 
+/* Apply theme colors to base HTML elements so everything inherits them */
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: hsl(var(--border)); /* All borders use the theme border color */
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--background)); /* Page background */
+    color: hsl(var(--foreground));             /* Default text color */
   }
 }
 
-/* Hide scrollbar for mobile feel */
+/* Utility to hide scrollbars — makes horizontal scrolling areas (like the
+   category filter) look cleaner on mobile, more like a native app.
+   Works across Chrome/Safari (-webkit), IE/Edge (-ms), and Firefox (scrollbar-width). */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

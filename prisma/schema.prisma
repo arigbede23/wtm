@@ -1,19 +1,32 @@
+// Prisma Schema — this is the "source of truth" for your database structure.
+// Prisma reads this file to create/update your database tables and generate
+// a type-safe client you can use in your code.
+// Docs: https://www.prisma.io/docs/concepts/components/prisma-schema
+
+// This tells Prisma to generate a JavaScript/TypeScript client we can import
 generator client {
   provider = "prisma-client-js"
 }
 
+// This connects Prisma to our Supabase PostgreSQL database.
+// The actual URLs are stored in .env (not committed to git for security).
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  url       = env("DATABASE_URL")    // Used at runtime (pooled connection)
+  directUrl = env("DIRECT_URL")      // Used for migrations (direct connection)
 }
 
+// --- ENUMS ---
+// Enums are like dropdown menus — they restrict a field to specific values.
+
+// Where did this event come from?
 enum EventSource {
-  USER
-  EVENTBRITE
-  TICKETMASTER
+  USER          // Created by a user on our app
+  EVENTBRITE    // Imported from Eventbrite API (Phase 4)
+  TICKETMASTER  // Imported from Ticketmaster API (Phase 4)
 }
 
+// What type of event is it?
 enum EventCategory {
   MUSIC
   SPORTS
@@ -29,70 +42,81 @@ enum EventCategory {
   OTHER
 }
 
+// Is the event live, still being edited, or cancelled?
 enum EventStatus {
   DRAFT
   PUBLISHED
   CANCELLED
 }
 
+// How is the user responding to an event?
 enum RSVPStatus {
   GOING
   INTERESTED
   NOT_GOING
 }
 
+// --- MODELS ---
+// Each model becomes a table in the database.
+// The fields become columns. The types (String, Int, etc.) define what data they hold.
+
+// A user of the app
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  username    String?  @unique
-  displayName String?
-  avatarUrl   String?
-  bio         String?
-  interests   String[] @default([])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String   @id @default(uuid())   // Unique ID, auto-generated
+  email       String   @unique                // Must be unique — no duplicate accounts
+  username    String?  @unique                // Optional display username (? = optional)
+  displayName String?                         // Their preferred name to show
+  avatarUrl   String?                         // Profile picture URL
+  bio         String?                         // Short bio text
+  interests   String[] @default([])           // Array of interest tags, e.g. ["music", "food"]
+  createdAt   DateTime @default(now())        // Auto-set when the user is created
+  updatedAt   DateTime @updatedAt             // Auto-updated whenever the user record changes
 
-  organizedEvents Event[]      @relation("organizer")
-  rsvps           RSVP[]
-  savedEvents     SavedEvent[]
+  // Relations — these connect User to other tables
+  organizedEvents Event[]      @relation("organizer")  // Events this user created
+  rsvps           RSVP[]                               // Events they've RSVP'd to
+  savedEvents     SavedEvent[]                          // Events they've bookmarked
 
-  @@map("users")
+  @@map("users")  // The actual table name in Postgres (lowercase convention)
 }
 
+// An event that users can discover and attend
 model Event {
   id            String        @id @default(uuid())
-  source        EventSource   @default(USER)
-  externalId    String?
-  title         String
-  description   String?
-  category      EventCategory @default(OTHER)
-  address       String?
+  source        EventSource   @default(USER)        // Where the event came from
+  externalId    String?                              // ID from external API (for deduplication)
+  title         String                               // Event name
+  description   String?                              // Details about the event
+  category      EventCategory @default(OTHER)        // What kind of event
+  address       String?                              // Street address
   city          String?
   state         String?
-  lat           Float?
-  lng           Float?
-  startDate     DateTime
-  endDate       DateTime?
-  coverImageUrl String?
-  isFree        Boolean       @default(true)
-  price         Float?
-  url           String?
-  organizerId   String?
+  lat           Float?                               // Latitude for map display
+  lng           Float?                               // Longitude for map display
+  startDate     DateTime                             // When the event starts
+  endDate       DateTime?                            // When it ends (optional)
+  coverImageUrl String?                              // Hero image URL
+  isFree        Boolean       @default(true)         // Is it free?
+  price         Float?                               // Ticket price (if not free)
+  url           String?                              // External link (e.g. ticket page)
+  organizerId   String?                              // Who created it (FK to User)
   organizer     User?         @relation("organizer", fields: [organizerId], references: [id])
   status        EventStatus   @default(PUBLISHED)
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  // Relations
   rsvps       RSVP[]
   savedEvents SavedEvent[]
 
-  @@unique([source, externalId])
-  @@index([startDate])
-  @@index([category])
-  @@index([city])
+  @@unique([source, externalId])  // Prevents duplicate imports from the same API
+  @@index([startDate])            // Makes sorting by date fast
+  @@index([category])             // Makes filtering by category fast
+  @@index([city])                 // Makes filtering by city fast
   @@map("events")
 }
 
+// Tracks a user's response to an event (Going / Interested / Not Going)
 model RSVP {
   id        String     @id @default(uuid())
   userId    String
@@ -101,13 +125,16 @@ model RSVP {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
+  // Relations — connect to User and Event tables
+  // onDelete: Cascade means if the user or event is deleted, their RSVPs are too
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, eventId])
+  @@unique([userId, eventId])  // One RSVP per user per event
   @@map("rsvps")
 }
 
+// Tracks events a user has bookmarked/saved for later
 model SavedEvent {
   id        String   @id @default(uuid())
   userId    String
@@ -117,6 +144,6 @@ model SavedEvent {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, eventId])
+  @@unique([userId, eventId])  // Can only save an event once
   @@map("saved_events")
 }

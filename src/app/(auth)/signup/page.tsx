@@ -1,3 +1,6 @@
+// Signup Page — registration form with email, password, and confirm password.
+// Validates passwords match and minimum length before calling Supabase.
+
 "use client";
 
 import { useState } from "react";
@@ -6,11 +9,13 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function SignupPage() {
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const { signUp } = useAuth();
   const router = useRouter();
 
@@ -18,6 +23,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
 
+    // Client-side validation before hitting the API
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       return;
@@ -34,12 +40,14 @@ export default function SignupPage() {
       setError(error.message);
       setLoading(false);
     } else {
+      // Success — go to the feed
       router.push("/feed");
     }
   };
 
   return (
     <div className="w-full max-w-sm">
+      {/* Logo */}
       <div className="text-center">
         <h1 className="text-3xl font-bold">
           <span className="text-brand-600">wtm</span>
@@ -49,12 +57,14 @@ export default function SignupPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {/* Error message banner */}
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">
             {error}
           </div>
         )}
 
+        {/* Email field */}
         <div>
           <label
             htmlFor="email"
@@ -73,6 +83,7 @@ export default function SignupPage() {
           />
         </div>
 
+        {/* Password field */}
         <div>
           <label
             htmlFor="password"
@@ -91,6 +102,7 @@ export default function SignupPage() {
           />
         </div>
 
+        {/* Confirm password field */}
         <div>
           <label
             htmlFor="confirm-password"
@@ -109,6 +121,7 @@ export default function SignupPage() {
           />
         </div>
 
+        {/* Submit button */}
         <button
           type="submit"
           disabled={loading}
@@ -118,6 +131,7 @@ export default function SignupPage() {
         </button>
       </form>
 
+      {/* Link to login page */}
       <p className="mt-6 text-center text-sm text-gray-500">
         Already have an account?{" "}
         <Link

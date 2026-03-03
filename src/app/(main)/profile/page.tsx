@@ -1,3 +1,6 @@
+// Profile Page — shows the user's account info or a sign-in prompt.
+// Uses the useAuth hook to check if someone is logged in.
+
 "use client";
 
 import { useAuth } from "@/hooks/useAuth";
@@ -7,6 +10,7 @@ import Link from "next/link";
 export default function ProfilePage() {
   const { user, loading, signOut } = useAuth();
 
+  // Show a spinner while checking auth status
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -15,6 +19,7 @@ export default function ProfilePage() {
     );
   }
 
+  // Not logged in — show sign-in prompt
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -38,9 +43,11 @@ export default function ProfilePage() {
     );
   }
 
+  // Logged in — show profile info and sign out button
   return (
     <div className="p-4">
       <div className="flex flex-col items-center text-center">
+        {/* Avatar circle with the first letter of their email */}
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700">
           {user.email?.[0].toUpperCase()}
         </div>

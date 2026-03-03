@@ -1,3 +1,7 @@
+// EventCard — displays a single event as a card in the feed.
+// Shows the cover image, category badge, price, title, date, and location.
+// The whole card is a link to the event detail page.
+
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
 import { cn, formatDate, formatTime, formatPrice } from "@/lib/utils";
@@ -10,17 +14,20 @@ export function EventCard({ event }: { event: EventWithCounts }) {
         {/* Cover Image */}
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-gray-800">
           {event.coverImageUrl ? (
+            // "group-hover:scale-105" zooms the image slightly on hover
             <img
               src={event.coverImageUrl}
               alt={event.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
+            // Fallback: show the category emoji if there's no image
             <div className="flex h-full items-center justify-center text-4xl">
               {CATEGORY_EMOJI[event.category]}
             </div>
           )}
-          {/* Price badge */}
+
+          {/* Price badge — top right corner */}
           <div
             className={cn(
               "absolute right-3 top-3 rounded-full px-3 py-1 text-xs font-semibold",
@@ -31,18 +38,20 @@ export function EventCard({ event }: { event: EventWithCounts }) {
           >
             {formatPrice(event.price, event.isFree)}
           </div>
-          {/* Category badge */}
+
+          {/* Category badge — top left corner */}
           <div className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
             {CATEGORY_EMOJI[event.category]} {event.category.toLowerCase()}
           </div>
         </div>
 
-        {/* Content */}
+        {/* Card body — text content below the image */}
         <div className="p-4">
           <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-gray-100">
             {event.title}
           </h3>
 
+          {/* Date and time */}
           <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
             <Calendar className="h-3.5 w-3.5" />
             <span>
@@ -51,6 +60,7 @@ export function EventCard({ event }: { event: EventWithCounts }) {
             </span>
           </div>
 
+          {/* Location */}
           {event.address && (
             <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
               <MapPin className="h-3.5 w-3.5" />
@@ -61,6 +71,7 @@ export function EventCard({ event }: { event: EventWithCounts }) {
             </div>
           )}
 
+          {/* RSVP count */}
           {event._count.rsvps > 0 && (
             <p className="mt-2 text-xs text-brand-600 font-medium">
               {event._count.rsvps} {event._count.rsvps === 1 ? "person" : "people"} going

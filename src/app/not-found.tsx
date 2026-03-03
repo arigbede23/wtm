@@ -1,3 +1,6 @@
+// 404 Not Found Page — shown when a user visits a URL that doesn't exist.
+// Also shown when notFound() is called (e.g. invalid event ID).
+
 import Link from "next/link";
 
 export default function NotFound() {

@@ -1,3 +1,9 @@
+// Event Detail Page — shows full details for a single event.
+// This is a Server Component (no "use client") so data is fetched on the server.
+// The [id] folder name is a dynamic route — /event/abc123 passes "abc123" as params.id.
+// Docs: https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes
+
+// Always fetch fresh data (don't use a cached/static version)
 export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
@@ -14,6 +20,7 @@ import { createClient } from "@supabase/supabase-js";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 
+// Create a Supabase client for server-side data fetching
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -22,14 +29,16 @@ const supabase = createClient(
 export default async function EventDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: { id: string }; // id comes from the [id] folder name in the URL
 }) {
+  // Fetch the event by ID, including RSVP count
   const { data: event, error } = await supabase
     .from("events")
     .select("*, rsvps(count)")
     .eq("id", params.id)
-    .single();
+    .single(); // .single() returns one object instead of an array
 
+  // If the event doesn't exist, show the 404 page
   if (error || !event) {
     notFound();
   }
@@ -39,7 +48,7 @@ export default async function EventDetailPage({
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-white dark:bg-gray-950">
-      {/* Header Image */}
+      {/* Hero Image Section */}
       <div className="relative">
         {event.coverImageUrl ? (
           <img
@@ -48,12 +57,13 @@ export default async function EventDetailPage({
             className="aspect-[16/9] w-full object-cover"
           />
         ) : (
+          // Fallback if no image — show category emoji
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-6xl dark:bg-gray-800">
             {CATEGORY_EMOJI[category]}
           </div>
         )}
 
-        {/* Back button */}
+        {/* Back button — overlaid on top of the image */}
         <Link
           href="/feed"
           className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
@@ -61,7 +71,7 @@ export default async function EventDetailPage({
           <ArrowLeft className="h-5 w-5" />
         </Link>
 
-        {/* Action buttons */}
+        {/* Share and Bookmark buttons — top right corner */}
         <div className="absolute right-4 top-4 flex gap-2">
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
             <Share2 className="h-5 w-5" />
@@ -72,27 +82,28 @@ export default async function EventDetailPage({
         </div>
       </div>
 
-      {/* Content */}
+      {/* Event Details Section */}
       <div className="p-4">
-        {/* Category */}
+        {/* Category pill */}
         <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
           {CATEGORY_EMOJI[category]} {category.toLowerCase()}
         </div>
 
-        {/* Title */}
+        {/* Event title */}
         <h1 className="mt-3 text-2xl font-bold text-gray-900 dark:text-gray-100">
           {event.title}
         </h1>
 
-        {/* RSVP Count */}
+        {/* How many people are going */}
         {rsvpCount > 0 && (
           <p className="mt-1 text-sm font-medium text-brand-600">
             {rsvpCount} {rsvpCount === 1 ? "person" : "people"} going
           </p>
         )}
 
-        {/* Details */}
+        {/* Date, location, and price details */}
         <div className="mt-4 space-y-3">
+          {/* Date and time */}
           <div className="flex items-start gap-3">
             <Calendar className="mt-0.5 h-5 w-5 text-gray-400" />
             <div>
@@ -106,6 +117,7 @@ export default async function EventDetailPage({
             </div>
           </div>
 
+          {/* Location */}
           {event.address && (
             <div className="flex items-start gap-3">
               <MapPin className="mt-0.5 h-5 w-5 text-gray-400" />
@@ -123,6 +135,7 @@ export default async function EventDetailPage({
             </div>
           )}
 
+          {/* Price */}
           <div className="flex items-start gap-3">
             <DollarSign className="mt-0.5 h-5 w-5 text-gray-400" />
             <p className="font-medium text-gray-900 dark:text-gray-100">
@@ -131,7 +144,7 @@ export default async function EventDetailPage({
           </div>
         </div>
 
-        {/* Description */}
+        {/* About / Description */}
         {event.description && (
           <div className="mt-6">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
@@ -143,7 +156,7 @@ export default async function EventDetailPage({
           </div>
         )}
 
-        {/* RSVP Button */}
+        {/* RSVP Buttons — functionality will be wired up in Phase 3 */}
         <div className="mt-8 pb-8">
           <button className="w-full rounded-xl bg-brand-600 py-3.5 text-center font-semibold text-white transition-colors hover:bg-brand-700">
             I&apos;m Going

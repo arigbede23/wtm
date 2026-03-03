@@ -1,3 +1,6 @@
+// Map Page — placeholder for the interactive map view (Phase 2).
+// Will show event markers on a Leaflet map with location-based filtering.
+
 export default function MapPage() {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center">

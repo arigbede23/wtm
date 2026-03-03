@@ -1,9 +1,13 @@
+// EventList — fetches events from the API and displays them as a scrollable list of cards.
+// Uses TanStack Query (useQuery) to handle loading, caching, and error states automatically.
+
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { EventCard } from "./EventCard";
 import type { EventWithCounts } from "@/types";
 
+// Fetch events from our API route
 async function fetchEvents(): Promise<EventWithCounts[]> {
   const res = await fetch("/api/events");
   if (!res.ok) throw new Error("Failed to fetch events");
@@ -11,6 +15,8 @@ async function fetchEvents(): Promise<EventWithCounts[]> {
 }
 
 export function EventList() {
+  // useQuery handles fetching, caching, loading states, and errors for us.
+  // "events" is the cache key — TanStack Query uses it to store and retrieve data.
   const {
     data: events,
     isLoading,
@@ -20,9 +26,11 @@ export function EventList() {
     queryFn: fetchEvents,
   });
 
+  // Loading state — show animated skeleton placeholders
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
+        {/* Create 3 skeleton cards using Array spread trick */}
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
@@ -39,6 +47,7 @@ export function EventList() {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -52,6 +61,7 @@ export function EventList() {
     );
   }
 
+  // Empty state — no events found
   if (!events?.length) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
@@ -66,6 +76,7 @@ export function EventList() {
     );
   }
 
+  // Success — render the list of event cards
   return (
     <div className="space-y-4 p-4">
       {events.map((event) => (

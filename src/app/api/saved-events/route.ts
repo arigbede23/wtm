@@ -78,10 +78,17 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Fetch saved events with full event details
+    // Fetch saved events with full event details (exclude embedding to keep response small)
     const { data, error } = await supabase
       .from("saved_events")
-      .select("id, eventId, createdAt, events:eventId(*, rsvps(count))")
+      .select(
+        `id, eventId, createdAt,
+         events:eventId(
+           id, title, description, category, address, city, state,
+           lat, lng, startDate, endDate, coverImageUrl, isFree, price,
+           url, status, rsvps(count)
+         )`
+      )
       .eq("userId", user.id)
       .order("createdAt", { ascending: false });
 

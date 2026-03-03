@@ -11,6 +11,7 @@ import { FriendsFeed } from "@/components/social/FriendsFeed";
 import { ForYouFeed } from "@/components/recommendations/ForYouFeed";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLocalSync } from "@/hooks/useLocalSync";
 import type { EventFilters } from "@/types";
 
 type FeedTab = "discover" | "foryou" | "friends";
@@ -19,6 +20,9 @@ function FeedContent() {
   const [tab, setTab] = useState<FeedTab>("discover");
   const { filters, setFilters } = useEventFilters();
   const { lat, lng } = useGeolocation();
+
+  // Sync Ticketmaster events near the user's location (runs once per area per 30 min)
+  useLocalSync(lat, lng);
 
   // Merge URL filters with user location for API call
   const apiFilters: EventFilters = {

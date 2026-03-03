@@ -17,15 +17,18 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function fetchTicketmasterEvents(): Promise<NormalizedEvent[]> {
+export async function fetchTicketmasterEvents(
+  overrideLat?: string,
+  overrideLng?: string
+): Promise<NormalizedEvent[]> {
   const apiKey = process.env.TICKETMASTER_API_KEY;
   if (!apiKey) {
     console.warn("[Sync] TICKETMASTER_API_KEY not set, skipping Ticketmaster");
     return [];
   }
 
-  const lat = process.env.SYNC_LAT ?? "40.7128";
-  const lng = process.env.SYNC_LNG ?? "-74.0060";
+  const lat = overrideLat ?? process.env.SYNC_LAT ?? "40.7128";
+  const lng = overrideLng ?? process.env.SYNC_LNG ?? "-74.0060";
 
   // 30-day window from now
   const now = new Date();

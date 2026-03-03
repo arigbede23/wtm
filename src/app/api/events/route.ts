@@ -127,30 +127,42 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Weighted shuffle — group into distance tiers, randomize within each tier.
-      // Closer events still come first, but the order feels fresh each load.
-      const tiers = [5, 15, 30, Infinity]; // miles
-      const buckets: any[][] = tiers.map(() => []);
-      const noDistance: any[] = [];
+      // Score-based sort: combines distance priority with chronological order
+      // and a small random factor for variety. Lower score = higher in feed.
+      // - Distance tier contributes most (0, 10, 25, 50 points)
+      // - Days until event adds 0–~30 points (sooner = lower)
+      // - Random jitter of 0–8 points diversifies within similar events
+      const now = Date.now();
+      const tierThresholds = [5, 15, 30, Infinity]; // miles
+      const tierWeights = [0, 10, 25, 50];
 
-      for (const event of shaped) {
-        if (event.distance == null) {
-          noDistance.push(event);
-          continue;
+      shaped = shaped.map((event: any) => {
+        let score = 0;
+
+        // Distance tier weight
+        if (event.distance != null) {
+          const tierIdx = tierThresholds.findIndex((t) => event.distance <= t);
+          score += tierWeights[tierIdx >= 0 ? tierIdx : tierWeights.length - 1];
+        } else {
+          score += 60; // no coordinates — push toward bottom
         }
-        const idx = tiers.findIndex((t) => event.distance <= t);
-        buckets[idx >= 0 ? idx : buckets.length - 1].push(event);
-      }
 
-      // Fisher-Yates shuffle within each bucket
-      for (const bucket of buckets) {
-        for (let i = bucket.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [bucket[i], bucket[j]] = [bucket[j], bucket[i]];
-        }
-      }
+        // Chronological weight: days until event (capped at 30)
+        const daysAway = event.startDate
+          ? Math.min((new Date(event.startDate).getTime() - now) / 86400000, 30)
+          : 15;
+        score += Math.max(daysAway, 0);
 
-      shaped = [...buckets.flat(), ...noDistance];
+        // Random jitter for variety
+        score += Math.random() * 8;
+
+        return { ...event, _score: score };
+      });
+
+      shaped.sort((a: any, b: any) => a._score - b._score);
+
+      // Strip internal score before returning
+      shaped = shaped.map(({ _score, ...rest }: any) => rest);
     }
 
     return NextResponse.json(shaped);

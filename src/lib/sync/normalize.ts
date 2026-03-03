@@ -7,7 +7,7 @@ import type { EventCategory } from "@/types";
 // The shape we insert/upsert into the events table.
 // Matches column names from the Prisma schema.
 export type NormalizedEvent = {
-  source: "TICKETMASTER" | "EVENTBRITE";
+  source: "TICKETMASTER" | "EVENTBRITE" | "INSTAGRAM";
   externalId: string;
   title: string;
   description: string | null;

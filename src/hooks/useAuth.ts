@@ -56,10 +56,23 @@ export function useAuth() {
     return { error };
   };
 
+  // Sign in with OAuth provider (Google, Apple, or Facebook/Instagram)
+  const signInWithOAuth = async (
+    provider: "google" | "apple" | "facebook"
+  ) => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    return { error };
+  };
+
   // Sign out — clears the session cookie
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
-  return { user, loading, signUp, signIn, signOut };
+  return { user, loading, signUp, signIn, signInWithOAuth, signOut };
 }

@@ -7,6 +7,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import OAuthButtons from "@/components/auth/OAuthButtons";
 
 export default function LoginPage() {
   // Form state
@@ -45,7 +46,24 @@ export default function LoginPage() {
         <p className="mt-2 text-gray-500">Sign in to your account</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+      {/* Social login buttons */}
+      <div className="mt-8">
+        <OAuthButtons />
+      </div>
+
+      {/* Divider */}
+      <div className="relative mt-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300 dark:border-gray-700" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-2 text-gray-500 dark:bg-gray-950 dark:text-gray-400">
+            or
+          </span>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         {/* Error message banner */}
         {error && (
           <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">

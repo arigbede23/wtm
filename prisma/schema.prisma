@@ -24,6 +24,7 @@ enum EventSource {
   USER          // Created by a user on our app
   EVENTBRITE    // Imported from Eventbrite API (Phase 4)
   TICKETMASTER  // Imported from Ticketmaster API (Phase 4)
+  INSTAGRAM     // Discovered from Instagram hashtags
 }
 
 // What type of event is it?

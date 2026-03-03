@@ -9,6 +9,7 @@ import { randomUUID } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { fetchTicketmasterEvents } from "@/lib/sync/ticketmaster";
 import { fetchEventbriteEvents } from "@/lib/sync/eventbrite";
+import { fetchInstagramEvents } from "@/lib/sync/instagram";
 import type { NormalizedEvent } from "@/lib/sync/normalize";
 
 export const dynamic = "force-dynamic";
@@ -36,13 +37,14 @@ function getSupabaseClient() {
 async function handleSync() {
   const supabase = getSupabaseClient();
 
-  // Fetch from both APIs in parallel
-  const [tmEvents, ebEvents] = await Promise.all([
+  // Fetch from all APIs in parallel
+  const [tmEvents, ebEvents, igEvents] = await Promise.all([
     fetchTicketmasterEvents(),
     fetchEventbriteEvents(),
+    fetchInstagramEvents(),
   ]);
 
-  const allEvents = [...tmEvents, ...ebEvents];
+  const allEvents = [...tmEvents, ...ebEvents, ...igEvents];
   let totalProcessed = 0;
   let errors = 0;
 
@@ -104,6 +106,7 @@ async function handleSync() {
     success: errors === 0,
     ticketmaster: tmEvents.length,
     eventbrite: ebEvents.length,
+    instagram: igEvents.length,
     totalProcessed,
     cleaned,
     errors,

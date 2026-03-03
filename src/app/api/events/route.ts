@@ -127,12 +127,30 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Sort by distance when location is provided
-      shaped.sort((a: any, b: any) => {
-        if (a.distance == null) return 1;
-        if (b.distance == null) return -1;
-        return a.distance - b.distance;
-      });
+      // Weighted shuffle — group into distance tiers, randomize within each tier.
+      // Closer events still come first, but the order feels fresh each load.
+      const tiers = [5, 15, 30, Infinity]; // miles
+      const buckets: any[][] = tiers.map(() => []);
+      const noDistance: any[] = [];
+
+      for (const event of shaped) {
+        if (event.distance == null) {
+          noDistance.push(event);
+          continue;
+        }
+        const idx = tiers.findIndex((t) => event.distance <= t);
+        buckets[idx >= 0 ? idx : buckets.length - 1].push(event);
+      }
+
+      // Fisher-Yates shuffle within each bucket
+      for (const bucket of buckets) {
+        for (let i = bucket.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [bucket[i], bucket[j]] = [bucket[j], bucket[i]];
+        }
+      }
+
+      shaped = [...buckets.flat(), ...noDistance];
     }
 
     return NextResponse.json(shaped);

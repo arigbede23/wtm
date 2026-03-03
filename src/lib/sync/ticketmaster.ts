@@ -96,6 +96,31 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
   const minPrice = priceRange?.min ?? null;
   const isFree = minPrice === 0 || minPrice === null;
 
+  // Build a reliable startDate. If Ticketmaster flags the time as TBD
+  // or doesn't provide a dateTime, store a date-only value (midnight UTC)
+  // so the UI knows not to display a timestamp.
+  const tmStart = ev.dates?.start;
+  let startDate: string;
+  if (
+    tmStart?.dateTime &&
+    !tmStart?.timeTBD &&
+    !tmStart?.noSpecificTime
+  ) {
+    startDate = tmStart.dateTime;
+  } else if (tmStart?.localDate) {
+    // date-only: midnight UTC signals "no specific time"
+    startDate = `${tmStart.localDate}T00:00:00Z`;
+  } else {
+    // No date info at all — skip this event
+    return null;
+  }
+
+  let endDate: string | null = null;
+  const tmEnd = ev.dates?.end;
+  if (tmEnd?.dateTime && !tmEnd?.approximate) {
+    endDate = tmEnd.dateTime;
+  }
+
   return {
     source: "TICKETMASTER",
     externalId: id,
@@ -111,8 +136,8 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
     lng: venue?.location?.longitude
       ? parseFloat(venue.location.longitude)
       : null,
-    startDate: ev.dates?.start?.dateTime ?? new Date().toISOString(),
-    endDate: ev.dates?.end?.dateTime ?? null,
+    startDate,
+    endDate,
     coverImageUrl: pickTicketmasterImage(ev.images),
     isFree,
     price: isFree ? null : minPrice,

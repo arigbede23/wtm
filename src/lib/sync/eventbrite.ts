@@ -97,6 +97,9 @@ function normalizeEBEvent(ev: any): NormalizedEvent | null {
   const venue = ev.venue;
   const isFree = ev.is_free ?? true;
 
+  // If Eventbrite doesn't provide a start time, skip the event
+  if (!ev.start?.utc) return null;
+
   return {
     source: "EVENTBRITE",
     externalId: String(id),
@@ -108,7 +111,7 @@ function normalizeEBEvent(ev: any): NormalizedEvent | null {
     state: venue?.address?.region ?? null,
     lat: venue?.latitude ? parseFloat(venue.latitude) : null,
     lng: venue?.longitude ? parseFloat(venue.longitude) : null,
-    startDate: ev.start?.utc ?? new Date().toISOString(),
+    startDate: ev.start.utc,
     endDate: ev.end?.utc ?? null,
     coverImageUrl: ev.logo?.original?.url ?? ev.logo?.url ?? null,
     isFree,

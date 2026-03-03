@@ -127,59 +127,14 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Score-based sort: combines distance priority with chronological order
-      // and a small random factor for variety. Lower score = higher in feed.
-      // - Distance tier contributes most (0, 10, 25, 50 points)
-      // - Days until event adds 0–~30 points (sooner = lower)
-      // - Random jitter of 0–8 points diversifies within similar events
-      const now = Date.now();
-      const tierThresholds = [5, 15, 30, Infinity]; // miles
-      const tierWeights = [0, 10, 25, 50];
-
-      shaped = shaped.map((event: any) => {
-        let score = 0;
-
-        // Distance tier weight
-        if (event.distance != null) {
-          const tierIdx = tierThresholds.findIndex((t) => event.distance <= t);
-          score += tierWeights[tierIdx >= 0 ? tierIdx : tierWeights.length - 1];
-        } else {
-          score += 60; // no coordinates — push toward bottom
-        }
-
-        // Chronological weight: days until event (capped at 30)
-        const daysAway = event.startDate
-          ? Math.min((new Date(event.startDate).getTime() - now) / 86400000, 30)
-          : 15;
-        score += Math.max(daysAway, 0);
-
-        // Random jitter for variety
-        score += Math.random() * 8;
-
-        return { ...event, _score: score };
+      // Keep chronological order (already sorted by startDate from Supabase).
+      // Events without coordinates sink to the end.
+      shaped.sort((a: any, b: any) => {
+        const aHas = a.distance != null ? 0 : 1;
+        const bHas = b.distance != null ? 0 : 1;
+        if (aHas !== bHas) return aHas - bHas;
+        return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
       });
-
-      shaped.sort((a: any, b: any) => a._score - b._score);
-
-      // Strip internal score before returning
-      shaped = shaped.map(({ _score, ...rest }: any) => rest);
-
-      // Category interleaving: spread out same-category events so the feed
-      // looks diverse instead of showing clusters of the same type.
-      for (let i = 0; i < shaped.length - 1; i++) {
-        if (shaped[i].category === shaped[i + 1].category) {
-          // Find the next event with a different category
-          const swapIdx = shaped.findIndex(
-            (e: any, j: number) => j > i + 1 && e.category !== shaped[i].category
-          );
-          if (swapIdx !== -1) {
-            // Swap it into position i+1
-            const temp = shaped[i + 1];
-            shaped[i + 1] = shaped[swapIdx];
-            shaped[swapIdx] = temp;
-          }
-        }
-      }
     }
 
     return NextResponse.json(shaped);

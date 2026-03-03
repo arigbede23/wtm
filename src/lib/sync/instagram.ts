@@ -83,7 +83,7 @@ export async function fetchInstagramEvents(): Promise<NormalizedEvent[]> {
             openai,
             post.caption
           );
-          if (!extracted || !extracted.isEvent) continue;
+          if (!extracted || !extracted.isEvent || !extracted.date) continue;
 
           allEvents.push({
             source: "INSTAGRAM",
@@ -137,8 +137,8 @@ If the caption describes a specific upcoming event with a date, return:
   "isEvent": true,
   "title": "event name",
   "description": "brief description",
-  "date": "ISO 8601 date string",
-  "endDate": "ISO 8601 or null",
+  "date": "ISO 8601 date string — if a specific start TIME is mentioned (e.g. '7 PM', '19:00'), include it. If only a date is mentioned with no time, use midnight UTC (e.g. '2026-03-14T00:00:00Z').",
+  "endDate": "ISO 8601 with time only if an end time is explicitly stated, otherwise null",
   "location": "venue or address or null",
   "city": "city name or null",
   "state": "two-letter state code or null",

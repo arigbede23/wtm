@@ -15,24 +15,31 @@ export function ForYouFeed() {
   const [events, setEvents] = useState<EventWithCounts[]>([]);
   const [strategy, setStrategy] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       setLoading(false);
       return;
     }
 
     fetch("/api/feed/for-you")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         if (data.events) {
           setEvents(data.events);
-          setStrategy(data.strategy ?? "");
         }
+        setStrategy(data.strategy ?? data.error ?? "");
       })
-      .catch(() => {})
+      .catch((err) => {
+        setError(err.message);
+      })
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, authLoading]);
 
   // Loading state
   if (authLoading || loading) {
@@ -68,6 +75,18 @@ export function ForYouFeed() {
         >
           Sign In
         </Link>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 text-center">
+        <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+          Something went wrong
+        </p>
+        <p className="mt-1 text-sm text-gray-500">{error}</p>
       </div>
     );
   }

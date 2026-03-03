@@ -23,7 +23,7 @@
     --foreground: 222.2 84% 4.9%;      /* Near-black for text */
     --card: 0 0% 100%;                 /* Card background (white) */
     --card-foreground: 222.2 84% 4.9%; /* Card text color */
-    --primary: 230 89% 62%;            /* Brand blue — matches brand-600 in tailwind.config */
+    --primary: 350 85% 42%;            /* Brand red — matches brand-600 in tailwind.config */
     --primary-foreground: 210 40% 98%; /* Text on primary-colored backgrounds */
     --secondary: 210 40% 96.1%;        /* Light gray for secondary elements */
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -31,10 +31,10 @@
     --muted-foreground: 215.4 16.3% 46.9%; /* Muted text (gray) */
     --accent: 210 40% 96.1%;           /* Accent highlights */
     --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;      /* Red for errors/delete actions */
+    --destructive: 25 95% 53%;          /* Amber/orange — avoids collision with brand red */
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;       /* Light border color */
-    --ring: 230 89% 62%;               /* Focus ring color (matches primary) */
+    --ring: 350 85% 42%;               /* Focus ring color (matches primary) */
     --radius: 0.75rem;                 /* Default border radius (12px) */
   }
 
@@ -45,7 +45,7 @@
     --foreground: 210 40% 98%;          /* Near-white text */
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    --primary: 230 89% 62%;             /* Brand blue stays the same */
+    --primary: 350 85% 42%;             /* Brand red stays the same */
     --primary-foreground: 222.2 47.4% 11.2%;
     --secondary: 217.2 32.6% 17.5%;    /* Dark gray */
     --secondary-foreground: 210 40% 98%;
@@ -53,10 +53,10 @@
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;      /* Darker red in dark mode */
+    --destructive: 25 95% 35%;          /* Darker amber in dark mode */
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;       /* Dark border */
-    --ring: 230 89% 62%;
+    --ring: 350 85% 42%;
   }
 }
 

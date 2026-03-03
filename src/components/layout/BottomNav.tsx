@@ -40,7 +40,7 @@ export function BottomNav() {
               )}
             >
               <item.icon
-                className={cn("h-6 w-6", isActive && "fill-brand-100")}
+                className={cn("h-6 w-6", isActive && "fill-brand-200")}
               />
               <span className="font-medium">{item.label}</span>
             </Link>

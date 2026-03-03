@@ -3,13 +3,13 @@
 // Docs: https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates
 
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 
-// Load the Inter font from Google Fonts and make it available as a CSS variable
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+// Load Outfit font from Google Fonts and make it available as a CSS variable
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 // Metadata — sets the page title, description, and PWA settings.
 // This info appears in browser tabs, search results, and when sharing links.
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 // maximumScale: 1 and userScalable: false prevent pinch-to-zoom
 // which makes the app feel more like a native mobile app.
 export const viewport: Viewport = {
-  themeColor: "#4c6ef5",    // Browser toolbar color (our brand blue)
+  themeColor: "#C8102E",    // Browser toolbar color (our brand red)
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -42,7 +42,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={outfit.variable}>
       <body className="font-sans antialiased">
         {/* Providers wraps the app with TanStack Query for data fetching */}
         <Providers>

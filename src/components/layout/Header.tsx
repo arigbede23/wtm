@@ -62,9 +62,9 @@ export function Header() {
         ) : (
           <>
             {/* App logo / title */}
-            <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-brand-600">wtm</span>
-              <span className="text-gray-400">?</span>
+            <h1 className="text-2xl font-extrabold tracking-tighter">
+              <span className="text-gray-900 dark:text-white">wtm</span>
+              <span className="text-brand-600">?</span>
             </h1>
             {/* Search + Notification buttons */}
             <div className="flex items-center gap-1">

@@ -19,28 +19,28 @@ const config: Config = {
 
   theme: {
     extend: {
-      // Custom "brand" color palette — used throughout the app as bg-brand-600,
-      // text-brand-600, etc. This is a blue palette inspired by Indigo from
-      // Open Color. The main brand color is brand-600 (#4c6ef5).
+      // Custom "brand" color palette — crimson red (Razorback vibes).
+      // Primary brand color is brand-600 (#C8102E).
       colors: {
         brand: {
-          50: "#f0f4ff",   // Lightest — used for subtle backgrounds
-          100: "#dbe4ff",
-          200: "#bac8ff",
-          300: "#91a7ff",
-          400: "#748ffc",
-          500: "#5c7cfa",
-          600: "#4c6ef5",  // Primary brand color — buttons, links, accents
-          700: "#4263eb",  // Hover state for brand-600
-          800: "#3b5bdb",
-          900: "#364fc7",  // Darkest — used for pressed/active states
+          50: "#fef2f2",   // Lightest — used for subtle backgrounds
+          100: "#fde3e3",
+          200: "#fccaca",
+          300: "#f9a3a3",
+          400: "#f46b6b",
+          500: "#e83a3a",
+          600: "#C8102E",  // Primary brand color — buttons, links, accents
+          700: "#a80d26",  // Hover state for brand-600
+          800: "#8c0f22",
+          900: "#751222",
+          950: "#40050e",  // Darkest
         },
       },
 
-      // Set Inter as the default sans-serif font.
-      // var(--font-inter) is set by next/font in layout.tsx.
+      // Set Outfit as the default sans-serif font.
+      // var(--font-outfit) is set by next/font in layout.tsx.
       fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-outfit)", "system-ui", "sans-serif"],
       },
     },
   },

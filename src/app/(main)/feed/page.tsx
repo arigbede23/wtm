@@ -38,34 +38,34 @@ function FeedContent() {
         </p>
       </div>
 
-      {/* Discover / For You / Friends tab toggle */}
-      <div className="mx-4 mt-3 flex rounded-lg border border-gray-200 dark:border-gray-700">
+      {/* Discover / For You / Friends pill toggle */}
+      <div className="mx-4 mt-3 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-gray-800">
         <button
           onClick={() => setTab("discover")}
-          className={`flex-1 rounded-l-lg px-3 py-2 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "discover"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           Discover
         </button>
         <button
           onClick={() => setTab("foryou")}
-          className={`flex-1 border-x border-gray-200 px-3 py-2 text-sm font-medium transition-colors dark:border-gray-700 ${
+          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "foryou"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           For You
         </button>
         <button
           onClick={() => setTab("friends")}
-          className={`flex-1 rounded-r-lg px-3 py-2 text-sm font-medium transition-colors ${
+          className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "friends"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           Friends

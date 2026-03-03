@@ -49,9 +49,9 @@ export default function SignupPage() {
     <div className="w-full max-w-sm">
       {/* Logo */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold">
-          <span className="text-brand-600">wtm</span>
-          <span className="text-gray-400">?</span>
+        <h1 className="text-4xl font-extrabold tracking-tighter">
+          <span className="text-gray-900 dark:text-white">wtm</span>
+          <span className="text-brand-600">?</span>
         </h1>
         <p className="mt-2 text-gray-500">Create your account</p>
       </div>
@@ -59,7 +59,7 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         {/* Error message banner */}
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">
+          <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
             {error}
           </div>
         )}

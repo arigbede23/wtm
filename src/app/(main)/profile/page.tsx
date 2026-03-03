@@ -133,14 +133,14 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Tabs: My Events / Saved / Attending */}
-      <div className="mt-6 flex rounded-lg border border-gray-200 dark:border-gray-700">
+      {/* Tabs: My Events / Saved / Attending — pill toggle */}
+      <div className="mt-6 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-gray-800">
         <button
           onClick={() => setTab("my-events")}
-          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors rounded-l-lg ${
+          className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "my-events"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           <CalendarPlus className="h-3.5 w-3.5" />
@@ -148,10 +148,10 @@ export default function ProfilePage() {
         </button>
         <button
           onClick={() => setTab("saved")}
-          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors border-x border-gray-200 dark:border-gray-700 ${
+          className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "saved"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           <Bookmark className="h-3.5 w-3.5" />
@@ -159,10 +159,10 @@ export default function ProfilePage() {
         </button>
         <button
           onClick={() => setTab("attending")}
-          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors rounded-r-lg ${
+          className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "attending"
-              ? "bg-brand-600 text-white"
-              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
           }`}
         >
           <Users className="h-3.5 w-3.5" />

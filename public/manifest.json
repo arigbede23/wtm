@@ -5,7 +5,7 @@
   "start_url": "/feed",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4c6ef5",
+  "theme_color": "#C8102E",
   "orientation": "portrait",
   "icons": [
     {

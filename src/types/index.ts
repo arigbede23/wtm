@@ -40,6 +40,18 @@ export type EventWithCounts = {
   };
 };
 
+// Filters that can be applied when fetching events
+export type EventFilters = {
+  category?: EventCategory;
+  search?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number; // miles
+  isFree?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+};
+
 // Emoji for each category — used on event cards and detail pages
 export const CATEGORY_EMOJI: Record<EventCategory, string> = {
   MUSIC: "🎵",

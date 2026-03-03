@@ -1,36 +1,27 @@
 // EventList — fetches events from the API and displays them as a scrollable list of cards.
-// Uses TanStack Query (useQuery) to handle loading, caching, and error states automatically.
+// Uses TanStack Query with shared fetch helper so Feed and Map share the same cache.
 
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
 import { EventCard } from "./EventCard";
-import type { EventWithCounts } from "@/types";
+import { fetchEvents, eventsQueryKey } from "@/lib/fetchEvents";
+import type { EventFilters } from "@/types";
 
-// Fetch events from our API route
-async function fetchEvents(): Promise<EventWithCounts[]> {
-  const res = await fetch("/api/events");
-  if (!res.ok) throw new Error("Failed to fetch events");
-  return res.json();
-}
-
-export function EventList() {
-  // useQuery handles fetching, caching, loading states, and errors for us.
-  // "events" is the cache key — TanStack Query uses it to store and retrieve data.
+export function EventList({ filters = {} }: { filters?: EventFilters }) {
   const {
     data: events,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
+    queryKey: eventsQueryKey(filters),
+    queryFn: () => fetchEvents(filters),
   });
 
   // Loading state — show animated skeleton placeholders
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
-        {/* Create 3 skeleton cards using Array spread trick */}
         {[...Array(3)].map((_, i) => (
           <div
             key={i}
@@ -67,10 +58,10 @@ export function EventList() {
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-4xl">🎉</p>
         <p className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">
-          No events yet
+          No events found
         </p>
         <p className="mt-1 text-sm text-gray-500">
-          Check back soon or create the first event!
+          Try adjusting your filters or check back soon!
         </p>
       </div>
     );

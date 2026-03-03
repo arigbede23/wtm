@@ -7,7 +7,11 @@ import { Calendar, MapPin } from "lucide-react";
 import { cn, formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
 
-export function EventCard({ event }: { event: EventWithCounts }) {
+export function EventCard({
+  event,
+}: {
+  event: EventWithCounts & { distance?: number };
+}) {
   return (
     <Link href={`/event/${event.id}`} className="block">
       <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
@@ -68,6 +72,14 @@ export function EventCard({ event }: { event: EventWithCounts }) {
                 {event.address}
                 {event.city ? `, ${event.city}` : ""}
               </span>
+            </div>
+          )}
+
+          {/* Distance — shown when user location is available */}
+          {event.distance != null && (
+            <div className="mt-1 flex items-center gap-1.5 text-sm text-brand-600">
+              <MapPin className="h-3.5 w-3.5" />
+              <span>{event.distance} mi away</span>
             </div>
           )}
 

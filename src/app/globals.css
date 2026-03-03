@@ -5,6 +5,8 @@
    - @tailwind base:       Reset styles + CSS variable defaults
    - @tailwind components: Reusable component classes (like .container)
    - @tailwind utilities:  All the utility classes (flex, p-4, text-sm, etc.) */
+@import "leaflet/dist/leaflet.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

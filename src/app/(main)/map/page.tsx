@@ -1,16 +1,91 @@
-// Map Page — placeholder for the interactive map view (Phase 2).
-// Will show event markers on a Leaflet map with location-based filtering.
+// Map Page — interactive Leaflet map showing events as markers.
+// Dynamically imports EventMap with { ssr: false } since Leaflet needs the browser.
+
+"use client";
+
+import { Suspense } from "react";
+import dynamic from "next/dynamic";
+import { useQuery } from "@tanstack/react-query";
+import { fetchEvents, eventsQueryKey } from "@/lib/fetchEvents";
+import { CategoryFilter } from "@/components/events/CategoryFilter";
+import { useEventFilters } from "@/hooks/useEventFilters";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { MapPin } from "lucide-react";
+import type { EventFilters } from "@/types";
+
+// Dynamic import with SSR disabled — Leaflet needs the DOM
+const EventMap = dynamic(() => import("@/components/map/EventMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="animate-pulse text-gray-400">Loading map...</div>
+    </div>
+  ),
+});
+
+function MapContent() {
+  const { filters, setFilters } = useEventFilters();
+  const { lat, lng, error: geoError, requestLocation } = useGeolocation();
+
+  // Default radius for map is wider (25mi)
+  const apiFilters: EventFilters = {
+    ...filters,
+    ...(lat != null && lng != null
+      ? { lat, lng, radius: filters.radius ?? 25 }
+      : {}),
+  };
+
+  const { data: events = [] } = useQuery({
+    queryKey: eventsQueryKey(apiFilters),
+    queryFn: () => fetchEvents(apiFilters),
+  });
+
+  return (
+    <div className="relative flex h-[calc(100vh-120px)] flex-col">
+      {/* Location permission banner */}
+      {geoError && (
+        <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+          <MapPin className="h-4 w-4 shrink-0" />
+          <span className="flex-1">
+            Location access needed to show nearby events.
+          </span>
+          <button
+            onClick={requestLocation}
+            className="shrink-0 rounded-full bg-amber-200 px-3 py-0.5 text-xs font-medium text-amber-900 hover:bg-amber-300 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {/* Category filter overlay */}
+      <div className="absolute left-0 right-0 top-0 z-[1000] bg-white/80 backdrop-blur-sm dark:bg-gray-950/80">
+        <CategoryFilter
+          selected={filters.category ?? "ALL"}
+          onChange={(cat) =>
+            setFilters({ category: cat === "ALL" ? undefined : (cat as any) })
+          }
+        />
+      </div>
+
+      {/* Map fills remaining space */}
+      <div className="flex-1 pt-12">
+        <EventMap events={events} userLat={lat} userLng={lng} />
+      </div>
+    </div>
+  );
+}
 
 export default function MapPage() {
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center">
-      <p className="text-4xl">🗺️</p>
-      <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
-        Map View
-      </h2>
-      <p className="mt-1 text-sm text-gray-500">
-        Coming soon! Discover events on an interactive map.
-      </p>
-    </div>
+    <Suspense
+      fallback={
+        <div className="flex h-[calc(100vh-120px)] items-center justify-center">
+          <div className="animate-pulse text-gray-400">Loading map...</div>
+        </div>
+      }
+    >
+      <MapContent />
+    </Suspense>
   );
 }

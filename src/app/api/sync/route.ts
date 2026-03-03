@@ -110,6 +110,25 @@ async function handleSync() {
   };
 
   console.log("[Sync] Complete:", summary);
+
+  // Fire-and-forget: backfill embeddings for newly synced events
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret) {
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      ? process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000"
+      : "http://localhost:3000";
+    fetch(`${baseUrl}/api/embeddings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${cronSecret}`,
+      },
+      body: JSON.stringify({ action: "backfill-events" }),
+    }).catch(() => {});
+  }
+
   return NextResponse.json(summary);
 }
 

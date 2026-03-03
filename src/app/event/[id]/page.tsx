@@ -21,6 +21,7 @@ import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
 import { ShareButton } from "@/components/social/ShareButton";
 import { AttendeeList } from "@/components/social/AttendeeList";
+import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
 
 export default async function EventDetailPage({
   params,
@@ -153,6 +154,9 @@ export default async function EventDetailPage({
 
         {/* RSVP Buttons — client component handles auth state and API calls */}
         <RsvpButtons eventId={event.id} initialRsvpCount={rsvpCount} />
+
+        {/* Similar Events — AI-powered recommendations */}
+        <SimilarEvents eventId={event.id} />
       </div>
     </div>
   );

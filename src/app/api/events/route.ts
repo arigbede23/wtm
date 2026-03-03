@@ -206,6 +206,16 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
+    // Fire-and-forget: generate embedding for the new event
+    if (data?.id) {
+      const baseUrl = request.nextUrl.origin;
+      fetch(`${baseUrl}/api/embeddings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "embed-event", eventId: data.id }),
+      }).catch(() => {});
+    }
+
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error("Failed to create event:", error);

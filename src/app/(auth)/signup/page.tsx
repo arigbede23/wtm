@@ -40,8 +40,8 @@ export default function SignupPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      // Success — go to the feed
-      router.push("/feed");
+      // Success — go to onboarding to pick interests
+      router.push("/onboarding");
     }
   };
 

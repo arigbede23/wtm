@@ -8,11 +8,12 @@ import { EventList } from "@/components/events/EventList";
 import { CategoryFilter } from "@/components/events/CategoryFilter";
 import { FilterBar } from "@/components/events/FilterBar";
 import { FriendsFeed } from "@/components/social/FriendsFeed";
+import { ForYouFeed } from "@/components/recommendations/ForYouFeed";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import type { EventFilters } from "@/types";
 
-type FeedTab = "discover" | "friends";
+type FeedTab = "discover" | "foryou" | "friends";
 
 function FeedContent() {
   const [tab, setTab] = useState<FeedTab>("discover");
@@ -37,7 +38,7 @@ function FeedContent() {
         </p>
       </div>
 
-      {/* Discover / Friends tab toggle */}
+      {/* Discover / For You / Friends tab toggle */}
       <div className="mx-4 mt-3 flex rounded-lg border border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setTab("discover")}
@@ -48,6 +49,16 @@ function FeedContent() {
           }`}
         >
           Discover
+        </button>
+        <button
+          onClick={() => setTab("foryou")}
+          className={`flex-1 border-x border-gray-200 px-3 py-2 text-sm font-medium transition-colors dark:border-gray-700 ${
+            tab === "foryou"
+              ? "bg-brand-600 text-white"
+              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+          }`}
+        >
+          For You
         </button>
         <button
           onClick={() => setTab("friends")}
@@ -61,7 +72,7 @@ function FeedContent() {
         </button>
       </div>
 
-      {tab === "discover" ? (
+      {tab === "discover" && (
         <>
           {/* Category filter pills */}
           <CategoryFilter
@@ -81,9 +92,11 @@ function FeedContent() {
           {/* Event list — uses shared fetch helper with filters */}
           <EventList filters={apiFilters} />
         </>
-      ) : (
-        <FriendsFeed />
       )}
+
+      {tab === "foryou" && <ForYouFeed />}
+
+      {tab === "friends" && <FriendsFeed />}
     </div>
   );
 }

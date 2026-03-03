@@ -1,8 +1,10 @@
 // Events API Route — serves event data at GET /api/events.
-// Supports filtering by category, search, location/distance, price, and date range.
+// Supports filtering by category, search, location/distance, price, date range, and organizerId.
+// POST creates a new event (requires auth).
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +29,7 @@ function haversineDistance(
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = createClient(
+  const supabase = createAnonClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
   const isFree = searchParams.get("isFree");
   const dateFrom = searchParams.get("dateFrom");
   const dateTo = searchParams.get("dateTo");
+  const organizerId = searchParams.get("organizerId");
 
   try {
     // Build Supabase query with filters
@@ -49,8 +52,17 @@ export async function GET(request: NextRequest) {
       .from("events")
       .select("*, rsvps(count)")
       .eq("status", "PUBLISHED")
-      .gte("startDate", new Date().toISOString())
       .order("startDate", { ascending: true });
+
+    // Only filter by future dates when not fetching organizer's events
+    if (!organizerId) {
+      query = query.gte("startDate", new Date().toISOString());
+    }
+
+    // Organizer filter (for "My Events" on profile)
+    if (organizerId) {
+      query = query.eq("organizerId", organizerId);
+    }
 
     // Category filter
     if (category) {
@@ -128,6 +140,77 @@ export async function GET(request: NextRequest) {
     console.error("Failed to fetch events:", error);
     return NextResponse.json(
       { error: "Failed to fetch events" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const supabase = createClient();
+
+  // Auth check
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const body = await request.json();
+
+  // Validate required fields
+  const { title, category, startDate } = body;
+  if (!title || !category || !startDate) {
+    return NextResponse.json(
+      { error: "title, category, and startDate are required" },
+      { status: 400 }
+    );
+  }
+
+  const validCategories = [
+    "MUSIC", "SPORTS", "ARTS", "FOOD", "TECH", "SOCIAL",
+    "COMEDY", "WELLNESS", "OUTDOORS", "NIGHTLIFE", "COMMUNITY", "OTHER",
+  ];
+  if (!validCategories.includes(category)) {
+    return NextResponse.json(
+      { error: "Invalid category" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("events")
+      .insert({
+        title,
+        description: body.description || null,
+        category,
+        address: body.address || null,
+        city: body.city || null,
+        state: body.state || null,
+        lat: body.lat ?? null,
+        lng: body.lng ?? null,
+        startDate,
+        endDate: body.endDate || null,
+        coverImageUrl: body.coverImageUrl || null,
+        isFree: body.isFree ?? true,
+        price: body.price ?? null,
+        url: body.url || null,
+        organizerId: user.id,
+        source: "USER",
+        status: "PUBLISHED",
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    console.error("Failed to create event:", error);
+    return NextResponse.json(
+      { error: "Failed to create event" },
       { status: 500 }
     );
   }

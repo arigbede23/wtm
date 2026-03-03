@@ -14,11 +14,12 @@ import {
   MapPin,
   DollarSign,
   Share2,
-  Bookmark,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
+import RsvpButtons from "@/components/events/RsvpButtons";
+import SaveButton from "@/components/events/SaveButton";
 
 export default async function EventDetailPage({
   params,
@@ -77,9 +78,7 @@ export default async function EventDetailPage({
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
             <Share2 className="h-5 w-5" />
           </button>
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
-            <Bookmark className="h-5 w-5" />
-          </button>
+          <SaveButton eventId={event.id} />
         </div>
       </div>
 
@@ -94,13 +93,6 @@ export default async function EventDetailPage({
         <h1 className="mt-3 text-2xl font-bold text-gray-900 dark:text-gray-100">
           {event.title}
         </h1>
-
-        {/* How many people are going */}
-        {rsvpCount > 0 && (
-          <p className="mt-1 text-sm font-medium text-brand-600">
-            {rsvpCount} {rsvpCount === 1 ? "person" : "people"} going
-          </p>
-        )}
 
         {/* Date, location, and price details */}
         <div className="mt-4 space-y-3">
@@ -157,15 +149,8 @@ export default async function EventDetailPage({
           </div>
         )}
 
-        {/* RSVP Buttons — functionality will be wired up in Phase 3 */}
-        <div className="mt-8 pb-8">
-          <button className="w-full rounded-xl bg-brand-600 py-3.5 text-center font-semibold text-white transition-colors hover:bg-brand-700">
-            I&apos;m Going
-          </button>
-          <button className="mt-2 w-full rounded-xl border border-gray-200 py-3.5 text-center font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
-            Interested
-          </button>
-        </div>
+        {/* RSVP Buttons — client component handles auth state and API calls */}
+        <RsvpButtons eventId={event.id} initialRsvpCount={rsvpCount} />
       </div>
     </div>
   );

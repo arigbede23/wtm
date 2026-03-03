@@ -66,6 +66,32 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    // Fire-and-forget: notify followers about this RSVP
+    try {
+      const notificationType =
+        status === "GOING" ? "FRIEND_GOING" : "FRIEND_INTERESTED";
+
+      // Get the user's followers
+      const { data: followers } = await supabase
+        .from("follows")
+        .select("followerId")
+        .eq("followingId", user.id);
+
+      if (followers && followers.length > 0) {
+        const notifications = followers.map((f) => ({
+          userId: f.followerId,
+          actorId: user.id,
+          type: notificationType,
+          eventId,
+        }));
+
+        await supabase.from("notifications").insert(notifications);
+      }
+    } catch {
+      // Don't break RSVP flow if notification fails
+    }
+
     return NextResponse.json(data);
   } catch (error) {
     console.error("RSVP error:", error);

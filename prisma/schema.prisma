@@ -56,6 +56,13 @@ enum RSVPStatus {
   NOT_GOING
 }
 
+// What kind of notification is it?
+enum NotificationType {
+  NEW_FOLLOWER
+  FRIEND_GOING
+  FRIEND_INTERESTED
+}
+
 // --- MODELS ---
 // Each model becomes a table in the database.
 // The fields become columns. The types (String, Int, etc.) define what data they hold.
@@ -76,6 +83,12 @@ model User {
   organizedEvents Event[]      @relation("organizer")  // Events this user created
   rsvps           RSVP[]                               // Events they've RSVP'd to
   savedEvents     SavedEvent[]                          // Events they've bookmarked
+
+  // Social relations (Phase 5)
+  followers          Follow[]        @relation("following") // People who follow this user
+  following          Follow[]        @relation("follower")  // People this user follows
+  notifications      Notification[]  @relation("notificationRecipient")
+  actedNotifications Notification[]  @relation("notificationActor")
 
   @@map("users")  // The actual table name in Postgres (lowercase convention)
 }
@@ -106,8 +119,9 @@ model Event {
   updatedAt     DateTime      @updatedAt
 
   // Relations
-  rsvps       RSVP[]
-  savedEvents SavedEvent[]
+  rsvps         RSVP[]
+  savedEvents   SavedEvent[]
+  notifications Notification[]   // Notifications referencing this event
 
   @@unique([source, externalId])  // Prevents duplicate imports from the same API
   @@index([startDate])            // Makes sorting by date fast
@@ -146,4 +160,37 @@ model SavedEvent {
 
   @@unique([userId, eventId])  // Can only save an event once
   @@map("saved_events")
+}
+
+// Tracks who follows whom
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String                          // The user who is following
+  followingId String                          // The user being followed
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])  // Can only follow someone once
+  @@map("follows")
+}
+
+// Notifications for social events (new follower, friend going to event, etc.)
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String                                // Who receives this notification
+  actorId   String                                // Who triggered it
+  type      NotificationType                      // What kind of notification
+  eventId   String?                               // Related event (optional)
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  user  User   @relation("notificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor User   @relation("notificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+  event Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

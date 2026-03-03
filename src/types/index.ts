@@ -52,6 +52,39 @@ export type EventFilters = {
   dateTo?: string;
 };
 
+// Public user profile shape
+export type UserProfile = {
+  id: string;
+  username: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+  createdAt: string;
+  followerCount: number;
+  followingCount: number;
+};
+
+// Notification types (must match Prisma enum)
+export type NotificationType = "NEW_FOLLOWER" | "FRIEND_GOING" | "FRIEND_INTERESTED";
+
+// A single notification as returned by the API
+export type NotificationItem = {
+  id: string;
+  type: NotificationType;
+  read: boolean;
+  createdAt: string;
+  actor: {
+    id: string;
+    displayName: string | null;
+    username: string | null;
+    avatarUrl: string | null;
+  };
+  event?: {
+    id: string;
+    title: string;
+  } | null;
+};
+
 // Emoji for each category — used on event cards and detail pages
 export const CATEGORY_EMOJI: Record<EventCategory, string> = {
   MUSIC: "🎵",

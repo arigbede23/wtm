@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
+import { NotificationBell } from "@/components/social/NotificationBell";
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -65,13 +66,16 @@ export function Header() {
               <span className="text-brand-600">wtm</span>
               <span className="text-gray-400">?</span>
             </h1>
-            {/* Search button */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-            >
-              <Search className="h-5 w-5" />
-            </button>
+            {/* Search + Notification buttons */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+              <NotificationBell />
+            </div>
           </>
         )}
       </div>

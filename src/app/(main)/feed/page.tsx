@@ -3,15 +3,19 @@
 
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { EventList } from "@/components/events/EventList";
 import { CategoryFilter } from "@/components/events/CategoryFilter";
 import { FilterBar } from "@/components/events/FilterBar";
+import { FriendsFeed } from "@/components/social/FriendsFeed";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import type { EventFilters } from "@/types";
 
+type FeedTab = "discover" | "friends";
+
 function FeedContent() {
+  const [tab, setTab] = useState<FeedTab>("discover");
   const { filters, setFilters } = useEventFilters();
   const { lat, lng } = useGeolocation();
 
@@ -33,23 +37,53 @@ function FeedContent() {
         </p>
       </div>
 
-      {/* Category filter pills */}
-      <CategoryFilter
-        selected={filters.category ?? "ALL"}
-        onChange={(cat) =>
-          setFilters({ category: cat === "ALL" ? undefined : (cat as any) })
-        }
-      />
+      {/* Discover / Friends tab toggle */}
+      <div className="mx-4 mt-3 flex rounded-lg border border-gray-200 dark:border-gray-700">
+        <button
+          onClick={() => setTab("discover")}
+          className={`flex-1 rounded-l-lg px-3 py-2 text-sm font-medium transition-colors ${
+            tab === "discover"
+              ? "bg-brand-600 text-white"
+              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+          }`}
+        >
+          Discover
+        </button>
+        <button
+          onClick={() => setTab("friends")}
+          className={`flex-1 rounded-r-lg px-3 py-2 text-sm font-medium transition-colors ${
+            tab === "friends"
+              ? "bg-brand-600 text-white"
+              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+          }`}
+        >
+          Friends
+        </button>
+      </div>
 
-      {/* Filter toggles: Free, This week, Distance */}
-      <FilterBar
-        filters={filters}
-        onFilterChange={setFilters}
-        hasLocation={lat != null && lng != null}
-      />
+      {tab === "discover" ? (
+        <>
+          {/* Category filter pills */}
+          <CategoryFilter
+            selected={filters.category ?? "ALL"}
+            onChange={(cat) =>
+              setFilters({ category: cat === "ALL" ? undefined : (cat as any) })
+            }
+          />
 
-      {/* Event list — uses shared fetch helper with filters */}
-      <EventList filters={apiFilters} />
+          {/* Filter toggles: Free, This week, Distance */}
+          <FilterBar
+            filters={filters}
+            onFilterChange={setFilters}
+            hasLocation={lat != null && lng != null}
+          />
+
+          {/* Event list — uses shared fetch helper with filters */}
+          <EventList filters={apiFilters} />
+        </>
+      ) : (
+        <FriendsFeed />
+      )}
     </div>
   );
 }

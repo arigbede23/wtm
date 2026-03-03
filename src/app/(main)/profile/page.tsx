@@ -5,12 +5,13 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, LogIn, CalendarPlus, Bookmark } from "lucide-react";
+import { LogOut, LogIn, CalendarPlus, Bookmark, Users } from "lucide-react";
 import Link from "next/link";
 import { EventCard } from "@/components/events/EventCard";
+import { UserAvatar } from "@/components/social/UserAvatar";
 import type { EventWithCounts } from "@/types";
 
-type ProfileTab = "my-events" | "saved";
+type ProfileTab = "my-events" | "saved" | "attending";
 
 export default function ProfilePage() {
   const { user, loading, signOut } = useAuth();
@@ -18,6 +19,21 @@ export default function ProfilePage() {
   const [myEvents, setMyEvents] = useState<EventWithCounts[]>([]);
   const [savedEvents, setSavedEvents] = useState<EventWithCounts[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
+
+  // Fetch follower/following counts
+  useEffect(() => {
+    if (!user) return;
+
+    fetch(`/api/follow?userId=${user.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setFollowerCount(data.followerCount ?? 0);
+        setFollowingCount(data.followingCount ?? 0);
+      })
+      .catch(() => {});
+  }, [user]);
 
   // Fetch events when user or tab changes
   useEffect(() => {
@@ -33,7 +49,7 @@ export default function ProfilePage() {
         })
         .catch(() => {})
         .finally(() => setLoadingEvents(false));
-    } else {
+    } else if (tab === "saved") {
       fetch("/api/saved-events")
         .then((res) => res.json())
         .then((data) => {
@@ -41,6 +57,10 @@ export default function ProfilePage() {
         })
         .catch(() => {})
         .finally(() => setLoadingEvents(false));
+    } else {
+      // "attending" — currently just re-uses saved events loading pattern
+      // In a full implementation, this would fetch events the user RSVP'd GOING to
+      setLoadingEvents(false);
     }
   }, [user, tab]);
 
@@ -84,41 +104,69 @@ export default function ProfilePage() {
     <div className="p-4">
       {/* User info */}
       <div className="flex flex-col items-center text-center">
-        {/* Avatar circle with the first letter of their email */}
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-2xl font-bold text-brand-700">
-          {user.email?.[0].toUpperCase()}
-        </div>
+        <UserAvatar
+          src={null}
+          name={user.email}
+          size="lg"
+        />
         <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
           {user.email}
         </h2>
         <p className="text-sm text-gray-500">
           Member since {new Date(user.created_at).toLocaleDateString()}
         </p>
+
+        {/* Follower / Following counts */}
+        <div className="mt-3 flex gap-6">
+          <div className="text-center">
+            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {followerCount}
+            </p>
+            <p className="text-xs text-gray-500">Followers</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {followingCount}
+            </p>
+            <p className="text-xs text-gray-500">Following</p>
+          </div>
+        </div>
       </div>
 
-      {/* Tabs: My Events / Saved */}
+      {/* Tabs: My Events / Saved / Attending */}
       <div className="mt-6 flex rounded-lg border border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setTab("my-events")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-l-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors rounded-l-lg ${
             tab === "my-events"
               ? "bg-brand-600 text-white"
               : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
           }`}
         >
-          <CalendarPlus className="h-4 w-4" />
+          <CalendarPlus className="h-3.5 w-3.5" />
           My Events
         </button>
         <button
           onClick={() => setTab("saved")}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-r-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors border-x border-gray-200 dark:border-gray-700 ${
             tab === "saved"
               ? "bg-brand-600 text-white"
               : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
           }`}
         >
-          <Bookmark className="h-4 w-4" />
+          <Bookmark className="h-3.5 w-3.5" />
           Saved
+        </button>
+        <button
+          onClick={() => setTab("attending")}
+          className={`flex flex-1 items-center justify-center gap-1 px-2 py-2.5 text-xs font-medium transition-colors rounded-r-lg ${
+            tab === "attending"
+              ? "bg-brand-600 text-white"
+              : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
+          }`}
+        >
+          <Users className="h-3.5 w-3.5" />
+          Attending
         </button>
       </div>
 
@@ -138,7 +186,9 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-500">
               {tab === "my-events"
                 ? "You haven't created any events yet."
-                : "You haven't saved any events yet."}
+                : tab === "saved"
+                ? "You haven't saved any events yet."
+                : "You're not attending any events yet."}
             </p>
             {tab === "my-events" && (
               <Link

@@ -13,13 +13,14 @@ import {
   Calendar,
   MapPin,
   DollarSign,
-  Share2,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
+import { ShareButton } from "@/components/social/ShareButton";
+import { AttendeeList } from "@/components/social/AttendeeList";
 
 export default async function EventDetailPage({
   params,
@@ -75,9 +76,7 @@ export default async function EventDetailPage({
 
         {/* Share and Bookmark buttons — top right corner */}
         <div className="absolute right-4 top-4 flex gap-2">
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60">
-            <Share2 className="h-5 w-5" />
-          </button>
+          <ShareButton title={event.title} />
           <SaveButton eventId={event.id} />
         </div>
       </div>
@@ -148,6 +147,9 @@ export default async function EventDetailPage({
             </p>
           </div>
         )}
+
+        {/* Attendee list — who's going */}
+        <AttendeeList eventId={event.id} rsvpCount={rsvpCount} />
 
         {/* RSVP Buttons — client component handles auth state and API calls */}
         <RsvpButtons eventId={event.id} initialRsvpCount={rsvpCount} />

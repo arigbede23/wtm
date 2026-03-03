@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#C8102E"/>
+  <text x="16" y="23" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="14" fill="white">wtm</text>
+  <text x="28" y="13" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="10" fill="white">?</text>
+</svg>

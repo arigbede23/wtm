@@ -1,10 +1,10 @@
 // useGeolocation — provides the user's current location via the browser Geolocation API.
 // Caches the position in localStorage so it's available instantly on subsequent loads.
-// Auto-requests location on mount.
+// Does NOT auto-request; the user must explicitly grant permission via requestLocation().
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 const STORAGE_KEY = "wtm-user-location";
 
@@ -29,7 +29,7 @@ export function useGeolocation() {
         // ignore parse errors
       }
     }
-    return { lat: null, lng: null, loading: true, error: null };
+    return { lat: null, lng: null, loading: false, error: null };
   });
 
   const requestLocation = useCallback(() => {
@@ -60,13 +60,6 @@ export function useGeolocation() {
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
   }, []);
-
-  // Auto-request on mount if we don't have a cached location
-  useEffect(() => {
-    if (state.lat === null && state.lng === null) {
-      requestLocation();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { ...state, requestLocation };
 }

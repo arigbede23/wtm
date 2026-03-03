@@ -27,11 +27,11 @@ function MapContent() {
   const { filters, setFilters } = useEventFilters();
   const { lat, lng, error: geoError, requestLocation } = useGeolocation();
 
-  // Default radius for map is wider (25mi)
+  // 50 mi radius from user's current location
   const apiFilters: EventFilters = {
     ...filters,
     ...(lat != null && lng != null
-      ? { lat, lng, radius: filters.radius ?? 25 }
+      ? { lat, lng, radius: 50 }
       : {}),
   };
 
@@ -43,17 +43,19 @@ function MapContent() {
   return (
     <div className="relative flex h-[calc(100vh-120px)] flex-col">
       {/* Location permission banner */}
-      {geoError && (
+      {lat == null && lng == null && (
         <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
           <MapPin className="h-4 w-4 shrink-0" />
           <span className="flex-1">
-            Location access needed to show nearby events.
+            {geoError
+              ? "Location access was denied. Please allow it in your browser settings, or tap below to try again."
+              : "Location access needed to show nearby events."}
           </span>
           <button
             onClick={requestLocation}
             className="shrink-0 rounded-full bg-amber-200 px-3 py-0.5 text-xs font-medium text-amber-900 hover:bg-amber-300 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700"
           >
-            Try again
+            {geoError ? "Try again" : "Allow"}
           </button>
         </div>
       )}

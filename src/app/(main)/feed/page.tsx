@@ -4,6 +4,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { MapPin } from "lucide-react";
 import { EventList } from "@/components/events/EventList";
 import { CategoryFilter } from "@/components/events/CategoryFilter";
 import { FilterBar } from "@/components/events/FilterBar";
@@ -19,15 +20,17 @@ type FeedTab = "discover" | "foryou" | "friends";
 function FeedContent() {
   const [tab, setTab] = useState<FeedTab>("discover");
   const { filters, setFilters } = useEventFilters();
-  const { lat, lng } = useGeolocation();
+  const { lat, lng, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
+
+  const hasLocation = lat != null && lng != null;
 
   // Sync Ticketmaster events near the user's location (runs once per area per 30 min)
   useLocalSync(lat, lng);
 
-  // Merge URL filters with user location for API call
+  // Merge URL filters with user location + 50 mi radius for API call
   const apiFilters: EventFilters = {
     ...filters,
-    ...(lat != null && lng != null ? { lat, lng } : {}),
+    ...(hasLocation ? { lat, lng, radius: 50 } : {}),
   };
 
   return (
@@ -78,6 +81,41 @@ function FeedContent() {
 
       {tab === "discover" && (
         <>
+          {/* Location permission banner */}
+          {!hasLocation && !geoLoading && (
+            <div className="mx-4 mt-3 rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-800 dark:bg-brand-950">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-brand-100 p-2 dark:bg-brand-900">
+                  <MapPin className="h-5 w-5 text-brand-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    Enable location to see events near you
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    {geoError
+                      ? "Location access was denied. Please allow it in your browser settings, or tap below to try again."
+                      : "We\u2019ll show events within 50 miles of your current location."}
+                  </p>
+                  <button
+                    onClick={requestLocation}
+                    className="mt-2.5 rounded-full bg-brand-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-brand-700"
+                  >
+                    Allow location access
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Loading state while getting location */}
+          {geoLoading && (
+            <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
+              Getting your location...
+            </div>
+          )}
+
           {/* Category filter pills */}
           <CategoryFilter
             selected={filters.category ?? "ALL"}
@@ -86,11 +124,10 @@ function FeedContent() {
             }
           />
 
-          {/* Filter toggles: Free, This week, Distance */}
+          {/* Filter toggles: Free, This week */}
           <FilterBar
             filters={filters}
             onFilterChange={setFilters}
-            hasLocation={lat != null && lng != null}
           />
 
           {/* Event list — uses shared fetch helper with filters */}

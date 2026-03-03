@@ -20,12 +20,32 @@ export function formatDate(date: Date | string) {
   });
 }
 
-// Format a time as "6:00 PM"
-export function formatTime(date: Date | string) {
+// Format a time as "6:00 PM", optionally in a specific timezone
+export function formatTime(date: Date | string, timeZone?: string) {
   return new Date(date).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
+    ...(timeZone && { timeZone }),
   });
+}
+
+// Returns true if the time portion is exactly 00:00:00 UTC,
+// meaning the API didn't provide a specific time (date-only event).
+export function isTimeMidnight(date: Date | string): boolean {
+  const d = new Date(date);
+  return (
+    d.getUTCHours() === 0 &&
+    d.getUTCMinutes() === 0 &&
+    d.getUTCSeconds() === 0
+  );
+}
+
+// Smart date+time formatter: returns "Mon, Mar 14 · 6:00 PM" for timed events,
+// or just "Mon, Mar 14" when the time is midnight UTC (date-only).
+export function formatEventDateTime(date: Date | string, timeZone?: string): string {
+  const formatted = formatDate(date);
+  if (isTimeMidnight(date)) return formatted;
+  return `${formatted} · ${formatTime(date, timeZone)}`;
 }
 
 // Calculate distance in miles between two lat/lng points using the Haversine formula

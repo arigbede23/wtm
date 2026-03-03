@@ -163,6 +163,23 @@ export async function GET(request: NextRequest) {
 
       // Strip internal score before returning
       shaped = shaped.map(({ _score, ...rest }: any) => rest);
+
+      // Category interleaving: spread out same-category events so the feed
+      // looks diverse instead of showing clusters of the same type.
+      for (let i = 0; i < shaped.length - 1; i++) {
+        if (shaped[i].category === shaped[i + 1].category) {
+          // Find the next event with a different category
+          const swapIdx = shaped.findIndex(
+            (e: any, j: number) => j > i + 1 && e.category !== shaped[i].category
+          );
+          if (swapIdx !== -1) {
+            // Swap it into position i+1
+            const temp = shaped[i + 1];
+            shaped[i + 1] = shaped[swapIdx];
+            shaped[swapIdx] = temp;
+          }
+        }
+      }
     }
 
     return NextResponse.json(shaped);

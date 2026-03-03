@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
-import { cn, formatDate, formatTime, formatPrice } from "@/lib/utils";
+import { cn, formatEventDateTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
 
 export function EventCard({
@@ -58,10 +58,7 @@ export function EventCard({
           {/* Date and time */}
           <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
             <Calendar className="h-3.5 w-3.5" />
-            <span>
-              {formatDate(event.startDate)} &middot;{" "}
-              {formatTime(event.startDate)}
-            </span>
+            <span>{formatEventDateTime(event.startDate)}</span>
           </div>
 
           {/* Location */}

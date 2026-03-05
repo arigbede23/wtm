@@ -40,6 +40,13 @@ function getNotificationText(notification: NotificationItemType): {
           ? `/event/${notification.event.id}`
           : `/user/${notification.actor.id}`,
       };
+    case "EVENT_UPDATED":
+      return {
+        text: `${actorName} updated ${notification.event?.title ?? "an event"}`,
+        href: notification.event
+          ? `/event/${notification.event.id}`
+          : `/user/${notification.actor.id}`,
+      };
   }
 }
 

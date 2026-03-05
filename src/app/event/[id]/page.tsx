@@ -22,8 +22,10 @@ import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
 import { EventActions } from "@/components/events/EventActions";
+import { Comments } from "@/components/events/Comments";
 import { ShareButton } from "@/components/social/ShareButton";
 import { AttendeeList } from "@/components/social/AttendeeList";
+import { UserAvatar } from "@/components/social/UserAvatar";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
 
 export default async function EventDetailPage({
@@ -41,7 +43,7 @@ export default async function EventDetailPage({
   // Fetch the event by ID, including RSVP count
   const { data: event, error } = await supabase
     .from("events")
-    .select("*, rsvps(count)")
+    .select("*, rsvps(count), organizer:organizerId(id, displayName, username, avatarUrl)")
     .eq("id", params.id)
     .single(); // .single() returns one object instead of an array
 
@@ -183,6 +185,36 @@ export default async function EventDetailPage({
             </p>
           </div>
         )}
+
+        {/* Organized by */}
+        {event.organizer && (
+          <div className="mt-6">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
+              Organized by
+            </h2>
+            <Link
+              href={`/user/${event.organizer.id}`}
+              className="mt-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+            >
+              <UserAvatar
+                src={event.organizer.avatarUrl}
+                name={event.organizer.displayName ?? event.organizer.username}
+                size="sm"
+              />
+              <div className="min-w-0">
+                <p className="font-medium text-gray-900 dark:text-gray-100">
+                  {event.organizer.displayName ?? event.organizer.username}
+                </p>
+                {event.organizer.username && (
+                  <p className="text-sm text-gray-500">@{event.organizer.username}</p>
+                )}
+              </div>
+            </Link>
+          </div>
+        )}
+
+        {/* Comments / Discussion */}
+        <Comments eventId={event.id} />
 
         {/* Attendee list — who's going */}
         <AttendeeList eventId={event.id} rsvpCount={rsvpCount} />

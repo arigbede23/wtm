@@ -91,6 +91,31 @@ export async function PATCH(
       }).catch(() => {});
     }
 
+    // Fire-and-forget: notify attendees about the update
+    (async () => {
+      try {
+        const { data: rsvps } = await supabase
+          .from("rsvps")
+          .select("userId")
+          .eq("eventId", params.id)
+          .in("status", ["GOING", "INTERESTED"]);
+        if (!rsvps || rsvps.length === 0) return;
+        const notifications = rsvps
+          .filter((r) => r.userId !== user.id)
+          .map((r) => ({
+            type: "EVENT_UPDATED" as const,
+            userId: r.userId,
+            actorId: user.id,
+            eventId: params.id,
+          }));
+        if (notifications.length > 0) {
+          await supabase.from("notifications").insert(notifications);
+        }
+      } catch {
+        // Best-effort — don't block the response
+      }
+    })();
+
     return NextResponse.json(updated);
   } catch (error) {
     console.error("Event PATCH error:", error);

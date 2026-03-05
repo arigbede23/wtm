@@ -21,6 +21,7 @@ import { formatDate, formatTime, formatPrice, isTimeMidnight, buildCalendarUrl, 
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
+import { EventActions } from "@/components/events/EventActions";
 import { ShareButton } from "@/components/social/ShareButton";
 import { AttendeeList } from "@/components/social/AttendeeList";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
@@ -86,6 +87,9 @@ export default async function EventDetailPage({
 
       {/* Event Details Section */}
       <div className="p-4">
+        {/* Edit / Delete buttons (only visible to organizer) */}
+        <EventActions eventId={event.id} organizerId={event.organizerId} />
+
         {/* Category pill */}
         <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
           {CATEGORY_EMOJI[category]} {category.toLowerCase()}

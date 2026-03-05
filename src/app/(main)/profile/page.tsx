@@ -1,15 +1,17 @@
 // Profile Page — shows the user's account info, created events, and saved events.
 // Uses the useAuth hook to check if someone is logged in.
+// Includes inline profile editing (avatar, display name, username, bio).
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { LogOut, LogIn, CalendarPlus, Bookmark, Users } from "lucide-react";
+import { uploadAvatarImage } from "@/lib/uploadImage";
+import { LogOut, LogIn, CalendarPlus, Bookmark, Users, Pencil, Loader2, Camera } from "lucide-react";
 import Link from "next/link";
 import { EventCard } from "@/components/events/EventCard";
 import { UserAvatar } from "@/components/social/UserAvatar";
-import type { EventWithCounts } from "@/types";
+import type { EventWithCounts, UserProfile } from "@/types";
 
 type ProfileTab = "my-events" | "saved" | "attending";
 
@@ -22,6 +24,35 @@ export default function ProfilePage() {
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+
+  // Profile data from DB
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  // Edit mode state
+  const [editing, setEditing] = useState(false);
+  const [editDisplayName, setEditDisplayName] = useState("");
+  const [editUsername, setEditUsername] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [editAvatarUrl, setEditAvatarUrl] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch DB profile
+  useEffect(() => {
+    if (!user) return;
+
+    fetch(`/api/users/${user.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.id) {
+          setProfile(data);
+        }
+      })
+      .catch(() => {});
+  }, [user]);
 
   // Fetch follower/following counts
   useEffect(() => {
@@ -69,6 +100,73 @@ export default function ProfilePage() {
     }
   }, [user, tab]);
 
+  const startEditing = () => {
+    setEditDisplayName(profile?.displayName || "");
+    setEditUsername(profile?.username || "");
+    setEditBio(profile?.bio || "");
+    setEditAvatarUrl(profile?.avatarUrl || "");
+    setAvatarPreview(profile?.avatarUrl || null);
+    setAvatarFile(null);
+    setEditError("");
+    setEditing(true);
+  };
+
+  const cancelEditing = () => {
+    if (avatarPreview && avatarPreview !== profile?.avatarUrl) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+    setEditing(false);
+    setEditError("");
+  };
+
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setSaving(true);
+    setEditError("");
+
+    try {
+      let avatarUrl = editAvatarUrl;
+      if (avatarFile) {
+        avatarUrl = await uploadAvatarImage(avatarFile);
+      }
+
+      const res = await fetch(`/api/users/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          displayName: editDisplayName || null,
+          username: editUsername || null,
+          bio: editBio || null,
+          avatarUrl: avatarUrl || null,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to update profile");
+      }
+
+      const updated = await res.json();
+      setProfile((prev) =>
+        prev
+          ? { ...prev, ...updated }
+          : { ...updated, followerCount: 0, followingCount: 0 }
+      );
+      setEditing(false);
+    } catch (err: any) {
+      setEditError(err.message || "Something went wrong");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // Show a spinner while checking auth status
   if (loading) {
     return (
@@ -102,6 +200,9 @@ export default function ProfilePage() {
     );
   }
 
+  const displayName = profile?.displayName || user.email;
+  const avatarUrl = profile?.avatarUrl || null;
+
   const events =
     tab === "my-events"
       ? myEvents
@@ -115,13 +216,21 @@ export default function ProfilePage() {
       {/* User info */}
       <div className="flex flex-col items-center text-center">
         <UserAvatar
-          src={null}
-          name={user.email}
+          src={avatarUrl}
+          name={displayName}
           size="lg"
         />
         <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
-          {user.email}
+          {displayName}
         </h2>
+        {profile?.username && (
+          <p className="text-sm text-gray-500">@{profile.username}</p>
+        )}
+        {profile?.bio && (
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            {profile.bio}
+          </p>
+        )}
         <p className="text-sm text-gray-500">
           Member since {new Date(user.created_at).toLocaleDateString()}
         </p>
@@ -141,7 +250,125 @@ export default function ProfilePage() {
             <p className="text-xs text-gray-500">Following</p>
           </div>
         </div>
+
+        {/* Edit Profile button */}
+        {!editing && (
+          <button
+            onClick={startEditing}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            Edit Profile
+          </button>
+        )}
       </div>
+
+      {/* Inline edit form */}
+      {editing && (
+        <div className="mt-4 space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+          {/* Avatar upload */}
+          <div className="flex flex-col items-center">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <UserAvatar
+                src={avatarPreview}
+                name={editDisplayName || user.email}
+                size="lg"
+              />
+              <div className="absolute bottom-0 right-0 flex h-6 w-6 items-center justify-center rounded-full bg-brand-600 text-white">
+                <Camera className="h-3.5 w-3.5" />
+              </div>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarSelect}
+              className="hidden"
+            />
+            <p className="mt-1 text-xs text-gray-500">Tap to change avatar</p>
+          </div>
+
+          {/* Display Name */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Display Name
+            </label>
+            <input
+              type="text"
+              value={editDisplayName}
+              onChange={(e) => setEditDisplayName(e.target.value)}
+              placeholder="Your name"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            />
+          </div>
+
+          {/* Username */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Username
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                @
+              </span>
+              <input
+                type="text"
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+                placeholder="username"
+                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-7 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              />
+            </div>
+          </div>
+
+          {/* Bio */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Bio
+            </label>
+            <textarea
+              value={editBio}
+              onChange={(e) => setEditBio(e.target.value)}
+              placeholder="Tell people about yourself..."
+              rows={3}
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            />
+          </div>
+
+          {/* Error */}
+          {editError && (
+            <p className="text-sm text-red-600">{editError}</p>
+          )}
+
+          {/* Save / Cancel */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleSaveProfile}
+              disabled={saving}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save"
+              )}
+            </button>
+            <button
+              onClick={cancelEditing}
+              disabled={saving}
+              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tabs: My Events / Saved / Attending — pill toggle */}
       <div className="mt-6 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-gray-800">

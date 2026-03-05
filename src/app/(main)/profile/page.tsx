@@ -119,11 +119,32 @@ export default function ProfilePage() {
     setEditError("");
   };
 
-  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+
+    let processedFile = file;
+
+    // Convert HEIC/HEIF to JPEG (Chrome doesn't support HEIC natively)
+    const isHeic =
+      file.type === "image/heic" ||
+      file.type === "image/heif" ||
+      file.name.toLowerCase().endsWith(".heic") ||
+      file.name.toLowerCase().endsWith(".heif");
+
+    if (isHeic) {
+      try {
+        const heic2any = (await import("heic2any")).default;
+        const blob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+        const result = Array.isArray(blob) ? blob[0] : blob;
+        processedFile = new File([result], "avatar.jpg", { type: "image/jpeg" });
+      } catch {
+        // If conversion fails, try using the file as-is
+      }
+    }
+
+    setAvatarFile(processedFile);
+    setAvatarPreview(URL.createObjectURL(processedFile));
   };
 
   const handleSaveProfile = async () => {

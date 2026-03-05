@@ -3,6 +3,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 type UserAvatarProps = {
@@ -19,13 +20,15 @@ const sizeClasses = {
 };
 
 export function UserAvatar({ src, name, size = "md", className }: UserAvatarProps) {
+  const [imgError, setImgError] = useState(false);
   const letter = (name ?? "?")[0].toUpperCase();
 
-  if (src) {
+  if (src && !imgError) {
     return (
       <img
         src={src}
         alt={name ?? "User"}
+        onError={() => setImgError(true)}
         className={cn(
           "shrink-0 rounded-full object-cover",
           sizeClasses[size],

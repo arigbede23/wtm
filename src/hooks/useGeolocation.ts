@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const STORAGE_KEY = "wtm-user-location";
 
@@ -16,21 +16,26 @@ type GeoState = {
 };
 
 export function useGeolocation() {
-  const [state, setState] = useState<GeoState>(() => {
-    // Try to restore cached location from localStorage on init
-    if (typeof window !== "undefined") {
-      try {
-        const cached = localStorage.getItem(STORAGE_KEY);
-        if (cached) {
-          const { lat, lng } = JSON.parse(cached);
-          return { lat, lng, loading: false, error: null };
-        }
-      } catch {
-        // ignore parse errors
-      }
-    }
-    return { lat: null, lng: null, loading: false, error: null };
+  // Always start with null so server and client initial render match.
+  const [state, setState] = useState<GeoState>({
+    lat: null,
+    lng: null,
+    loading: false,
+    error: null,
   });
+
+  // Restore cached location from localStorage after mount (avoids hydration mismatch)
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached) {
+        const { lat, lng } = JSON.parse(cached);
+        setState({ lat, lng, loading: false, error: null });
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
 
   const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {

@@ -120,41 +120,45 @@ export async function GET(request: NextRequest) {
         return event;
       });
 
-      // Filter by radius if specified
-      if (maxRadius != null) {
-        shaped = shaped.filter(
-          (event: any) => event.distance != null && event.distance <= maxRadius
-        );
-      }
-
-      // Combined sort: closer + sooner events rank higher.
-      // Normalize distance (0–50 mi → 0–1) and days away (0–30 → 0–1),
-      // then blend them equally. Events without coordinates sink to the end.
-      const now = Date.now();
-      shaped.sort((a: any, b: any) => {
-        const aHas = a.distance != null ? 0 : 1;
-        const bHas = b.distance != null ? 0 : 1;
-        if (aHas !== bHas) return aHas - bHas;
-
-        const aDist = (a.distance ?? 50) / 50;
-        const bDist = (b.distance ?? 50) / 50;
-        const aDays = Math.min(Math.max((new Date(a.startDate).getTime() - now) / (30 * 86400000), 0), 1);
-        const bDays = Math.min(Math.max((new Date(b.startDate).getTime() - now) / (30 * 86400000), 0), 1);
-
-        return (aDist + aDays) - (bDist + bDays);
-      });
-
-      // Category interleaving: when two adjacent events share the same
-      // category, swap the second one with the next different-category event.
-      for (let i = 0; i < shaped.length - 1; i++) {
-        if (shaped[i].category === shaped[i + 1].category) {
-          const swapIdx = shaped.findIndex(
-            (e: any, j: number) => j > i + 1 && e.category !== shaped[i].category
+      // When searching, skip radius filtering and distance-based sorting —
+      // just return search matches in chronological order (already sorted by startDate).
+      if (!search) {
+        // Filter by radius if specified
+        if (maxRadius != null) {
+          shaped = shaped.filter(
+            (event: any) => event.distance != null && event.distance <= maxRadius
           );
-          if (swapIdx !== -1) {
-            const temp = shaped[i + 1];
-            shaped[i + 1] = shaped[swapIdx];
-            shaped[swapIdx] = temp;
+        }
+
+        // Combined sort: closer + sooner events rank higher.
+        // Normalize distance (0–50 mi → 0–1) and days away (0–30 → 0–1),
+        // then blend them equally. Events without coordinates sink to the end.
+        const now = Date.now();
+        shaped.sort((a: any, b: any) => {
+          const aHas = a.distance != null ? 0 : 1;
+          const bHas = b.distance != null ? 0 : 1;
+          if (aHas !== bHas) return aHas - bHas;
+
+          const aDist = (a.distance ?? 50) / 50;
+          const bDist = (b.distance ?? 50) / 50;
+          const aDays = Math.min(Math.max((new Date(a.startDate).getTime() - now) / (30 * 86400000), 0), 1);
+          const bDays = Math.min(Math.max((new Date(b.startDate).getTime() - now) / (30 * 86400000), 0), 1);
+
+          return (aDist + aDays) - (bDist + bDays);
+        });
+
+        // Category interleaving: when two adjacent events share the same
+        // category, swap the second one with the next different-category event.
+        for (let i = 0; i < shaped.length - 1; i++) {
+          if (shaped[i].category === shaped[i + 1].category) {
+            const swapIdx = shaped.findIndex(
+              (e: any, j: number) => j > i + 1 && e.category !== shaped[i].category
+            );
+            if (swapIdx !== -1) {
+              const temp = shaped[i + 1];
+              shaped[i + 1] = shaped[swapIdx];
+              shaped[swapIdx] = temp;
+            }
           }
         }
       }

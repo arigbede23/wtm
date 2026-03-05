@@ -11,11 +11,13 @@ import Link from "next/link";
 import {
   ArrowLeft,
   Calendar,
+  CalendarPlus,
   MapPin,
+  Navigation,
   DollarSign,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
-import { formatDate, formatTime, formatPrice } from "@/lib/utils";
+import { formatDate, formatTime, formatPrice, isTimeMidnight, buildCalendarUrl, buildDirectionsUrl } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
@@ -103,10 +105,12 @@ export default async function EventDetailPage({
               <p className="font-medium text-gray-900 dark:text-gray-100">
                 {formatDate(event.startDate)}
               </p>
-              <p className="text-sm text-gray-500">
-                {formatTime(event.startDate)}
-                {event.endDate && ` – ${formatTime(event.endDate)}`}
-              </p>
+              {!isTimeMidnight(event.startDate) && (
+                <p className="text-sm text-gray-500">
+                  {formatTime(event.startDate)}
+                  {event.endDate && !isTimeMidnight(event.endDate) && ` – ${formatTime(event.endDate)}`}
+                </p>
+              )}
             </div>
           </div>
 
@@ -135,6 +139,33 @@ export default async function EventDetailPage({
               {formatPrice(event.price, event.isFree)}
             </p>
           </div>
+        </div>
+
+        {/* Add to Calendar & Get Directions */}
+        <div className="mt-4 flex flex-col gap-2">
+          <a
+            href={buildCalendarUrl(event)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          >
+            <CalendarPlus className="h-4 w-4" />
+            Add to Calendar
+          </a>
+          {(() => {
+            const directionsUrl = buildDirectionsUrl(event);
+            return directionsUrl ? (
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                <Navigation className="h-4 w-4" />
+                Get Directions
+              </a>
+            ) : null;
+          })()}
         </div>
 
         {/* About / Description */}

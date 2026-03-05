@@ -91,3 +91,54 @@ export function formatPrice(price: number | null, isFree: boolean) {
   if (!price) return "Free";
   return `$${price.toFixed(0)}`;
 }
+
+// Build a Google Calendar "Add Event" URL from event data
+export function buildCalendarUrl(event: {
+  title: string;
+  startDate: string;
+  endDate?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  description?: string | null;
+}): string {
+  const fmt = (iso: string) =>
+    new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+
+  const start = fmt(event.startDate);
+  const end = event.endDate ? fmt(event.endDate) : fmt(event.startDate);
+
+  const location = [event.address, event.city, event.state]
+    .filter(Boolean)
+    .join(", ");
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: event.title,
+    dates: `${start}/${end}`,
+  });
+  if (location) params.set("location", location);
+  if (event.description) params.set("details", event.description);
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+// Build a Google Maps directions URL from event location data
+export function buildDirectionsUrl(event: {
+  lat?: number | null;
+  lng?: number | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+}): string | null {
+  if (event.lat != null && event.lng != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${event.lat},${event.lng}`;
+  }
+  const addr = [event.address, event.city, event.state]
+    .filter(Boolean)
+    .join(", ");
+  if (addr) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(addr)}`;
+  }
+  return null;
+}

@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<ProfileTab>("my-events");
   const [myEvents, setMyEvents] = useState<EventWithCounts[]>([]);
   const [savedEvents, setSavedEvents] = useState<EventWithCounts[]>([]);
+  const [attendingEvents, setAttendingEvents] = useState<EventWithCounts[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -57,10 +58,14 @@ export default function ProfilePage() {
         })
         .catch(() => {})
         .finally(() => setLoadingEvents(false));
-    } else {
-      // "attending" — currently just re-uses saved events loading pattern
-      // In a full implementation, this would fetch events the user RSVP'd GOING to
-      setLoadingEvents(false);
+    } else if (tab === "attending") {
+      fetch("/api/attending")
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) setAttendingEvents(data);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingEvents(false));
     }
   }, [user, tab]);
 
@@ -97,7 +102,12 @@ export default function ProfilePage() {
     );
   }
 
-  const events = tab === "my-events" ? myEvents : savedEvents;
+  const events =
+    tab === "my-events"
+      ? myEvents
+      : tab === "saved"
+        ? savedEvents
+        : attendingEvents;
 
   // Logged in — show profile info, tabs, and events
   return (

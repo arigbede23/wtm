@@ -27,8 +27,13 @@ export async function fetchTicketmasterEvents(
     return [];
   }
 
-  const lat = overrideLat ?? process.env.SYNC_LAT ?? "40.7128";
-  const lng = overrideLng ?? process.env.SYNC_LNG ?? "-74.0060";
+  const lat = overrideLat ?? process.env.SYNC_LAT;
+  const lng = overrideLng ?? process.env.SYNC_LNG;
+
+  if (!lat || !lng) {
+    console.warn("[Sync] No coordinates provided and no SYNC_LAT/SYNC_LNG set, skipping Ticketmaster");
+    return [];
+  }
 
   // 30-day window from now
   const now = new Date();

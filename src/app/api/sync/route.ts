@@ -37,12 +37,37 @@ function getSupabaseClient() {
 async function handleSync() {
   const supabase = getSupabaseClient();
 
-  // Fetch from all APIs in parallel
-  const [tmEvents, ebEvents, igEvents] = await Promise.all([
-    fetchTicketmasterEvents(),
+  // Look up distinct cities where users have RSVP'd or created events recently
+  // so we sync content for areas with actual active users.
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: activeEvents } = await supabase
+    .from("events")
+    .select("city, lat, lng")
+    .eq("source", "USER")
+    .gte("startDate", thirtyDaysAgo)
+    .not("city", "is", null)
+    .not("lat", "is", null);
+
+  // De-duplicate cities and collect one coordinate per city
+  const cityMap = new Map<string, { lat: string; lng: string }>();
+  for (const ev of activeEvents ?? []) {
+    if (ev.city && ev.lat != null && ev.lng != null && !cityMap.has(ev.city)) {
+      cityMap.set(ev.city, { lat: String(ev.lat), lng: String(ev.lng) });
+    }
+  }
+  const activeCities = Array.from(cityMap.keys());
+  const cityCoords = Array.from(cityMap.values());
+
+  // Fetch Ticketmaster events for each active city + Instagram for those cities
+  const tmPromises = cityCoords.map((c) =>
+    fetchTicketmasterEvents(c.lat, c.lng)
+  );
+  const [tmResults, ebEvents, igEvents] = await Promise.all([
+    Promise.all(tmPromises),
     fetchEventbriteEvents(),
-    fetchInstagramEvents(),
+    fetchInstagramEvents(activeCities.length > 0 ? activeCities : undefined),
   ]);
+  const tmEvents = tmResults.flat();
 
   const allEvents = [...tmEvents, ...ebEvents, ...igEvents];
   let totalProcessed = 0;

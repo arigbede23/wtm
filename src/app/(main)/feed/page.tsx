@@ -13,6 +13,8 @@ import { ForYouFeed } from "@/components/recommendations/ForYouFeed";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLocalSync } from "@/hooks/useLocalSync";
+import { useLocalTeamContext } from "@/components/layout/LocalTeamProvider";
+import { getTeamLogoUrl } from "@/lib/localTeams";
 import type { EventFilters } from "@/types";
 
 type FeedTab = "discover" | "foryou" | "friends";
@@ -21,6 +23,7 @@ function FeedContent() {
   const [tab, setTab] = useState<FeedTab>("discover");
   const { filters, setFilters } = useEventFilters();
   const { lat, lng, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
+  const team = useLocalTeamContext();
 
   const hasLocation = lat != null && lng != null;
 
@@ -35,6 +38,25 @@ function FeedContent() {
 
   return (
     <div>
+      {/* Team-themed welcome banner */}
+      {team && (
+        <div className="mx-4 mt-3 flex items-center gap-3 rounded-2xl bg-brand-50 p-3 dark:bg-brand-950">
+          <img
+            src={getTeamLogoUrl(team)}
+            alt={`${team.city} ${team.team}`}
+            className="h-10 w-10 object-contain"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-brand-700 dark:text-brand-300">
+              Welcome to {team.city}
+            </p>
+            <p className="text-xs text-brand-600 dark:text-brand-400">
+              Home of the {team.city} {team.team}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Page heading */}
       <div className="px-4 pt-4">
         <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">

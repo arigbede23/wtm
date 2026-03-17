@@ -5,7 +5,7 @@
 
 import { useEffect, useRef } from "react";
 
-const STORAGE_KEY = "wtm-local-sync";
+const STORAGE_KEY = "wtm-local-sync-v2";
 const COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
 
 function bucketKey(lat: number, lng: number): string {

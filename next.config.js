@@ -34,6 +34,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "unpkg.com",
       },
+      {
+        protocol: "https",
+        hostname: "a.espncdn.com",
+      },
     ],
   },
 };

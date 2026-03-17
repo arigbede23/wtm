@@ -7,7 +7,10 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Search, X, Sun, Moon } from "lucide-react";
+import Image from "next/image";
 import { NotificationBell } from "@/components/social/NotificationBell";
+import { useLocalTeamContext } from "@/components/layout/LocalTeamProvider";
+import { getTeamLogoUrl } from "@/lib/localTeams";
 
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -16,6 +19,7 @@ export function Header() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const team = useLocalTeamContext();
 
   useEffect(() => setMounted(true), []);
 
@@ -66,11 +70,30 @@ export function Header() {
           </form>
         ) : (
           <>
-            {/* App logo / title */}
-            <h1 className="text-2xl font-extrabold tracking-tighter">
-              <span className="text-gray-900 dark:text-white">wtm</span>
-              <span className="text-brand-600">?</span>
-            </h1>
+            {/* App logo / title + team branding */}
+            <div className="flex items-center gap-2">
+              {team && (
+                <Image
+                  src={getTeamLogoUrl(team)}
+                  alt={`${team.city} ${team.team} logo`}
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-contain"
+                  unoptimized
+                />
+              )}
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-extrabold tracking-tighter leading-none">
+                  <span className="text-gray-900 dark:text-white">wtm</span>
+                  <span className="text-brand-600">?</span>
+                </h1>
+                {team && (
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-600">
+                    Home of the {team.team}
+                  </p>
+                )}
+              </div>
+            </div>
             {/* Search + Theme toggle + Notification buttons */}
             <div className="flex items-center gap-1">
               <button

@@ -123,12 +123,14 @@ export async function GET(request: NextRequest) {
       // When searching, skip radius filtering and distance-based sorting —
       // just return search matches in chronological order (already sorted by startDate).
       if (!search) {
-        // Filter by radius if specified
-        if (maxRadius != null) {
-          shaped = shaped.filter(
-            (event: any) => event.distance != null && event.distance <= maxRadius
-          );
-        }
+        // Always filter out events that have no coordinates — they can't be
+        // distance-ranked and may be from an unrelated region.
+        // Then apply the radius cap if one was requested.
+        shaped = shaped.filter(
+          (event: any) =>
+            event.distance != null &&
+            (maxRadius == null || event.distance <= maxRadius)
+        );
 
         // Combined sort: closer + sooner events rank higher.
         // Normalize distance (0–50 mi → 0–1) and days away (0–30 → 0–1),

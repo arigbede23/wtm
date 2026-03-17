@@ -19,21 +19,22 @@ const config: Config = {
 
   theme: {
     extend: {
-      // Custom "brand" color palette — crimson red (Razorback vibes).
-      // Primary brand color is brand-600 (#C8102E).
+      // Custom "brand" color palette — defaults to crimson red (#C8102E).
+      // Each shade reads from a CSS variable (--brand-*) set by useLocalTeam,
+      // falling back to the default hex when no local team is detected.
       colors: {
         brand: {
-          50: "#fef2f2",   // Lightest — used for subtle backgrounds
-          100: "#fde3e3",
-          200: "#fccaca",
-          300: "#f9a3a3",
-          400: "#f46b6b",
-          500: "#e83a3a",
-          600: "#C8102E",  // Primary brand color — buttons, links, accents
-          700: "#a80d26",  // Hover state for brand-600
-          800: "#8c0f22",
-          900: "#751222",
-          950: "#40050e",  // Darkest
+          50: "var(--brand-50, #fef2f2)",
+          100: "var(--brand-100, #fde3e3)",
+          200: "var(--brand-200, #fccaca)",
+          300: "var(--brand-300, #f9a3a3)",
+          400: "var(--brand-400, #f46b6b)",
+          500: "var(--brand-500, #e83a3a)",
+          600: "var(--brand-600, #C8102E)",
+          700: "var(--brand-700, #a80d26)",
+          800: "var(--brand-800, #8c0f22)",
+          900: "var(--brand-900, #751222)",
+          950: "var(--brand-950, #40050e)",
         },
       },
 

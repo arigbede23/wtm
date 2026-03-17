@@ -18,25 +18,48 @@ type ExtractedEvent = {
   location: string | null;
   city: string | null;
   state: string | null;
+  lat: number | null;
+  lng: number | null;
   category: EventCategory;
   isFree: boolean;
   price: number | null;
 };
 
-export async function fetchInstagramEvents(): Promise<NormalizedEvent[]> {
+// Generate location-aware hashtags for a city (e.g. "Atlanta" → ["atlantaevents", "atlnightlife", ...])
+function cityHashtags(city: string): string[] {
+  const c = city.toLowerCase().replace(/[\s.'-]+/g, "");
+  return [
+    `${c}events`,
+    `${c}nightlife`,
+    `thingsToDo${city.replace(/[\s.'-]+/g, "")}`,
+  ];
+}
+
+export async function fetchInstagramEvents(
+  cities?: string[]
+): Promise<NormalizedEvent[]> {
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN;
   const userId = process.env.INSTAGRAM_USER_ID;
-  const hashtagsRaw = process.env.INSTAGRAM_HASHTAGS;
 
-  if (!accessToken || !userId || !hashtagsRaw) {
+  if (!accessToken || !userId) {
     console.warn(
       "[Sync] Instagram env vars not set, skipping Instagram discovery"
     );
     return [];
   }
 
+  // Build hashtags: from explicit city list, env override, or skip
+  let hashtags: string[];
+  if (cities && cities.length > 0) {
+    hashtags = cities.flatMap(cityHashtags);
+  } else if (process.env.INSTAGRAM_HASHTAGS) {
+    hashtags = process.env.INSTAGRAM_HASHTAGS.split(",").map((h) => h.trim());
+  } else {
+    console.warn("[Sync] No cities or INSTAGRAM_HASHTAGS provided, skipping Instagram");
+    return [];
+  }
+
   const openai = new OpenAI();
-  const hashtags = hashtagsRaw.split(",").map((h) => h.trim());
   const cutoff = new Date(Date.now() - MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
   const allEvents: NormalizedEvent[] = [];
 
@@ -94,8 +117,8 @@ export async function fetchInstagramEvents(): Promise<NormalizedEvent[]> {
             address: extracted.location,
             city: extracted.city,
             state: extracted.state,
-            lat: null,
-            lng: null,
+            lat: extracted.lat,
+            lng: extracted.lng,
             startDate: extracted.date,
             endDate: extracted.endDate,
             coverImageUrl: null,
@@ -142,6 +165,8 @@ If the caption describes a specific upcoming event with a date, return:
   "location": "venue or address or null",
   "city": "city name or null",
   "state": "two-letter state code or null",
+  "lat": approximate latitude of the city as a number, or null if city is unknown,
+  "lng": approximate longitude of the city as a number, or null if city is unknown,
   "category": one of "MUSIC","SPORTS","ARTS","FOOD","TECH","SOCIAL","COMEDY","WELLNESS","OUTDOORS","NIGHTLIFE","COMMUNITY","OTHER",
   "isFree": true/false,
   "price": number or null

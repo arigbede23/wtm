@@ -4,13 +4,21 @@
 
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
-import { cn, formatEventDateTime, formatPrice } from "@/lib/utils";
+import { cn, formatEventDateTime, formatPrice, friendsGoingText } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
+import { UserAvatar } from "@/components/social/UserAvatar";
+
+type FriendInfo = {
+  id: string;
+  displayName: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+};
 
 export function EventCard({
   event,
 }: {
-  event: EventWithCounts & { distance?: number };
+  event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -80,8 +88,28 @@ export function EventCard({
             </div>
           )}
 
+          {/* Friends going */}
+          {event.friendsGoing && event.friendsGoing.length > 0 && (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                {event.friendsGoing.slice(0, 3).map((friend) => (
+                  <UserAvatar
+                    key={friend.id}
+                    src={friend.avatarUrl}
+                    name={friend.displayName ?? friend.username}
+                    size="sm"
+                    className="ring-2 ring-white dark:ring-gray-900"
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {friendsGoingText(event.friendsGoing)}
+              </p>
+            </div>
+          )}
+
           {/* RSVP count */}
-          {event._count.rsvps > 0 && (
+          {event._count.rsvps > 0 && (!event.friendsGoing || event.friendsGoing.length === 0) && (
             <p className="mt-2 text-xs text-brand-600 font-medium">
               {event._count.rsvps} {event._count.rsvps === 1 ? "person" : "people"} going
             </p>

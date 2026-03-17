@@ -164,6 +164,52 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Attach friendsGoing if user is authenticated
+    try {
+      const authSupabase = createClient();
+      const {
+        data: { user },
+      } = await authSupabase.auth.getUser();
+
+      if (user && shaped.length > 0) {
+        // Get user's following list
+        const { data: follows } = await authSupabase
+          .from("follows")
+          .select("followingId")
+          .eq("followerId", user.id);
+
+        const followingIds = (follows ?? []).map((f: any) => f.followingId);
+
+        if (followingIds.length > 0) {
+          const eventIds = shaped.map((e: any) => e.id);
+
+          // Get RSVPs from friends for these events
+          const { data: friendRsvps } = await authSupabase
+            .from("rsvps")
+            .select("eventId, userId, user:userId(id, displayName, username, avatarUrl)")
+            .in("userId", followingIds)
+            .in("eventId", eventIds)
+            .eq("status", "GOING");
+
+          // Group by event
+          const friendsByEvent: Record<string, any[]> = {};
+          for (const rsvp of friendRsvps ?? []) {
+            if (!friendsByEvent[rsvp.eventId]) {
+              friendsByEvent[rsvp.eventId] = [];
+            }
+            friendsByEvent[rsvp.eventId].push(rsvp.user);
+          }
+
+          shaped = shaped.map((event: any) => ({
+            ...event,
+            friendsGoing: friendsByEvent[event.id] ?? [],
+          }));
+        }
+      }
+    } catch {
+      // Non-critical — just skip friendsGoing
+    }
+
     return NextResponse.json(shaped);
   } catch (error) {
     console.error("Failed to fetch events:", error);

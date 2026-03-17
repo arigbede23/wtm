@@ -123,6 +123,18 @@ export function buildCalendarUrl(event: {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+// Format friend names for "X is going" text on event cards
+export function friendsGoingText(
+  friends: { displayName: string | null; username: string | null }[]
+): string {
+  const names = friends.map(
+    (f) => f.displayName ?? f.username ?? "Someone"
+  );
+  if (names.length === 1) return `${names[0]} is going`;
+  if (names.length === 2) return `${names[0]} and ${names[1]} are going`;
+  return `${names[0]} and ${names.length - 1} others are going`;
+}
+
 // Build a Google Maps directions URL from event location data
 export function buildDirectionsUrl(event: {
   lat?: number | null;

@@ -5,21 +5,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORY_EMOJI, type EventCategory } from "@/types";
-
-const CATEGORIES: { value: EventCategory; label: string }[] = [
-  { value: "MUSIC", label: "Music" },
-  { value: "SPORTS", label: "Sports" },
-  { value: "ARTS", label: "Arts" },
-  { value: "FOOD", label: "Food & Drink" },
-  { value: "TECH", label: "Tech" },
-  { value: "SOCIAL", label: "Social" },
-  { value: "COMEDY", label: "Comedy" },
-  { value: "WELLNESS", label: "Wellness" },
-  { value: "OUTDOORS", label: "Outdoors" },
-  { value: "NIGHTLIFE", label: "Nightlife" },
-  { value: "COMMUNITY", label: "Community" },
-];
+import { CATEGORY_EMOJI } from "@/types";
+import { CATEGORIES } from "@/lib/constants";
 
 export default function OnboardingPage() {
   const router = useRouter();

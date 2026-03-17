@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { EventCard } from "@/components/events/EventCard";
 import { UserAvatar } from "./UserAvatar";
+import { friendsGoingText } from "@/lib/utils";
 import type { EventWithCounts } from "@/types";
 import Link from "next/link";
 import { Users } from "lucide-react";
@@ -113,13 +114,3 @@ export function FriendsFeed() {
   );
 }
 
-function friendsGoingText(
-  friends: { displayName: string | null; username: string | null }[]
-): string {
-  const names = friends.map(
-    (f) => f.displayName ?? f.username ?? "Someone"
-  );
-  if (names.length === 1) return `${names[0]} is going`;
-  if (names.length === 2) return `${names[0]} and ${names[1]} are going`;
-  return `${names[0]} and ${names.length - 1} others are going`;
-}

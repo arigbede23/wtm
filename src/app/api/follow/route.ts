@@ -14,7 +14,35 @@ export async function GET(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const userId = request.nextUrl.searchParams.get("userId");
+  const { searchParams } = request.nextUrl;
+  const list = searchParams.get("list");
+
+  // Return the current user's following list
+  if (list === "following") {
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    try {
+      const { data: follows, error } = await supabase
+        .from("follows")
+        .select("following:followingId(id, displayName, username, avatarUrl)")
+        .eq("followerId", user.id);
+
+      if (error) throw error;
+
+      const following = (follows ?? []).map((f: any) => f.following);
+      return NextResponse.json({ following });
+    } catch (error) {
+      console.error("Follow list error:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch following list" },
+        { status: 500 }
+      );
+    }
+  }
+
+  const userId = searchParams.get("userId");
 
   if (!userId) {
     return NextResponse.json(
@@ -118,15 +146,16 @@ export async function POST(request: NextRequest) {
 
       if (error) throw error;
 
-      // Fire-and-forget: create NEW_FOLLOWER notification
+      // Create NEW_FOLLOWER notification (non-blocking)
       try {
-        await supabase.from("notifications").insert({
+        const { error: notifError } = await supabase.from("notifications").insert({
           userId: targetUserId,
           actorId: user.id,
           type: "NEW_FOLLOWER",
         });
-      } catch {
-        // Don't break follow flow if notification fails
+        if (notifError) console.error("Follow notification insert error:", notifError);
+      } catch (err) {
+        console.error("Follow notification flow error:", err);
       }
 
       return NextResponse.json({ followed: true });

@@ -47,6 +47,13 @@ function getNotificationText(notification: NotificationItemType): {
           ? `/event/${notification.event.id}`
           : `/user/${notification.actor.id}`,
       };
+    case "EVENT_INVITE":
+      return {
+        text: `${actorName} invited you to ${notification.event?.title ?? "an event"}`,
+        href: notification.event
+          ? `/event/${notification.event.id}`
+          : `/user/${notification.actor.id}`,
+      };
   }
 }
 

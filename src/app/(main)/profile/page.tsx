@@ -11,7 +11,10 @@ import { LogOut, LogIn, CalendarPlus, Bookmark, Users, Pencil, Loader2, Camera }
 import Link from "next/link";
 import { EventCard } from "@/components/events/EventCard";
 import { UserAvatar } from "@/components/social/UserAvatar";
-import type { EventWithCounts, UserProfile } from "@/types";
+import { CATEGORIES } from "@/lib/constants";
+import { PushNotificationToggle } from "@/components/settings/PushNotificationToggle";
+import { CATEGORY_EMOJI } from "@/types";
+import type { EventWithCounts, UserProfile, EventCategory } from "@/types";
 
 type ProfileTab = "my-events" | "saved" | "attending";
 
@@ -40,6 +43,12 @@ export default function ProfilePage() {
   const [editError, setEditError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Interest editing state
+  const [interests, setInterests] = useState<string[]>([]);
+  const [editingInterests, setEditingInterests] = useState(false);
+  const [selectedInterests, setSelectedInterests] = useState<Set<string>>(new Set());
+  const [savingInterests, setSavingInterests] = useState(false);
+
   // Fetch DB profile
   useEffect(() => {
     if (!user) return;
@@ -63,6 +72,18 @@ export default function ProfilePage() {
       .then((data) => {
         setFollowerCount(data.followerCount ?? 0);
         setFollowingCount(data.followingCount ?? 0);
+      })
+      .catch(() => {});
+  }, [user]);
+
+  // Fetch interests
+  useEffect(() => {
+    if (!user) return;
+
+    fetch("/api/users/interests")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.interests)) setInterests(data.interests);
       })
       .catch(() => {});
   }, [user]);
@@ -117,6 +138,44 @@ export default function ProfilePage() {
     }
     setEditing(false);
     setEditError("");
+  };
+
+  const startEditingInterests = () => {
+    setSelectedInterests(new Set(interests));
+    setEditingInterests(true);
+  };
+
+  const toggleInterest = (category: string) => {
+    setSelectedInterests((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) next.delete(category);
+      else next.add(category);
+      return next;
+    });
+  };
+
+  const handleSaveInterests = async () => {
+    setSavingInterests(true);
+    const updated = Array.from(selectedInterests);
+    try {
+      await fetch("/api/users/interests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interests: updated }),
+      });
+      setInterests(updated);
+      setEditingInterests(false);
+      // Fire-and-forget: re-generate user embedding
+      fetch("/api/embeddings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "embed-user" }),
+      }).catch(() => {});
+    } catch {
+      // Silently fail — user can retry
+    } finally {
+      setSavingInterests(false);
+    }
   };
 
   const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -255,6 +314,84 @@ export default function ProfilePage() {
         <p className="text-sm text-gray-500">
           Member since {new Date(user.created_at).toLocaleDateString()}
         </p>
+
+        {/* Interests */}
+        {!editingInterests && interests.length > 0 && (
+          <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+            {interests.map((cat) => (
+              <span
+                key={cat}
+                className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
+                {CATEGORY_EMOJI[cat as EventCategory]} {cat.toLowerCase()}
+              </span>
+            ))}
+            <button
+              onClick={startEditingInterests}
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:text-gray-300"
+            >
+              <Pencil className="h-3 w-3" />
+              Edit
+            </button>
+          </div>
+        )}
+        {!editingInterests && interests.length === 0 && (
+          <button
+            onClick={startEditingInterests}
+            className="mt-3 text-xs text-brand-600 hover:text-brand-700"
+          >
+            + Add interests
+          </button>
+        )}
+        {editingInterests && (
+          <div className="mt-3 w-full rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+            <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select your interests
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {CATEGORIES.map(({ value, label }) => {
+                const isSelected = selectedInterests.has(value);
+                return (
+                  <button
+                    key={value}
+                    onClick={() => toggleInterest(value)}
+                    className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-left text-xs font-medium transition-all ${
+                      isSelected
+                        ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
+                        : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600"
+                    }`}
+                  >
+                    <span className="text-base">{CATEGORY_EMOJI[value]}</span>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={handleSaveInterests}
+                disabled={savingInterests}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-brand-600 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+              >
+                {savingInterests ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Interests"
+                )}
+              </button>
+              <button
+                onClick={() => setEditingInterests(false)}
+                disabled={savingInterests}
+                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Follower / Following counts */}
         <div className="mt-3 flex gap-6">
@@ -467,8 +604,12 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Sign out button */}
-      <div className="mt-8">
+      {/* Settings */}
+      <div className="mt-8 space-y-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
+          Settings
+        </h2>
+        <PushNotificationToggle />
         <button
           onClick={signOut}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"

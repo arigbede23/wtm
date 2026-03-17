@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendPushToUser } from "@/lib/pushNotifications";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,23 @@ export async function PATCH(
           }));
         if (notifications.length > 0) {
           await supabase.from("notifications").insert(notifications);
+
+          // Send push notifications
+          const { data: actor } = await supabase
+            .from("users")
+            .select("displayName, username")
+            .eq("id", user.id)
+            .single();
+          const actorName = actor?.displayName ?? actor?.username ?? "Someone";
+          const eventTitle = updated?.title ?? "an event";
+
+          for (const n of notifications) {
+            sendPushToUser(supabase, n.userId, {
+              title: "WTM",
+              body: `${actorName} updated ${eventTitle}`,
+              url: `/event/${params.id}`,
+            }).catch(() => {});
+          }
         }
       } catch {
         // Best-effort — don't block the response

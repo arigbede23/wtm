@@ -152,8 +152,15 @@ function FeedContent() {
             onFilterChange={setFilters}
           />
 
-          {/* Event list — uses shared fetch helper with filters */}
-          <EventList filters={apiFilters} />
+          {/* Event list — only fetch once we have location so we don't show
+              irrelevant events from other cities */}
+          {hasLocation ? (
+            <EventList filters={apiFilters} />
+          ) : !geoLoading ? (
+            <div className="px-4 pt-6 text-center text-sm text-gray-400 dark:text-gray-500">
+              Grant location access above to discover events near you
+            </div>
+          ) : null}
         </>
       )}
 

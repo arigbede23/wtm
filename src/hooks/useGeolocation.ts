@@ -6,7 +6,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 
-const STORAGE_KEY = "wtm-user-location";
+const STORAGE_KEY = "wtm-user-location-v2";
 
 type GeoState = {
   lat: number | null;
@@ -24,7 +24,8 @@ export function useGeolocation() {
     error: null,
   });
 
-  // Restore cached location from localStorage after mount (avoids hydration mismatch)
+  // Restore cached location from localStorage after mount (avoids hydration mismatch),
+  // then auto-refresh if permission was already granted so we don't serve stale coords.
   useEffect(() => {
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
@@ -34,6 +35,23 @@ export function useGeolocation() {
       }
     } catch {
       // ignore parse errors
+    }
+
+    // If permission is already granted, silently refresh in the background
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: "geolocation" }).then((result) => {
+        if (result.state === "granted") {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude: lat, longitude: lng } = position.coords;
+              localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+              setState({ lat, lng, loading: false, error: null });
+            },
+            () => {},
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+          );
+        }
+      }).catch(() => {});
     }
   }, []);
 
@@ -62,7 +80,7 @@ export function useGeolocation() {
           error: err.code === 1 ? "Location permission denied" : err.message,
         }));
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
     );
   }, []);
 

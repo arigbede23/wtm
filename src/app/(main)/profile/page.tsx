@@ -283,12 +283,20 @@ export default function ProfilePage() {
   const displayName = profile?.displayName || user.email;
   const avatarUrl = profile?.avatarUrl || null;
 
-  const events =
+  const allEvents =
     tab === "my-events"
       ? myEvents
       : tab === "saved"
         ? savedEvents
         : attendingEvents;
+
+  const now = Date.now();
+  const upcomingEvents = allEvents.filter(
+    (e) => new Date(e.endDate ?? e.startDate).getTime() >= now
+  );
+  const pastEvents = allEvents.filter(
+    (e) => new Date(e.endDate ?? e.startDate).getTime() < now
+  );
 
   // Logged in — show profile info, tabs, and events
   return (
@@ -576,7 +584,7 @@ export default function ProfilePage() {
               />
             ))}
           </div>
-        ) : events.length === 0 ? (
+        ) : allEvents.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-sm text-gray-500">
               {tab === "my-events"
@@ -596,11 +604,31 @@ export default function ProfilePage() {
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
+          <>
+            {/* Upcoming events */}
+            {upcomingEvents.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Upcoming
+                </h3>
+                {upcomingEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            )}
+
+            {/* Past events */}
+            {pastEvents.length > 0 && (
+              <div className={upcomingEvents.length > 0 ? "mt-6 space-y-4" : "space-y-4"}>
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                  Past
+                </h3>
+                {pastEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

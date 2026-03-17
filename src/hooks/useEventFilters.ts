@@ -31,6 +31,8 @@ export function useEventFilters() {
     if (dateFrom) f.dateFrom = dateFrom;
     const dateTo = searchParams.get("dateTo");
     if (dateTo) f.dateTo = dateTo;
+    const datePreset = searchParams.get("datePreset");
+    if (datePreset) f.datePreset = datePreset;
     return f;
   }, [searchParams]);
 

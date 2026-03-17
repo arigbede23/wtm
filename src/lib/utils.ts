@@ -48,6 +48,16 @@ export function formatEventDateTime(date: Date | string, timeZone?: string): str
   return `${formatted} · ${formatTime(date, timeZone)}`;
 }
 
+// Returns true if the event has already ended (or started, if no endDate)
+export function isEventPast(
+  startDate: Date | string,
+  endDate?: Date | string | null
+): boolean {
+  const now = Date.now();
+  if (endDate) return new Date(endDate).getTime() < now;
+  return new Date(startDate).getTime() < now;
+}
+
 // Calculate distance in miles between two lat/lng points using the Haversine formula
 export function getDistanceMiles(
   lat1: number,

@@ -157,26 +157,61 @@ export default function PublicProfilePage() {
           Events
         </h3>
 
-        {eventsLoading ? (
-          <div className="mt-4 space-y-4">
-            {[1, 2].map((i) => (
-              <div
-                key={i}
-                className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
-              />
-            ))}
-          </div>
-        ) : events.length === 0 ? (
-          <p className="mt-4 text-center text-sm text-gray-500">
-            No events yet
-          </p>
-        ) : (
-          <div className="mt-4 space-y-4">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        )}
+        {(() => {
+          const now = Date.now();
+          const upcoming = events.filter(
+            (e) => new Date(e.endDate ?? e.startDate).getTime() >= now
+          );
+          const past = events.filter(
+            (e) => new Date(e.endDate ?? e.startDate).getTime() < now
+          );
+
+          if (eventsLoading) {
+            return (
+              <div className="mt-4 space-y-4">
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
+                  />
+                ))}
+              </div>
+            );
+          }
+
+          if (events.length === 0) {
+            return (
+              <p className="mt-4 text-center text-sm text-gray-500">
+                No events yet
+              </p>
+            );
+          }
+
+          return (
+            <div className="mt-4">
+              {upcoming.length > 0 && (
+                <div className="space-y-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    Upcoming
+                  </h4>
+                  {upcoming.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+              )}
+              {past.length > 0 && (
+                <div className={upcoming.length > 0 ? "mt-6 space-y-4" : "space-y-4"}>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    Past
+                  </h4>
+                  {past.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

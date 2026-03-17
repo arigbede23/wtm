@@ -2,6 +2,10 @@ import { PrismaClient, EventCategory } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// Seed events with realistic dates relative to "now" so they're always fresh.
+// Sports events use typical game-time starts (NBA 7:30 PM ET, etc.)
+// based on common scheduling patterns from ESPN/league schedules.
+
 const events = [
   {
     title: "Rooftop Sunset DJ Set",
@@ -12,8 +16,8 @@ const events = [
     state: "NY",
     lat: 40.7565,
     lng: -73.9877,
-    startDate: new Date("2026-03-14T18:00:00"),
-    endDate: new Date("2026-03-14T23:00:00"),
+    startDate: daysFromNow(4, 18, 0),  // 6:00 PM
+    endDate: daysFromNow(4, 23, 0),    // 11:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800",
     isFree: false,
     price: 25,
@@ -27,8 +31,8 @@ const events = [
     state: "NY",
     lat: 40.7359,
     lng: -73.9911,
-    startDate: new Date("2026-03-15T08:00:00"),
-    endDate: new Date("2026-03-15T14:00:00"),
+    startDate: nextDayOfWeek(6, 8, 0),   // Saturday 8:00 AM
+    endDate: nextDayOfWeek(6, 14, 0),     // Saturday 2:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800",
     isFree: true,
   },
@@ -41,25 +45,27 @@ const events = [
     state: "NY",
     lat: 40.7297,
     lng: -74.0003,
-    startDate: new Date("2026-03-13T20:00:00"),
-    endDate: new Date("2026-03-13T23:00:00"),
+    startDate: daysFromNow(2, 20, 0),  // 8:00 PM
+    endDate: daysFromNow(2, 23, 0),    // 11:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800",
     isFree: false,
     price: 10,
   },
   {
-    title: "Pickup Basketball Tournament",
-    description: "3v3 streetball tournament. All skill levels welcome. Prizes for top team!",
+    // NBA game times: weeknight home games typically 7:30 PM ET (from ESPN)
+    title: "Knicks vs. Celtics — NBA Regular Season",
+    description: "New York Knicks host the Boston Celtics at Madison Square Garden. Tip-off at 7:30 PM ET.",
     category: EventCategory.SPORTS,
-    address: "West 4th Street Courts",
+    address: "Madison Square Garden, 4 Pennsylvania Plaza",
     city: "New York",
     state: "NY",
-    lat: 40.7318,
-    lng: -74.0003,
-    startDate: new Date("2026-03-16T10:00:00"),
-    endDate: new Date("2026-03-16T16:00:00"),
+    lat: 40.7505,
+    lng: -73.9934,
+    startDate: daysFromNow(3, 19, 30),  // 7:30 PM ET (typical NBA weeknight start)
+    endDate: daysFromNow(3, 22, 0),     // ~10:00 PM ET
     coverImageUrl: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800",
-    isFree: true,
+    isFree: false,
+    price: 89,
   },
   {
     title: "Indie Band Showcase",
@@ -70,8 +76,8 @@ const events = [
     state: "NY",
     lat: 40.7204,
     lng: -73.9937,
-    startDate: new Date("2026-03-14T19:00:00"),
-    endDate: new Date("2026-03-14T23:30:00"),
+    startDate: daysFromNow(5, 19, 0),  // 7:00 PM
+    endDate: daysFromNow(5, 23, 30),   // 11:30 PM
     coverImageUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
     isFree: false,
     price: 20,
@@ -85,8 +91,8 @@ const events = [
     state: "NY",
     lat: 40.7694,
     lng: -73.9751,
-    startDate: new Date("2026-03-15T07:00:00"),
-    endDate: new Date("2026-03-15T08:30:00"),
+    startDate: nextDayOfWeek(6, 7, 0),   // Saturday 7:00 AM
+    endDate: nextDayOfWeek(6, 8, 30),     // Saturday 8:30 AM
     coverImageUrl: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=800",
     isFree: true,
   },
@@ -99,8 +105,8 @@ const events = [
     state: "NY",
     lat: 40.6942,
     lng: -73.9866,
-    startDate: new Date("2026-03-21T09:00:00"),
-    endDate: new Date("2026-03-23T17:00:00"),
+    startDate: daysFromNow(8, 9, 0),    // 9:00 AM
+    endDate: daysFromNow(10, 17, 0),     // 5:00 PM (2 days later)
     coverImageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800",
     isFree: true,
   },
@@ -113,8 +119,8 @@ const events = [
     state: "NY",
     lat: 40.6932,
     lng: -73.9082,
-    startDate: new Date("2026-03-15T11:00:00"),
-    endDate: new Date("2026-03-15T13:30:00"),
+    startDate: nextDayOfWeek(0, 11, 0),   // Sunday 11:00 AM
+    endDate: nextDayOfWeek(0, 13, 30),     // Sunday 1:30 PM
     coverImageUrl: "https://images.unsplash.com/photo-1561059488-916d69792237?w=800",
     isFree: false,
     price: 15,
@@ -128,8 +134,8 @@ const events = [
     state: "NY",
     lat: 40.6861,
     lng: -73.9797,
-    startDate: new Date("2026-03-12T19:30:00"),
-    endDate: new Date("2026-03-12T22:00:00"),
+    startDate: nextDayOfWeek(3, 19, 30),  // Wednesday 7:30 PM
+    endDate: nextDayOfWeek(3, 22, 0),     // Wednesday 10:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800",
     isFree: true,
   },
@@ -142,8 +148,8 @@ const events = [
     state: "NY",
     lat: 40.6741,
     lng: -73.9708,
-    startDate: new Date("2026-03-16T08:00:00"),
-    endDate: new Date("2026-03-16T10:00:00"),
+    startDate: nextDayOfWeek(6, 8, 0),   // Saturday 8:00 AM
+    endDate: nextDayOfWeek(6, 10, 0),    // Saturday 10:00 AM
     coverImageUrl: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800",
     isFree: true,
   },
@@ -156,8 +162,8 @@ const events = [
     state: "NY",
     lat: 40.7026,
     lng: -73.9887,
-    startDate: new Date("2026-03-22T10:00:00"),
-    endDate: new Date("2026-03-22T17:00:00"),
+    startDate: daysFromNow(9, 10, 0),   // 10:00 AM
+    endDate: daysFromNow(9, 17, 0),     // 5:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?w=800",
     isFree: true,
   },
@@ -170,8 +176,8 @@ const events = [
     state: "NY",
     lat: 40.7171,
     lng: -73.9618,
-    startDate: new Date("2026-03-17T14:00:00"),
-    endDate: new Date("2026-03-17T17:00:00"),
+    startDate: daysFromNow(6, 14, 0),   // 2:00 PM
+    endDate: daysFromNow(6, 17, 0),     // 5:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800",
     isFree: false,
     price: 45,
@@ -185,8 +191,8 @@ const events = [
     state: "NY",
     lat: 40.6515,
     lng: -73.9969,
-    startDate: new Date("2026-03-20T12:00:00"),
-    endDate: new Date("2026-03-20T16:00:00"),
+    startDate: daysFromNow(7, 12, 0),   // 12:00 PM
+    endDate: daysFromNow(7, 16, 0),     // 4:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800",
     isFree: false,
     price: 35,
@@ -200,8 +206,8 @@ const events = [
     state: "NY",
     lat: 40.7265,
     lng: -73.9845,
-    startDate: new Date("2026-03-22T09:00:00"),
-    endDate: new Date("2026-03-22T13:00:00"),
+    startDate: nextDayOfWeek(6, 9, 0),   // Saturday 9:00 AM
+    endDate: nextDayOfWeek(6, 13, 0),    // Saturday 1:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800",
     isFree: true,
   },
@@ -214,8 +220,8 @@ const events = [
     state: "NY",
     lat: 40.7468,
     lng: -74.0084,
-    startDate: new Date("2026-03-18T18:30:00"),
-    endDate: new Date("2026-03-18T19:45:00"),
+    startDate: daysFromNow(5, 18, 30),  // 6:30 PM
+    endDate: daysFromNow(5, 19, 45),    // 7:45 PM
     coverImageUrl: "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?w=800",
     isFree: false,
     price: 20,
@@ -229,8 +235,8 @@ const events = [
     state: "NY",
     lat: 40.7145,
     lng: -73.9625,
-    startDate: new Date("2026-03-19T19:00:00"),
-    endDate: new Date("2026-03-19T22:00:00"),
+    startDate: daysFromNow(6, 19, 0),   // 7:00 PM
+    endDate: daysFromNow(6, 22, 0),     // 10:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800",
     isFree: false,
     price: 16,
@@ -244,8 +250,8 @@ const events = [
     state: "NY",
     lat: 40.7087,
     lng: -74.0107,
-    startDate: new Date("2026-03-18T18:00:00"),
-    endDate: new Date("2026-03-18T21:00:00"),
+    startDate: daysFromNow(4, 18, 0),   // 6:00 PM
+    endDate: daysFromNow(4, 21, 0),     // 9:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800",
     isFree: true,
   },
@@ -258,8 +264,8 @@ const events = [
     state: "NY",
     lat: 40.7336,
     lng: -73.9918,
-    startDate: new Date("2026-03-13T19:00:00"),
-    endDate: new Date("2026-03-13T21:00:00"),
+    startDate: daysFromNow(1, 19, 0),   // 7:00 PM
+    endDate: daysFromNow(1, 21, 0),     // 9:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800",
     isFree: false,
     price: 12,
@@ -273,8 +279,8 @@ const events = [
     state: "NY",
     lat: 40.7334,
     lng: -74.0115,
-    startDate: new Date("2026-03-21T17:00:00"),
-    endDate: new Date("2026-03-21T21:00:00"),
+    startDate: nextDayOfWeek(5, 17, 0),  // Friday 5:00 PM
+    endDate: nextDayOfWeek(5, 21, 0),    // Friday 9:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1504609813442-a8924e83f76e?w=800",
     isFree: true,
   },
@@ -287,25 +293,27 @@ const events = [
     state: "NY",
     lat: 40.7701,
     lng: -73.9558,
-    startDate: new Date("2026-03-14T14:00:00"),
-    endDate: new Date("2026-03-14T18:00:00"),
+    startDate: nextDayOfWeek(0, 14, 0),  // Sunday 2:00 PM
+    endDate: nextDayOfWeek(0, 18, 0),    // Sunday 6:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=800",
     isFree: false,
     price: 10,
   },
   {
-    title: "Soccer Pickup Game",
-    description: "Casual co-ed soccer. Show up and play! Pinnies provided. All skill levels.",
+    // MLS games typically kick off at 1:30 PM or 7:30 PM ET (per MLS schedule / ESPN)
+    title: "NYCFC vs. Inter Miami — MLS Regular Season",
+    description: "New York City FC take on Inter Miami at Yankee Stadium. Kickoff at 1:30 PM ET.",
     category: EventCategory.SPORTS,
-    address: "Randall's Island Fields",
-    city: "New York",
+    address: "Yankee Stadium, 1 E 161st St",
+    city: "Bronx",
     state: "NY",
-    lat: 40.7932,
-    lng: -73.9213,
-    startDate: new Date("2026-03-16T14:00:00"),
-    endDate: new Date("2026-03-16T17:00:00"),
+    lat: 40.8296,
+    lng: -73.9262,
+    startDate: nextDayOfWeek(6, 13, 30),  // Saturday 1:30 PM ET (typical MLS weekend start)
+    endDate: nextDayOfWeek(6, 15, 30),    // ~3:30 PM ET
     coverImageUrl: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800",
-    isFree: true,
+    isFree: false,
+    price: 35,
   },
   {
     title: "Jazz & Wine Night",
@@ -316,8 +324,8 @@ const events = [
     state: "NY",
     lat: 40.7338,
     lng: -74.0022,
-    startDate: new Date("2026-03-20T20:00:00"),
-    endDate: new Date("2026-03-21T00:00:00"),
+    startDate: daysFromNow(7, 20, 0),   // 8:00 PM
+    endDate: daysFromNow(8, 0, 0),      // 12:00 AM
     coverImageUrl: "https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800",
     isFree: false,
     price: 30,
@@ -331,8 +339,8 @@ const events = [
     state: "NY",
     lat: 40.7207,
     lng: -74.0134,
-    startDate: new Date("2026-03-22T10:00:00"),
-    endDate: new Date("2026-03-22T15:00:00"),
+    startDate: nextDayOfWeek(6, 10, 0),  // Saturday 10:00 AM
+    endDate: nextDayOfWeek(6, 15, 0),    // Saturday 3:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1472745433479-4556f22e32c2?w=800",
     isFree: true,
   },
@@ -345,8 +353,8 @@ const events = [
     state: "NY",
     lat: 40.7462,
     lng: -73.8448,
-    startDate: new Date("2026-03-21T17:00:00"),
-    endDate: new Date("2026-03-21T23:00:00"),
+    startDate: nextDayOfWeek(5, 17, 0),  // Friday 5:00 PM
+    endDate: nextDayOfWeek(5, 23, 0),    // Friday 11:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800",
     isFree: true,
   },
@@ -359,13 +367,73 @@ const events = [
     state: "NY",
     lat: 40.7473,
     lng: -73.9516,
-    startDate: new Date("2026-03-19T21:00:00"),
-    endDate: new Date("2026-03-19T23:00:00"),
+    startDate: daysFromNow(3, 21, 0),   // 9:00 PM
+    endDate: daysFromNow(3, 23, 0),     // 11:00 PM
     coverImageUrl: "https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=800",
     isFree: false,
     price: 15,
   },
+  {
+    // NHL games at MSG are typically 7:00 PM ET (per NHL schedule / ESPN)
+    title: "Rangers vs. Devils — NHL Regular Season",
+    description: "New York Rangers host the New Jersey Devils at Madison Square Garden. Puck drop at 7:00 PM ET.",
+    category: EventCategory.SPORTS,
+    address: "Madison Square Garden, 4 Pennsylvania Plaza",
+    city: "New York",
+    state: "NY",
+    lat: 40.7505,
+    lng: -73.9934,
+    startDate: daysFromNow(6, 19, 0),   // 7:00 PM ET (typical NHL weeknight)
+    endDate: daysFromNow(6, 22, 0),     // ~10:00 PM ET
+    coverImageUrl: "https://images.unsplash.com/photo-1580748141549-71748dbe0bdc?w=800",
+    isFree: false,
+    price: 75,
+  },
+  {
+    // MLB games: weeknight first pitch typically 7:05 PM ET (per MLB schedule / ESPN)
+    title: "Yankees vs. Red Sox — MLB Regular Season",
+    description: "The New York Yankees host the Boston Red Sox at Yankee Stadium. First pitch at 7:05 PM ET.",
+    category: EventCategory.SPORTS,
+    address: "Yankee Stadium, 1 E 161st St",
+    city: "Bronx",
+    state: "NY",
+    lat: 40.8296,
+    lng: -73.9262,
+    startDate: daysFromNow(10, 19, 5),  // 7:05 PM ET (typical MLB weeknight first pitch)
+    endDate: daysFromNow(10, 22, 0),    // ~10:00 PM ET
+    coverImageUrl: "https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=800",
+    isFree: false,
+    price: 55,
+  },
 ];
+
+// Helper: create a Date that is N days from now at a specific hour:minute (local time)
+function daysFromNow(days: number, hour: number, minute: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
+
+// Helper: get the next occurrence of a specific day of week (0=Sun, 6=Sat)
+// at a specific hour:minute. If today is that day and time hasn't passed, use today.
+function nextDayOfWeek(dayOfWeek: number, hour: number, minute: number): Date {
+  const d = new Date();
+  const currentDay = d.getDay();
+  let daysAhead = dayOfWeek - currentDay;
+  if (daysAhead < 0) daysAhead += 7;
+  if (daysAhead === 0) {
+    // Same day — check if time has passed
+    const target = new Date(d);
+    target.setHours(hour, minute, 0, 0);
+    if (target.getTime() <= d.getTime()) {
+      daysAhead = 7; // next week
+    }
+  }
+  d.setDate(d.getDate() + daysAhead);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
 
 async function main() {
   console.log("Seeding database...");

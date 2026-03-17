@@ -50,6 +50,7 @@ export type EventFilters = {
   isFree?: boolean;
   dateFrom?: string;
   dateTo?: string;
+  datePreset?: string; // tracks which date filter button is active
 };
 
 // Public user profile shape

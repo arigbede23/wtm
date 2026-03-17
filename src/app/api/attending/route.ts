@@ -30,12 +30,11 @@ export async function GET(request: NextRequest) {
          )`
       )
       .eq("userId", user.id)
-      .eq("status", "GOING")
-      .order("createdAt", { ascending: false });
+      .eq("status", "GOING");
 
     if (error) throw error;
 
-    // Reshape to match EventWithCounts format
+    // Reshape to match EventWithCounts format, sorted by event startDate
     const events = (data ?? [])
       .filter((r: any) => r.events)
       .map((r: any) => ({
@@ -43,7 +42,8 @@ export async function GET(request: NextRequest) {
         _count: {
           rsvps: r.events.rsvps?.[0]?.count ?? 0,
         },
-      }));
+      }))
+      .sort((a: any, b: any) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
     return NextResponse.json(events);
   } catch (error) {

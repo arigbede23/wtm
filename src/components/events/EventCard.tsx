@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
-import { cn, formatEventDateTime, formatPrice, friendsGoingText } from "@/lib/utils";
+import { cn, formatEventDateTime, formatPrice, friendsGoingText, isEventPast } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
 import { UserAvatar } from "@/components/social/UserAvatar";
 
@@ -20,9 +20,11 @@ export function EventCard({
 }: {
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
+  const past = isEventPast(event.startDate, event.endDate);
+
   return (
     <Link href={`/event/${event.id}`} className="block">
-      <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
+      <article className={cn("group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900", past && "opacity-60")}>
         {/* Cover Image */}
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-gray-800">
           {event.coverImageUrl ? (
@@ -55,6 +57,13 @@ export function EventCard({
           <div className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
             {CATEGORY_EMOJI[event.category]} {event.category.toLowerCase()}
           </div>
+
+          {/* Ended badge — bottom left corner */}
+          {past && (
+            <div className="absolute bottom-3 left-3 rounded-full bg-gray-900/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              Ended
+            </div>
+          )}
         </div>
 
         {/* Card body — text content below the image */}

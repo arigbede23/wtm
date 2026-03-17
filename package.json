@@ -30,12 +30,14 @@
     "react-leaflet": "^4.2.1",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
+    "web-push": "^3.6.7",
     "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.21",
     "@types/node": "^25.3.3",
     "@types/react": "^18.3.28",
+    "@types/web-push": "^3.6.4",
     "autoprefixer": "^10.4.27",
     "pg": "^8.19.0",
     "postcss": "^8.5.8",

@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { sendPushToUser } from "@/lib/pushNotifications";
 
 export const dynamic = "force-dynamic";
 
@@ -86,10 +87,37 @@ export async function POST(request: NextRequest) {
           eventId,
         }));
 
-        await supabase.from("notifications").insert(notifications);
+        const { error: notifError } = await supabase.from("notifications").insert(notifications);
+        if (notifError) console.error("RSVP notification insert error:", notifError);
+
+        // Send push notifications
+        const [{ data: actor }, { data: evt }] = await Promise.all([
+          supabase
+            .from("users")
+            .select("displayName, username")
+            .eq("id", user.id)
+            .single(),
+          supabase
+            .from("events")
+            .select("title")
+            .eq("id", eventId)
+            .single(),
+        ]);
+
+        const actorName = actor?.displayName ?? actor?.username ?? "Someone";
+        const eventTitle = evt?.title ?? "an event";
+        const verb = status === "GOING" ? "is going to" : "is interested in";
+
+        for (const f of followers) {
+          sendPushToUser(supabase, f.followerId, {
+            title: "WTM",
+            body: `${actorName} ${verb} ${eventTitle}`,
+            url: `/event/${eventId}`,
+          }).catch((err) => console.error("Push notification error for follower:", f.followerId, err));
+        }
       }
-    } catch {
-      // Don't break RSVP flow if notification fails
+    } catch (err) {
+      console.error("RSVP notification flow error:", err);
     }
 
     return NextResponse.json(data);

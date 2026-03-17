@@ -4,14 +4,35 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // Allow loading images from ANY https domain.
-    // This is needed because event cover images come from external URLs
-    // (e.g., images.unsplash.com). Without this, Next.js blocks external images.
-    // In production, you'd restrict this to specific trusted domains.
+    // Allow loading images from trusted external domains only.
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // ** = wildcard, matches any hostname
+        hostname: "lqapbkfbvlcqvnurszhv.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "s1.ticketm.net",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ticketm.net",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "img.evbuc.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.eventbritecdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "unpkg.com",
       },
     ],
   },

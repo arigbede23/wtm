@@ -30,6 +30,46 @@ self.addEventListener("activate", (event) => {
   self.clients.claim(); // Take control of all open tabs immediately
 });
 
+// PUSH — handle incoming push notifications from the server.
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+
+  try {
+    const data = event.data.json();
+    const options = {
+      body: data.body || "",
+      icon: "/icons/icon-192x192.png",
+      badge: "/icons/icon-192x192.png",
+      data: { url: data.url || "/feed" },
+    };
+
+    event.waitUntil(self.registration.showNotification(data.title || "WTM", options));
+  } catch {
+    // Ignore malformed push data
+  }
+});
+
+// NOTIFICATION CLICK — handle taps on push notifications.
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const url = event.notification.data?.url || "/feed";
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      // Focus an existing tab if one is open
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      // Otherwise open a new tab
+      return clients.openWindow(url);
+    })
+  );
+});
+
 // FETCH — intercepts every network request the app makes.
 // Strategy: try network first, fall back to cache if offline.
 self.addEventListener("fetch", (event) => {

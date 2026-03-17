@@ -2,12 +2,24 @@
 
 import webpush from "web-push";
 
-// Configure VAPID keys
-webpush.setVapidDetails(
-  "mailto:noreply@wtm-one.vercel.app",
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+// Configure VAPID keys lazily to avoid crashing at import time
+// when environment variables are not yet available (e.g. during build).
+let vapidConfigured = false;
+function ensureVapid() {
+  if (vapidConfigured) return;
+  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const privateKey = process.env.VAPID_PRIVATE_KEY;
+  if (!publicKey || !privateKey) {
+    console.warn("VAPID keys not configured — push notifications disabled");
+    return;
+  }
+  webpush.setVapidDetails(
+    "mailto:noreply@wtm-one.vercel.app",
+    publicKey,
+    privateKey
+  );
+  vapidConfigured = true;
+}
 
 type PushPayload = {
   title: string;
@@ -28,6 +40,9 @@ export async function sendPushToUser(
     .eq("userId", userId);
 
   if (!subscriptions || subscriptions.length === 0) return;
+
+  ensureVapid();
+  if (!vapidConfigured) return;
 
   const message = JSON.stringify(payload);
 

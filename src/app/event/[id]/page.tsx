@@ -17,7 +17,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
-import { formatDate, formatTime, formatPrice, isTimeMidnight, buildCalendarUrl, buildDirectionsUrl } from "@/lib/utils";
+import { formatDate, formatTime, formatPrice, isTimeMidnight, isEventPast, buildCalendarUrl, buildDirectionsUrl } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
@@ -41,20 +41,33 @@ export default async function EventDetailPage({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Fetch the event by ID, including RSVP count
+  // Fetch the event by ID, including RSVP count.
+  // Note: organizer join is separate to avoid RLS issues with the users table.
   const { data: event, error } = await supabase
     .from("events")
-    .select("*, rsvps(count), organizer:organizerId(id, displayName, username, avatarUrl)")
+    .select("*, rsvps(count)")
     .eq("id", params.id)
-    .single(); // .single() returns one object instead of an array
+    .single();
 
   // If the event doesn't exist, show the 404 page
   if (error || !event) {
     notFound();
   }
 
+  // Fetch organizer info separately (may fail if user is anonymous — that's OK)
+  let organizer: { id: string; displayName: string | null; username: string | null; avatarUrl: string | null } | null = null;
+  if (event.organizerId) {
+    const { data } = await supabase
+      .from("users")
+      .select("id, displayName, username, avatarUrl")
+      .eq("id", event.organizerId)
+      .single();
+    organizer = data;
+  }
+
   const rsvpCount = event.rsvps?.[0]?.count ?? 0;
   const category = event.category as EventCategory;
+  const past = isEventPast(event.startDate, event.endDate);
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-white dark:bg-gray-950">
@@ -90,8 +103,15 @@ export default async function EventDetailPage({
 
       {/* Event Details Section */}
       <div className="p-4">
+        {/* Past event banner */}
+        {past && (
+          <div className="mb-3 rounded-xl bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            This event has ended
+          </div>
+        )}
+
         {/* Edit / Delete buttons (only visible to organizer) */}
-        <EventActions eventId={event.id} organizerId={event.organizerId} />
+        <EventActions eventId={event.id} organizerId={(event as any).organizerId ?? null} />
 
         {/* Category pill */}
         <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
@@ -188,26 +208,26 @@ export default async function EventDetailPage({
         )}
 
         {/* Organized by */}
-        {event.organizer && (
+        {organizer && (
           <div className="mt-6">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
               Organized by
             </h2>
             <Link
-              href={`/user/${event.organizer.id}`}
+              href={`/user/${organizer.id}`}
               className="mt-2 flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
             >
               <UserAvatar
-                src={event.organizer.avatarUrl}
-                name={event.organizer.displayName ?? event.organizer.username}
+                src={organizer.avatarUrl}
+                name={organizer.displayName ?? organizer.username}
                 size="sm"
               />
               <div className="min-w-0">
                 <p className="font-medium text-gray-900 dark:text-gray-100">
-                  {event.organizer.displayName ?? event.organizer.username}
+                  {organizer.displayName ?? organizer.username}
                 </p>
-                {event.organizer.username && (
-                  <p className="text-sm text-gray-500">@{event.organizer.username}</p>
+                {organizer.username && (
+                  <p className="text-sm text-gray-500">@{organizer.username}</p>
                 )}
               </div>
             </Link>

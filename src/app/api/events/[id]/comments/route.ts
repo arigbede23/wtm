@@ -6,14 +6,19 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const supabase = createClient();
 
+  // Check auth for likedByMe
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: comments, error } = await supabase
     .from("comments")
-    .select("id, text, createdAt, userId, user:userId(id, displayName, username, avatarUrl)")
+    .select("id, text, createdAt, pinned, userId, user:userId(id, displayName, username, avatarUrl)")
     .eq("eventId", params.id)
     .order("createdAt", { ascending: true });
 
@@ -25,7 +30,51 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(comments ?? []);
+  if (!comments || comments.length === 0) {
+    return NextResponse.json([]);
+  }
+
+  // Batch-query like counts for all comments
+  const commentIds = comments.map((c: any) => c.id);
+
+  const { data: likeCounts } = await supabase
+    .from("comment_likes")
+    .select("commentId")
+    .in("commentId", commentIds);
+
+  // Count likes per comment
+  const likeCountMap: Record<string, number> = {};
+  for (const like of likeCounts ?? []) {
+    likeCountMap[like.commentId] = (likeCountMap[like.commentId] ?? 0) + 1;
+  }
+
+  // Check which comments the current user has liked
+  let userLikeSet = new Set<string>();
+  if (user) {
+    const { data: userLikes } = await supabase
+      .from("comment_likes")
+      .select("commentId")
+      .eq("userId", user.id)
+      .in("commentId", commentIds);
+
+    userLikeSet = new Set((userLikes ?? []).map((l: any) => l.commentId));
+  }
+
+  // Attach like data and sort pinned first
+  const enriched = comments.map((c: any) => ({
+    ...c,
+    likeCount: likeCountMap[c.id] ?? 0,
+    likedByMe: userLikeSet.has(c.id),
+    pinned: c.pinned ?? false,
+  }));
+
+  enriched.sort((a: any, b: any) => {
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+    return 0;
+  });
+
+  return NextResponse.json(enriched);
 }
 
 export async function POST(

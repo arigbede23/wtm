@@ -62,6 +62,15 @@ enum NotificationType {
   NEW_FOLLOWER
   FRIEND_GOING
   FRIEND_INTERESTED
+  EVENT_UPDATED
+  EVENT_INVITE
+}
+
+// What's the status of an invite?
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }
 
 // --- MODELS ---
@@ -80,16 +89,23 @@ model User {
   createdAt   DateTime @default(now())        // Auto-set when the user is created
   updatedAt   DateTime @updatedAt             // Auto-updated whenever the user record changes
 
+  embedding   Unsupported("vector(1536)")?  // OpenAI embedding for recommendations
+
   // Relations — these connect User to other tables
   organizedEvents Event[]      @relation("organizer")  // Events this user created
   rsvps           RSVP[]                               // Events they've RSVP'd to
   savedEvents     SavedEvent[]                          // Events they've bookmarked
+  comments        Comment[]                             // Comments this user posted
+  commentLikes    CommentLike[]                         // Comments this user liked
 
-  // Social relations (Phase 5)
+  // Social relations
   followers          Follow[]        @relation("following") // People who follow this user
   following          Follow[]        @relation("follower")  // People this user follows
   notifications      Notification[]  @relation("notificationRecipient")
   actedNotifications Notification[]  @relation("notificationActor")
+  sentInvites        Invite[]        @relation("inviteSender")
+  receivedInvites    Invite[]        @relation("inviteRecipient")
+  pushSubscriptions  PushSubscription[]
 
   @@map("users")  // The actual table name in Postgres (lowercase convention)
 }
@@ -119,10 +135,14 @@ model Event {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
+  embedding     Unsupported("vector(1536)")?  // OpenAI embedding for recommendations
+
   // Relations
   rsvps         RSVP[]
   savedEvents   SavedEvent[]
   notifications Notification[]   // Notifications referencing this event
+  comments      Comment[]
+  invites       Invite[]
 
   @@unique([source, externalId])  // Prevents duplicate imports from the same API
   @@index([startDate])            // Makes sorting by date fast
@@ -194,4 +214,67 @@ model Notification {
   @@index([userId, read])
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+// A comment on an event
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  pinned    Boolean  @default(false)
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  likes CommentLike[]
+
+  @@index([eventId, createdAt])
+  @@map("comments")
+}
+
+// Tracks likes on comments
+model CommentLike {
+  id        String   @id @default(uuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])  // One like per user per comment
+  @@map("comment_likes")
+}
+
+// Browser push notification subscriptions
+model PushSubscription {
+  id       String @id @default(uuid())
+  userId   String
+  endpoint String
+  p256dh   String
+  auth     String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, endpoint])  // One subscription per endpoint per user
+  @@map("push_subscriptions")
+}
+
+// Event invitations from one user to another
+model Invite {
+  id          String       @id @default(uuid())
+  eventId     String
+  senderId    String
+  recipientId String
+  status      InviteStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+
+  event     Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sender    User  @relation("inviteSender", fields: [senderId], references: [id], onDelete: Cascade)
+  recipient User  @relation("inviteRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, senderId, recipientId])  // One invite per sender-recipient-event combo
+  @@index([recipientId])
+  @@map("invites")
 }

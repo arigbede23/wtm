@@ -65,7 +65,7 @@ export type UserProfile = {
 };
 
 // Notification types (must match Prisma enum)
-export type NotificationType = "NEW_FOLLOWER" | "FRIEND_GOING" | "FRIEND_INTERESTED" | "EVENT_UPDATED";
+export type NotificationType = "NEW_FOLLOWER" | "FRIEND_GOING" | "FRIEND_INTERESTED" | "EVENT_UPDATED" | "EVENT_INVITE";
 
 // A single notification as returned by the API
 export type NotificationItem = {

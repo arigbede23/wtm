@@ -27,6 +27,7 @@ import { ShareButton } from "@/components/social/ShareButton";
 import { AttendeeList } from "@/components/social/AttendeeList";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
+import { InviteFriendsButton } from "@/components/events/InviteFriendsButton";
 
 export default async function EventDetailPage({
   params,
@@ -214,10 +215,15 @@ export default async function EventDetailPage({
         )}
 
         {/* Comments / Discussion */}
-        <Comments eventId={event.id} />
+        <Comments eventId={event.id} organizerId={event.organizerId} />
 
         {/* Attendee list — who's going */}
         <AttendeeList eventId={event.id} rsvpCount={rsvpCount} />
+
+        {/* Invite Friends */}
+        <div className="mt-4">
+          <InviteFriendsButton eventId={event.id} />
+        </div>
 
         {/* RSVP Buttons — client component handles auth state and API calls */}
         <RsvpButtons eventId={event.id} initialRsvpCount={rsvpCount} />

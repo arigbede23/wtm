@@ -1,10 +1,11 @@
 // useGeolocation — provides the user's current location via the browser Geolocation API.
-// Caches the position in localStorage so it's available instantly on subsequent loads.
-// Does NOT auto-request; the user must explicitly grant permission via requestLocation().
+// Continuously watches position when permission is granted so the app stays
+// up to date as the user moves. Caches the latest position in localStorage
+// so it's available instantly on subsequent loads.
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 const STORAGE_KEY = "wtm-user-location-v2";
 
@@ -16,17 +17,17 @@ type GeoState = {
 };
 
 export function useGeolocation() {
-  // Always start with null so server and client initial render match.
   const [state, setState] = useState<GeoState>({
     lat: null,
     lng: null,
     loading: false,
     error: null,
   });
+  const watchId = useRef<number | null>(null);
 
-  // Restore cached location from localStorage after mount (avoids hydration mismatch),
-  // then auto-refresh if permission was already granted so we don't serve stale coords.
+  // Restore cached position on mount, then start watching if permission exists
   useEffect(() => {
+    // 1. Restore cache so we have something immediately
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
@@ -34,26 +35,45 @@ export function useGeolocation() {
         setState({ lat, lng, loading: false, error: null });
       }
     } catch {
-      // ignore parse errors
+      // ignore
     }
 
-    // If permission is already granted, silently refresh in the background
+    // 2. If permission already granted, start watching position continuously
     if (navigator.permissions) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         if (result.state === "granted") {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const { latitude: lat, longitude: lng } = position.coords;
-              localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
-              setState({ lat, lng, loading: false, error: null });
-            },
-            () => {},
-            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
-          );
+          startWatching();
         }
       }).catch(() => {});
     }
+
+    return () => {
+      if (watchId.current != null) {
+        navigator.geolocation.clearWatch(watchId.current);
+      }
+    };
   }, []);
+
+  function startWatching() {
+    if (watchId.current != null) return; // already watching
+    if (!navigator.geolocation) return;
+
+    watchId.current = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+        setState({ lat, lng, loading: false, error: null });
+      },
+      (err) => {
+        setState((s) => ({
+          ...s,
+          loading: false,
+          error: err.code === 1 ? "Location permission denied" : err.message,
+        }));
+      },
+      { enableHighAccuracy: false, timeout: 10000 }
+    );
+  }
 
   const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {
@@ -72,6 +92,8 @@ export function useGeolocation() {
         const { latitude: lat, longitude: lng } = position.coords;
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
         setState({ lat, lng, loading: false, error: null });
+        // Start continuous watching after first grant
+        startWatching();
       },
       (err) => {
         setState((s) => ({
@@ -80,7 +102,7 @@ export function useGeolocation() {
           error: err.code === 1 ? "Location permission denied" : err.message,
         }));
       },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      { enableHighAccuracy: false, timeout: 10000 }
     );
   }, []);
 

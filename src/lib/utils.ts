@@ -11,28 +11,38 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Ensure a date string is treated as UTC — some stored dates are missing
+// the trailing "Z", which causes JS to parse them as local time.
+function toUTC(date: Date | string): Date {
+  if (typeof date === "string" && !date.endsWith("Z") && !date.includes("+")) {
+    return new Date(date + "Z");
+  }
+  return new Date(date);
+}
+
 // Format a date as "Mon, Mar 14"
 export function formatDate(date: Date | string) {
-  return new Date(date).toLocaleDateString("en-US", {
+  return toUTC(date).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
     day: "numeric",
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 }
 
 // Format a time as "6:00 PM", optionally in a specific timezone
 export function formatTime(date: Date | string, timeZone?: string) {
-  return new Date(date).toLocaleTimeString("en-US", {
+  return toUTC(date).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
-    ...(timeZone && { timeZone }),
+    timeZone: timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 }
 
 // Returns true if the time portion is exactly 00:00:00 UTC,
 // meaning the API didn't provide a specific time (date-only event).
 export function isTimeMidnight(date: Date | string): boolean {
-  const d = new Date(date);
+  const d = toUTC(date);
   return (
     d.getUTCHours() === 0 &&
     d.getUTCMinutes() === 0 &&

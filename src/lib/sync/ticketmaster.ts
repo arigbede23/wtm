@@ -111,7 +111,11 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
     !tmStart?.timeTBD &&
     !tmStart?.noSpecificTime
   ) {
-    startDate = tmStart.dateTime;
+    // Ticketmaster dateTime is UTC — ensure it has a Z suffix so JS
+    // doesn't misinterpret it as local time when parsing.
+    startDate = tmStart.dateTime.endsWith("Z")
+      ? tmStart.dateTime
+      : tmStart.dateTime + "Z";
   } else if (tmStart?.localDate) {
     // date-only: midnight UTC signals "no specific time"
     startDate = `${tmStart.localDate}T00:00:00Z`;
@@ -123,7 +127,9 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
   let endDate: string | null = null;
   const tmEnd = ev.dates?.end;
   if (tmEnd?.dateTime && !tmEnd?.approximate) {
-    endDate = tmEnd.dateTime;
+    endDate = tmEnd.dateTime.endsWith("Z")
+      ? tmEnd.dateTime
+      : tmEnd.dateTime + "Z";
   }
 
   return {

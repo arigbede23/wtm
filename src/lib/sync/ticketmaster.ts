@@ -99,7 +99,7 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
   // Price info
   const priceRange = ev.priceRanges?.[0];
   const minPrice = priceRange?.min ?? null;
-  const isFree = minPrice === 0 || minPrice === null;
+  const isFree = minPrice === 0;
 
   // Build a reliable startDate. If Ticketmaster flags the time as TBD
   // or doesn't provide a dateTime, store a date-only value (midnight UTC)

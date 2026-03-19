@@ -95,7 +95,7 @@ function normalizeEBEvent(ev: any): NormalizedEvent | null {
   if (!id || !title) return null;
 
   const venue = ev.venue;
-  const isFree = ev.is_free ?? true;
+  const isFree = ev.is_free ?? false;
 
   // If Eventbrite doesn't provide a start time, skip the event
   if (!ev.start?.utc) return null;

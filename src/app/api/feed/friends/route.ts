@@ -3,10 +3,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { haversineDistance } from "@/lib/geo";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const userLat = searchParams.get("lat") ? parseFloat(searchParams.get("lat")!) : null;
+  const userLng = searchParams.get("lng") ? parseFloat(searchParams.get("lng")!) : null;
+  const maxRadius = searchParams.get("radius") ? parseFloat(searchParams.get("radius")!) : null;
   const supabase = createClient();
 
   const {
@@ -76,11 +81,20 @@ export async function GET(request: NextRequest) {
     if (eventError) throw eventError;
 
     // 5. Attach friendsGoing to each event
-    const result = (events ?? []).map((event: any) => ({
+    let result = (events ?? []).map((event: any) => ({
       ...event,
       _count: { rsvps: event.rsvps?.[0]?.count ?? 0 },
       friendsGoing: eventFriendsMap[event.id] ?? [],
     }));
+
+    // 6. Filter by location radius
+    if (userLat != null && userLng != null) {
+      result = result.filter((e: any) => {
+        if (e.lat == null || e.lng == null) return false;
+        const dist = haversineDistance(userLat, userLng, e.lat, e.lng);
+        return maxRadius == null || dist <= maxRadius;
+      });
+    }
 
     return NextResponse.json(result);
   } catch (error) {

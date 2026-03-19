@@ -164,9 +164,9 @@ function FeedContent() {
         </>
       )}
 
-      {tab === "foryou" && <ForYouFeed />}
+      {tab === "foryou" && <ForYouFeed lat={lat} lng={lng} />}
 
-      {tab === "friends" && <FriendsFeed />}
+      {tab === "friends" && <FriendsFeed lat={lat} lng={lng} />}
     </div>
   );
 }

@@ -20,7 +20,7 @@ type FriendEvent = EventWithCounts & {
   }[];
 };
 
-export function FriendsFeed() {
+export function FriendsFeed({ lat, lng }: { lat?: number | null; lng?: number | null }) {
   const { user, loading: authLoading } = useAuth();
   const [events, setEvents] = useState<FriendEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,14 +31,20 @@ export function FriendsFeed() {
       return;
     }
 
-    fetch("/api/feed/friends")
+    const params = new URLSearchParams();
+    if (lat != null && lng != null) {
+      params.set("lat", String(lat));
+      params.set("lng", String(lng));
+      params.set("radius", "50");
+    }
+    fetch(`/api/feed/friends?${params}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setEvents(data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, lat, lng]);
 
   if (authLoading || loading) {
     return (

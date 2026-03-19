@@ -3,13 +3,18 @@
 // Strategy 2: category fallback (user has interests but no embedding)
 // Strategy 3: empty array (no interests — UI prompts user to set them)
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
+import { haversineDistance } from "@/lib/geo";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const userLat = searchParams.get("lat") ? parseFloat(searchParams.get("lat")!) : null;
+  const userLng = searchParams.get("lng") ? parseFloat(searchParams.get("lng")!) : null;
+  const maxRadius = searchParams.get("radius") ? parseFloat(searchParams.get("radius")!) : null;
   const supabase = createClient();
   const {
     data: { user },
@@ -60,10 +65,19 @@ export async function GET() {
         .eq("status", "PUBLISHED")
         .gte("startDate", new Date().toISOString());
 
-      const shaped = (events ?? []).map((e: any) => ({
+      let shaped = (events ?? []).map((e: any) => ({
         ...e,
         _count: { rsvps: e.rsvps?.[0]?.count ?? 0 },
       }));
+
+      // Filter by location radius
+      if (userLat != null && userLng != null) {
+        shaped = shaped.filter((e: any) => {
+          if (e.lat == null || e.lng == null) return false;
+          const dist = haversineDistance(userLat, userLng, e.lat, e.lng);
+          return maxRadius == null || dist <= maxRadius;
+        });
+      }
 
       // Preserve similarity ordering
       const orderMap = new Map<string, number>(eventIds.map((id: string, i: number) => [id, i]));
@@ -86,10 +100,19 @@ export async function GET() {
     .order("startDate", { ascending: true })
     .limit(20);
 
-  const shaped = (events ?? []).map((e: any) => ({
+  let shaped = (events ?? []).map((e: any) => ({
     ...e,
     _count: { rsvps: e.rsvps?.[0]?.count ?? 0 },
   }));
+
+  // Filter by location radius
+  if (userLat != null && userLng != null) {
+    shaped = shaped.filter((e: any) => {
+      if (e.lat == null || e.lng == null) return false;
+      const dist = haversineDistance(userLat, userLng, e.lat, e.lng);
+      return maxRadius == null || dist <= maxRadius;
+    });
+  }
 
   return NextResponse.json({ events: shaped, strategy: "categories" });
 }

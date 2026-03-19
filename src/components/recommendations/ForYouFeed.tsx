@@ -10,7 +10,7 @@ import type { EventWithCounts } from "@/types";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
-export function ForYouFeed() {
+export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | null }) {
   const { user, loading: authLoading } = useAuth();
   const [events, setEvents] = useState<EventWithCounts[]>([]);
   const [strategy, setStrategy] = useState<string>("");
@@ -24,7 +24,13 @@ export function ForYouFeed() {
       return;
     }
 
-    fetch("/api/feed/for-you")
+    const params = new URLSearchParams();
+    if (lat != null && lng != null) {
+      params.set("lat", String(lat));
+      params.set("lng", String(lng));
+      params.set("radius", "50");
+    }
+    fetch(`/api/feed/for-you?${params}`)
       .then((res) => {
         if (!res.ok) throw new Error(`API returned ${res.status}`);
         return res.json();
@@ -39,7 +45,7 @@ export function ForYouFeed() {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  }, [user, authLoading]);
+  }, [user, authLoading, lat, lng]);
 
   // Loading state
   if (authLoading || loading) {

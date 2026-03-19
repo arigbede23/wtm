@@ -38,13 +38,21 @@ export function useGeolocation() {
       // ignore
     }
 
-    // 2. If permission already granted, start watching position continuously
+    // 2. If permission already granted, start watching position continuously.
+    // navigator.permissions is not supported in Safari, so fall back to
+    // attempting watchPosition directly (it will silently succeed if granted).
     if (navigator.permissions) {
       navigator.permissions.query({ name: "geolocation" }).then((result) => {
         if (result.state === "granted") {
           startWatching();
         }
-      }).catch(() => {});
+      }).catch(() => {
+        // Safari: permissions API unavailable, try watching directly
+        startWatching();
+      });
+    } else {
+      // Safari / older browsers: no permissions API, try watching directly
+      startWatching();
     }
 
     return () => {

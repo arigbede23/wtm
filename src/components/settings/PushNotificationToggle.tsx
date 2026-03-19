@@ -101,8 +101,8 @@ export function PushNotificationToggle() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             endpoint: subscription.endpoint,
-            p256dh: btoa(String.fromCharCode.apply(null, keyArray)),
-            auth: btoa(String.fromCharCode.apply(null, authArray)),
+            p256dh: btoa(String.fromCharCode(...keyArray)),
+            auth: btoa(String.fromCharCode(...authArray)),
           }),
         });
 

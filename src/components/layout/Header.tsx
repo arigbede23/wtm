@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Search, X, Sun, Moon } from "lucide-react";
@@ -70,8 +71,8 @@ export function Header() {
           </form>
         ) : (
           <>
-            {/* App logo / title + team branding */}
-            <div className="flex items-center gap-2">
+            {/* App logo / title + team branding — tapping navigates home */}
+            <Link href="/feed" className="flex items-center gap-2">
               {team && (
                 <Image
                   src={getTeamLogoUrl(team)}
@@ -93,7 +94,7 @@ export function Header() {
                   </p>
                 )}
               </div>
-            </div>
+            </Link>
             {/* Search + Theme toggle + Notification buttons */}
             <div className="flex items-center gap-1">
               <button

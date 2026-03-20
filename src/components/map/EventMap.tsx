@@ -90,7 +90,7 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
             <Popup>
               <div className="min-w-[180px]">
                 <p className="text-xs text-gray-500">
-                  {CATEGORY_EMOJI[event.category]} {event.category.toLowerCase()}
+                  {CATEGORY_EMOJI[event.category]} {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
                 </p>
                 <p className="mt-0.5 font-semibold text-sm leading-tight">
                   {event.title}

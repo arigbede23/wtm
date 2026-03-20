@@ -131,7 +131,7 @@ export default async function EventDetailPage({
         {/* Category pill + source badge */}
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-neutral-300">
-            {CATEGORY_EMOJI[category]} {category.toLowerCase()}
+            {CATEGORY_EMOJI[category]} {category.charAt(0) + category.slice(1).toLowerCase()}
           </div>
           {isExternal && (
             <div className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700 dark:bg-brand-950 dark:text-brand-300">

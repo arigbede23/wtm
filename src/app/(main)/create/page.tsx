@@ -247,7 +247,7 @@ export default function CreatePage() {
                       : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
                   }`}
                 >
-                  {CATEGORY_EMOJI[cat]} {cat.toLowerCase()}
+                  {CATEGORY_EMOJI[cat]} {cat.charAt(0) + cat.slice(1).toLowerCase()}
                 </button>
               ))}
             </div>

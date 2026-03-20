@@ -331,7 +331,7 @@ export default function ProfilePage() {
                 key={cat}
                 className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-neutral-300"
               >
-                {CATEGORY_EMOJI[cat as EventCategory]} {cat.toLowerCase()}
+                {CATEGORY_EMOJI[cat as EventCategory]} {cat.charAt(0) + cat.slice(1).toLowerCase()}
               </span>
             ))}
             <button

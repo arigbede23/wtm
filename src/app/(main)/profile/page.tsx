@@ -260,10 +260,10 @@ export default function ProfilePage() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-3xl dark:bg-gray-800">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100 text-3xl dark:bg-neutral-800">
           👤
         </div>
-        <h2 className="mt-4 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-4 text-lg font-bold text-gray-900 dark:text-white">
           Not signed in
         </h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -308,14 +308,14 @@ export default function ProfilePage() {
           name={displayName}
           size="lg"
         />
-        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-white">
           {displayName}
         </h2>
         {profile?.username && (
           <p className="text-sm text-gray-500">@{profile.username}</p>
         )}
         {profile?.bio && (
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-1 text-sm text-gray-600 dark:text-neutral-400">
             {profile.bio}
           </p>
         )}
@@ -329,14 +329,14 @@ export default function ProfilePage() {
             {interests.map((cat) => (
               <span
                 key={cat}
-                className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-neutral-300"
               >
                 {CATEGORY_EMOJI[cat as EventCategory]} {cat.toLowerCase()}
               </span>
             ))}
             <button
               onClick={startEditingInterests}
-              className="inline-flex items-center gap-1 rounded-full border border-dashed border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:text-gray-300"
+              className="inline-flex items-center gap-1 rounded-full border border-dashed border-gray-300 px-2.5 py-1 text-xs text-gray-500 hover:border-gray-400 hover:text-gray-700 dark:border-neutral-600 dark:hover:border-neutral-500 dark:hover:text-neutral-300"
             >
               <Pencil className="h-3 w-3" />
               Edit
@@ -352,8 +352,8 @@ export default function ProfilePage() {
           </button>
         )}
         {editingInterests && (
-          <div className="mt-3 w-full rounded-xl border border-gray-200 p-4 dark:border-gray-700">
-            <p className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="mt-3 w-full rounded-xl border border-gray-200 p-4 dark:border-neutral-700">
+            <p className="mb-3 text-sm font-medium text-gray-700 dark:text-neutral-300">
               Select your interests
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -366,7 +366,7 @@ export default function ProfilePage() {
                     className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-left text-xs font-medium transition-all ${
                       isSelected
                         ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                        : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600"
+                        : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600"
                     }`}
                   >
                     <span className="text-base">{CATEGORY_EMOJI[value]}</span>
@@ -393,7 +393,7 @@ export default function ProfilePage() {
               <button
                 onClick={() => setEditingInterests(false)}
                 disabled={savingInterests}
-                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
               >
                 Cancel
               </button>
@@ -404,13 +404,13 @@ export default function ProfilePage() {
         {/* Follower / Following counts */}
         <div className="mt-3 flex gap-6">
           <div className="text-center">
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
               {followerCount}
             </p>
             <p className="text-xs text-gray-500">Followers</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
               {followingCount}
             </p>
             <p className="text-xs text-gray-500">Following</p>
@@ -421,7 +421,7 @@ export default function ProfilePage() {
         {!editing && (
           <button
             onClick={startEditing}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <Pencil className="h-3.5 w-3.5" />
             Edit Profile
@@ -431,7 +431,7 @@ export default function ProfilePage() {
 
       {/* Inline edit form */}
       {editing && (
-        <div className="mt-4 space-y-4 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+        <div className="mt-4 space-y-4 rounded-xl border border-gray-200 p-4 dark:border-neutral-700">
           {/* Avatar upload */}
           <div className="flex flex-col items-center">
             <div
@@ -459,7 +459,7 @@ export default function ProfilePage() {
 
           {/* Display Name */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Display Name
             </label>
             <input
@@ -467,13 +467,13 @@ export default function ProfilePage() {
               value={editDisplayName}
               onChange={(e) => setEditDisplayName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
           {/* Username */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Username
             </label>
             <div className="relative">
@@ -485,14 +485,14 @@ export default function ProfilePage() {
                 value={editUsername}
                 onChange={(e) => setEditUsername(e.target.value)}
                 placeholder="username"
-                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-7 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-7 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
               />
             </div>
           </div>
 
           {/* Bio */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Bio
             </label>
             <textarea
@@ -500,7 +500,7 @@ export default function ProfilePage() {
               onChange={(e) => setEditBio(e.target.value)}
               placeholder="Tell people about yourself..."
               rows={3}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
@@ -528,7 +528,7 @@ export default function ProfilePage() {
             <button
               onClick={cancelEditing}
               disabled={saving}
-              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
             >
               Cancel
             </button>
@@ -537,13 +537,13 @@ export default function ProfilePage() {
       )}
 
       {/* Tabs: My Events / Saved / Attending — pill toggle */}
-      <div className="mt-6 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-gray-800">
+      <div className="mt-6 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-neutral-800">
         <button
           onClick={() => setTab("my-events")}
           className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "my-events"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <CalendarPlus className="h-3.5 w-3.5" />
@@ -554,7 +554,7 @@ export default function ProfilePage() {
           className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "saved"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <Bookmark className="h-3.5 w-3.5" />
@@ -565,7 +565,7 @@ export default function ProfilePage() {
           className={`flex flex-1 items-center justify-center gap-1 rounded-full px-2 py-2.5 text-xs font-medium transition-colors ${
             tab === "attending"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <Users className="h-3.5 w-3.5" />
@@ -580,7 +580,7 @@ export default function ProfilePage() {
             {[1, 2].map((i) => (
               <div
                 key={i}
-                className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
+                className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-neutral-800"
               />
             ))}
           </div>
@@ -640,7 +640,7 @@ export default function ProfilePage() {
         <PushNotificationToggle />
         <button
           onClick={signOut}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
         >
           <LogOut className="h-4 w-4" />
           Sign Out

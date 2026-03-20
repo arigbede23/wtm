@@ -44,7 +44,7 @@ export function EventActions({
     <div className="mb-3 flex gap-2">
       <Link
         href={`/edit/${eventId}`}
-        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+        className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
       >
         <Pencil className="h-3.5 w-3.5" />
         Edit Event
@@ -66,7 +66,7 @@ export function EventActions({
           <button
             onClick={() => setShowConfirm(false)}
             disabled={deleting}
-            className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-neutral-300"
           >
             Cancel
           </button>

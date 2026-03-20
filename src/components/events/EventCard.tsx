@@ -24,9 +24,9 @@ export function EventCard({
 
   return (
     <Link href={`/event/${event.id}`} className="block">
-      <article className={cn("group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900", past && "opacity-60")}>
+      <article className={cn("group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900", past && "opacity-60")}>
         {/* Cover Image */}
-        <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-neutral-800">
           {event.coverImageUrl ? (
             // "group-hover:scale-105" zooms the image slightly on hover
             <img
@@ -68,19 +68,19 @@ export function EventCard({
 
         {/* Card body — text content below the image */}
         <div className="p-4">
-          <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-gray-100">
+          <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-white">
             {event.title}
           </h3>
 
           {/* Date and time */}
-          <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+          <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-neutral-400">
             <Calendar className="h-3.5 w-3.5" />
             <span>{formatEventDateTime(event.startDate)}</span>
           </div>
 
           {/* Location */}
           {event.address && (
-            <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-500 dark:text-neutral-400">
               <MapPin className="h-3.5 w-3.5" />
               <span className="truncate">
                 {event.address}
@@ -107,11 +107,11 @@ export function EventCard({
                     src={friend.avatarUrl}
                     name={friend.displayName ?? friend.username}
                     size="sm"
-                    className="ring-2 ring-white dark:ring-gray-900"
+                    className="ring-2 ring-white dark:ring-neutral-900"
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-neutral-400">
                 {friendsGoingText(event.friendsGoing)}
               </p>
             </div>

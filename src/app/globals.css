@@ -39,24 +39,24 @@
   }
 
   /* Dark mode colors — activated when <html class="dark"> is set.
-     Same variable names, different values for a dark theme. */
+     Uses pure black/neutral tones instead of blue-tinted grays. */
   .dark {
-    --background: 222.2 84% 4.9%;      /* Near-black background */
-    --foreground: 210 40% 98%;          /* Near-white text */
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --primary: 350 85% 42%;             /* Brand red stays the same */
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;    /* Dark gray */
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 25 95% 35%;          /* Darker amber in dark mode */
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;       /* Dark border */
-    --ring: 350 85% 42%;
+    --background: 0 0% 0%;              /* Pure black background */
+    --foreground: 0 0% 95%;             /* Bright white text */
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 95%;
+    --primary: 350 85% 48%;             /* Brand red — slightly brighter for dark bg */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 12%;              /* Neutral dark gray */
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;       /* Visible gray for secondary text */
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 95%;
+    --destructive: 25 95% 45%;          /* Amber in dark mode */
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 15%;                 /* Neutral dark border */
+    --ring: 350 85% 48%;
   }
 }
 

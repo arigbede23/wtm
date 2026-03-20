@@ -91,7 +91,7 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
       >
         <Send className="h-4 w-4" />
         Invite Friends
@@ -105,15 +105,15 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
-          <div className="max-h-[80vh] w-full max-w-md overflow-hidden rounded-t-2xl bg-white dark:bg-gray-900 sm:rounded-2xl">
+          <div className="max-h-[80vh] w-full max-w-md overflow-hidden rounded-t-2xl bg-white dark:bg-neutral-900 sm:rounded-2xl">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-neutral-700">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                 Invite Friends
               </h3>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800"
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-neutral-800"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -145,7 +145,7 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
                             ? "opacity-60"
                             : isSelected
                               ? "bg-brand-50 dark:bg-brand-950"
-                              : "hover:bg-gray-50 dark:hover:bg-gray-800"
+                              : "hover:bg-gray-50 dark:hover:bg-neutral-800"
                         }`}
                       >
                         <UserAvatar
@@ -154,7 +154,7 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
                           size="sm"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white">
                             {friend.displayName ?? friend.username ?? "User"}
                           </p>
                           {friend.username && (
@@ -171,7 +171,7 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
                             className={`h-5 w-5 rounded-full border-2 transition-colors ${
                               isSelected
                                 ? "border-brand-600 bg-brand-600"
-                                : "border-gray-300 dark:border-gray-600"
+                                : "border-gray-300 dark:border-neutral-600"
                             }`}
                           >
                             {isSelected && (
@@ -188,7 +188,7 @@ export function InviteFriendsButton({ eventId }: InviteFriendsButtonProps) {
 
             {/* Footer */}
             {friends.length > 0 && (
-              <div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+              <div className="border-t border-gray-200 px-4 py-3 dark:border-neutral-700">
                 {sent ? (
                   <p className="text-center text-sm font-medium text-green-600">
                     Invites sent!

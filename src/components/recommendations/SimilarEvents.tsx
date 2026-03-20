@@ -33,12 +33,12 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="w-48 flex-shrink-0 animate-pulse rounded-xl border border-gray-100 dark:border-gray-800"
+              className="w-48 flex-shrink-0 animate-pulse rounded-xl border border-gray-100 dark:border-neutral-800"
             >
-              <div className="aspect-[3/2] rounded-t-xl bg-gray-200 dark:bg-gray-800" />
+              <div className="aspect-[3/2] rounded-t-xl bg-gray-200 dark:bg-neutral-800" />
               <div className="space-y-2 p-3">
-                <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
-                <div className="h-2 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
+                <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-neutral-800" />
+                <div className="h-2 w-1/2 rounded bg-gray-200 dark:bg-neutral-800" />
               </div>
             </div>
           ))}
@@ -61,8 +61,8 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
             href={`/event/${event.id}`}
             className="w-48 flex-shrink-0"
           >
-            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-              <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-gray-800">
+            <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
+              <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-neutral-800">
                 {event.coverImageUrl ? (
                   <img
                     src={event.coverImageUrl}
@@ -79,7 +79,7 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                 </div>
               </div>
               <div className="p-3">
-                <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-gray-900 dark:text-gray-100">
+                <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-gray-900 dark:text-white">
                   {event.title}
                 </h3>
                 <div className="mt-1.5 flex items-center gap-1 text-xs text-gray-500">

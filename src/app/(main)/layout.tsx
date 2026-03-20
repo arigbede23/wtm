@@ -2,11 +2,11 @@
 // Adds the sticky header at the top and bottom navigation bar.
 // The (main) folder name with parentheses is a "route group" — it organizes
 // files without affecting the URL. So /feed, not /(main)/feed.
+// Note: LocalTeamProvider is in the root Providers so all pages get team colors.
 
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { MobileContainer } from "@/components/layout/MobileContainer";
-import { LocalTeamProvider } from "@/components/layout/LocalTeamProvider";
 
 export default function MainLayout({
   children,
@@ -14,13 +14,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <LocalTeamProvider>
-      <MobileContainer>
-        <Header />
-        {/* pb-20 adds padding at the bottom so content doesn't hide behind the nav bar */}
-        <main className="pb-20">{children}</main>
-        <BottomNav />
-      </MobileContainer>
-    </LocalTeamProvider>
+    <MobileContainer>
+      <Header />
+      {/* pb-20 adds padding at the bottom so content doesn't hide behind the nav bar */}
+      <main className="pb-20">{children}</main>
+      <BottomNav />
+    </MobileContainer>
   );
 }

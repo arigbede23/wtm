@@ -34,6 +34,7 @@ export type EventWithCounts = {
   isFree: boolean;
   price: number | null;
   url: string | null;
+  source?: string;
   status: string;
   _count: {
     rsvps: number;                // How many people have RSVP'd

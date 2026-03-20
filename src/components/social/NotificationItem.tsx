@@ -63,7 +63,7 @@ export function NotificationItemRow({ notification }: NotificationItemProps) {
   return (
     <Link
       href={href}
-      className={`flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+      className={`flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800 ${
         !notification.read ? "bg-brand-50/50 dark:bg-brand-950/20" : ""
       }`}
     >
@@ -73,7 +73,7 @@ export function NotificationItemRow({ notification }: NotificationItemProps) {
         size="md"
       />
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-gray-900 dark:text-gray-100">{text}</p>
+        <p className="text-sm text-gray-900 dark:text-white">{text}</p>
         <p className="mt-0.5 text-xs text-gray-500">
           {formatRelativeTime(notification.createdAt)}
         </p>

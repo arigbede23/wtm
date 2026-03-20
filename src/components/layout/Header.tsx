@@ -46,7 +46,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-gray-800 dark:bg-gray-950/80">
+    <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-lg dark:border-neutral-800 dark:bg-black/80">
       <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3">
         {isSearchOpen ? (
           // Expanded search input
@@ -58,12 +58,12 @@ export function Header() {
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               placeholder="Search events..."
-              className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-gray-100"
+              className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none dark:text-white"
             />
             <button
               type="button"
               onClick={handleClose}
-              className="rounded-full p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="rounded-full p-1 text-gray-400 hover:text-gray-600 dark:hover:text-neutral-300"
             >
               <X className="h-4 w-4" />
             </button>
@@ -98,14 +98,14 @@ export function Header() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-white"
               >
                 <Search className="h-5 w-5" />
               </button>
               {mounted && (
                 <button
                   onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+                  className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-neutral-800 dark:hover:text-white"
                 >
                   {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </button>

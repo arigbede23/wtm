@@ -59,7 +59,7 @@ export default function OnboardingPage() {
   return (
     <div className="w-full max-w-sm">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           What are you into?
         </h1>
         <p className="mt-2 text-sm text-gray-500">
@@ -77,7 +77,7 @@ export default function OnboardingPage() {
               className={`flex items-center gap-2 rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all ${
                 isSelected
                   ? "border-brand-600 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                  : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-600"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600"
               }`}
             >
               <span className="text-lg">{CATEGORY_EMOJI[value]}</span>
@@ -102,7 +102,7 @@ export default function OnboardingPage() {
 
         <button
           onClick={() => router.push("/feed")}
-          className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-neutral-300"
         >
           Skip for now
         </button>

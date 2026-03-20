@@ -36,7 +36,7 @@ export default function LocationPicker({ lat, lng, onChange }: LocationPickerPro
   const centerLng = lng ?? -74.006;
 
   return (
-    <div className="h-[200px] w-full overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="h-[200px] w-full overflow-hidden rounded-lg border border-gray-200 dark:border-neutral-700">
       <MapContainer
         center={[centerLat, centerLng]}
         zoom={12}

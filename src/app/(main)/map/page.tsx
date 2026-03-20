@@ -17,7 +17,7 @@ import type { EventFilters } from "@/types";
 const EventMap = dynamic(() => import("@/components/map/EventMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div className="flex h-full items-center justify-center bg-gray-100 dark:bg-neutral-900">
       <div className="animate-pulse text-gray-400">Loading map...</div>
     </div>
   ),
@@ -61,7 +61,7 @@ function MapContent() {
       )}
 
       {/* Category filter overlay */}
-      <div className="absolute left-0 right-0 top-0 z-[1000] bg-white/80 backdrop-blur-sm dark:bg-gray-950/80">
+      <div className="absolute left-0 right-0 top-0 z-[1000] bg-white/80 backdrop-blur-sm dark:bg-black/80">
         <CategoryFilter
           selected={filters.category ?? "ALL"}
           onChange={(cat) =>

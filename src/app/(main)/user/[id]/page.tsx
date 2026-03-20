@@ -65,7 +65,7 @@ export default function PublicProfilePage() {
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <p className="text-lg font-bold text-gray-900 dark:text-white">
           User not found
         </p>
         <Link
@@ -95,7 +95,7 @@ export default function PublicProfilePage() {
       {/* Back button */}
       <Link
         href={isSelf ? "/profile" : "/feed"}
-        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-neutral-300"
       >
         <ArrowLeft className="h-4 w-4" />
         Back
@@ -109,7 +109,7 @@ export default function PublicProfilePage() {
           size="lg"
         />
 
-        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-white">
           {profile.displayName ?? profile.username ?? "Anonymous"}
         </h2>
 
@@ -118,7 +118,7 @@ export default function PublicProfilePage() {
         )}
 
         {profile.bio && (
-          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+          <p className="mt-2 text-sm text-gray-700 dark:text-neutral-300">
             {profile.bio}
           </p>
         )}
@@ -126,13 +126,13 @@ export default function PublicProfilePage() {
         {/* Follow counts */}
         <div className="mt-3 flex gap-6">
           <div className="text-center">
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
               {profile.followerCount}
             </p>
             <p className="text-xs text-gray-500">Followers</p>
           </div>
           <div className="text-center">
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
               {profile.followingCount}
             </p>
             <p className="text-xs text-gray-500">Following</p>
@@ -172,7 +172,7 @@ export default function PublicProfilePage() {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
+                    className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-neutral-800"
                   />
                 ))}
               </div>

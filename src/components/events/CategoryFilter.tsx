@@ -43,7 +43,7 @@ export function CategoryFilter({
             "flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
             selected === cat.value
               ? "bg-brand-600 text-white"           // Active: filled blue
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
           )}
         >
           {/* Show emoji for all categories except "All" */}

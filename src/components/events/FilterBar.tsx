@@ -62,7 +62,7 @@ export function FilterBar({
           "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
           filters.isFree
             ? "bg-green-600 text-white"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
         )}
       >
         Free only
@@ -75,7 +75,7 @@ export function FilterBar({
           "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
           activePreset === "this-weekend"
             ? "bg-brand-600 text-white"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
         )}
       >
         This weekend
@@ -88,7 +88,7 @@ export function FilterBar({
           "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
           activePreset === "this-week"
             ? "bg-brand-600 text-white"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
         )}
       >
         This week
@@ -101,7 +101,7 @@ export function FilterBar({
           "shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
           activePreset === "this-month"
             ? "bg-brand-600 text-white"
-            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
         )}
       >
         This month

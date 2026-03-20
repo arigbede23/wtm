@@ -59,7 +59,7 @@ function FeedContent() {
 
       {/* Page heading */}
       <div className="px-4 pt-4">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
           Happening near you
         </h2>
         <p className="text-sm text-gray-500">
@@ -68,13 +68,13 @@ function FeedContent() {
       </div>
 
       {/* Discover / For You / Friends pill toggle */}
-      <div className="mx-4 mt-3 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-gray-800">
+      <div className="mx-4 mt-3 flex gap-1 rounded-full bg-gray-100 p-1 dark:bg-neutral-800">
         <button
           onClick={() => setTab("discover")}
           className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "discover"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           Discover
@@ -84,7 +84,7 @@ function FeedContent() {
           className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "foryou"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           For You
@@ -94,7 +94,7 @@ function FeedContent() {
           className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
             tab === "friends"
               ? "bg-brand-600 text-white shadow-sm"
-              : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+              : "text-gray-600 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           Friends
@@ -111,10 +111,10 @@ function FeedContent() {
                   <MapPin className="h-5 w-5 text-brand-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     Enable location to see events near you
                   </p>
-                  <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                     {geoError
                       ? "Location access was denied. Please allow it in your browser settings, or tap below to try again."
                       : "We\u2019ll show events within 50 miles of your current location."}
@@ -132,7 +132,7 @@ function FeedContent() {
 
           {/* Loading state while getting location */}
           {geoLoading && (
-            <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            <div className="mx-4 mt-3 flex items-center gap-2 rounded-xl bg-gray-50 p-3 text-sm text-gray-500 dark:bg-neutral-800 dark:text-neutral-400">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-brand-600 border-t-transparent" />
               Getting your location...
             </div>
@@ -157,7 +157,7 @@ function FeedContent() {
           {hasLocation ? (
             <EventList filters={apiFilters} />
           ) : !geoLoading ? (
-            <div className="px-4 pt-6 text-center text-sm text-gray-400 dark:text-gray-500">
+            <div className="px-4 pt-6 text-center text-sm text-gray-400 dark:text-neutral-400">
               Grant location access above to discover events near you
             </div>
           ) : null}
@@ -180,12 +180,12 @@ export default function FeedPage() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="animate-pulse rounded-2xl border border-gray-100 dark:border-gray-800"
+              className="animate-pulse rounded-2xl border border-gray-100 dark:border-neutral-800"
             >
-              <div className="aspect-[2/1] rounded-t-2xl bg-gray-200 dark:bg-gray-800" />
+              <div className="aspect-[2/1] rounded-t-2xl bg-gray-200 dark:bg-neutral-800" />
               <div className="space-y-2 p-4">
-                <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
-                <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
+                <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-neutral-800" />
+                <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-neutral-800" />
               </div>
             </div>
           ))}

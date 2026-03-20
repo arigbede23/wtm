@@ -80,7 +80,7 @@ export function FollowButton({ targetUserId, onCountChange }: FollowButtonProps)
       disabled={loading}
       className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50 ${
         isFollowing
-          ? "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+          ? "border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
           : "bg-brand-600 text-white hover:bg-brand-700"
       }`}
     >

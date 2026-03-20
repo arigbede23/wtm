@@ -25,7 +25,7 @@ const LocationPicker = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[200px] w-full animate-pulse rounded-lg bg-gray-100 dark:bg-gray-800" />
+      <div className="h-[200px] w-full animate-pulse rounded-lg bg-gray-100 dark:bg-neutral-800" />
     ),
   }
 );
@@ -219,7 +219,7 @@ export default function EditEventPage({
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-4xl">🔒</p>
-        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-white">
           Sign in required
         </h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -239,7 +239,7 @@ export default function EditEventPage({
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-4xl">🚫</p>
-        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-white">
           Not authorized
         </h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -278,7 +278,7 @@ export default function EditEventPage({
   return (
     <div className="p-4">
       {/* Header */}
-      <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+      <h1 className="text-xl font-bold text-gray-900 dark:text-white">
         Edit Event
       </h1>
 
@@ -288,7 +288,7 @@ export default function EditEventPage({
           <div
             key={s}
             className={`h-2 flex-1 rounded-full transition-colors ${
-              s <= step ? "bg-brand-600" : "bg-gray-200 dark:bg-gray-700"
+              s <= step ? "bg-brand-600" : "bg-gray-200 dark:bg-neutral-700"
             }`}
           />
         ))}
@@ -302,7 +302,7 @@ export default function EditEventPage({
       {step === 1 && (
         <div className="mt-4 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Event Title *
             </label>
             <input
@@ -310,12 +310,12 @@ export default function EditEventPage({
               value={form.title}
               onChange={(e) => updateField("title", e.target.value)}
               placeholder="What's the event called?"
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Category *
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -327,7 +327,7 @@ export default function EditEventPage({
                   className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                     form.category === cat
                       ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                      : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
                   }`}
                 >
                   {CATEGORY_EMOJI[cat]} {cat.toLowerCase()}
@@ -337,7 +337,7 @@ export default function EditEventPage({
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Description
             </label>
             <textarea
@@ -345,7 +345,7 @@ export default function EditEventPage({
               onChange={(e) => updateField("description", e.target.value)}
               placeholder="Tell people about your event..."
               rows={4}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
         </div>
@@ -355,31 +355,31 @@ export default function EditEventPage({
       {step === 2 && (
         <div className="mt-4 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Start Date & Time *
             </label>
             <input
               type="datetime-local"
               value={form.startDate}
               onChange={(e) => updateField("startDate", e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               End Date & Time
             </label>
             <input
               type="datetime-local"
               value={form.endDate}
               onChange={(e) => updateField("endDate", e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Address
             </label>
             <input
@@ -387,13 +387,13 @@ export default function EditEventPage({
               value={form.address}
               onChange={(e) => updateField("address", e.target.value)}
               placeholder="123 Main St"
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                 City
               </label>
               <input
@@ -401,11 +401,11 @@ export default function EditEventPage({
                 value={form.city}
                 onChange={(e) => updateField("city", e.target.value)}
                 placeholder="New York"
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
                 State
               </label>
               <input
@@ -413,7 +413,7 @@ export default function EditEventPage({
                 value={form.state}
                 onChange={(e) => updateField("state", e.target.value)}
                 placeholder="NY"
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
               />
             </div>
           </div>
@@ -457,7 +457,7 @@ export default function EditEventPage({
         <div className="mt-4 space-y-4">
           {/* Cover image */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Cover Image
             </label>
             {imagePreview ? (
@@ -476,7 +476,7 @@ export default function EditEventPage({
                 </button>
               </div>
             ) : (
-              <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 px-4 py-8 transition-colors hover:border-brand-400 dark:border-gray-700">
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 px-4 py-8 transition-colors hover:border-brand-400 dark:border-neutral-700">
                 <ImageIcon className="h-8 w-8 text-gray-400" />
                 <span className="mt-2 text-sm text-gray-500">
                   Click to upload or drag and drop
@@ -496,7 +496,7 @@ export default function EditEventPage({
 
           {/* Free / Paid toggle */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               Pricing
             </label>
             <div className="flex gap-2">
@@ -506,7 +506,7 @@ export default function EditEventPage({
                 className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   form.isFree
                     ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                    : "border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-400"
+                    : "border-gray-200 text-gray-600 dark:border-neutral-700 dark:text-neutral-400"
                 }`}
               >
                 Free
@@ -517,7 +517,7 @@ export default function EditEventPage({
                 className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   !form.isFree
                     ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                    : "border-gray-200 text-gray-600 dark:border-gray-700 dark:text-gray-400"
+                    : "border-gray-200 text-gray-600 dark:border-neutral-700 dark:text-neutral-400"
                 }`}
               >
                 Paid
@@ -536,7 +536,7 @@ export default function EditEventPage({
                     placeholder="0.00"
                     min="0"
                     step="0.01"
-                    className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-7 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                    className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-7 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -545,7 +545,7 @@ export default function EditEventPage({
 
           {/* External URL */}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-neutral-300">
               External Link
             </label>
             <input
@@ -553,7 +553,7 @@ export default function EditEventPage({
               value={form.url}
               onChange={(e) => updateField("url", e.target.value)}
               placeholder="https://tickets.example.com"
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
             />
           </div>
         </div>
@@ -568,7 +568,7 @@ export default function EditEventPage({
           <button
             type="button"
             onClick={() => setStep(step - 1)}
-            className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <ArrowLeft className="h-4 w-4" />
             Back

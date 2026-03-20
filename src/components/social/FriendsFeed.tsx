@@ -52,7 +52,7 @@ export function FriendsFeed({ lat, lng }: { lat?: number | null; lng?: number | 
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800"
+            className="h-48 animate-pulse rounded-2xl bg-gray-100 dark:bg-neutral-800"
           />
         ))}
       </div>
@@ -80,7 +80,7 @@ export function FriendsFeed({ lat, lng }: { lat?: number | null; lng?: number | 
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <Users className="h-12 w-12 text-gray-300" />
-        <p className="mt-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+        <p className="mt-3 text-sm font-medium text-gray-900 dark:text-white">
           No events from friends yet
         </p>
         <p className="mt-1 text-sm text-gray-500">
@@ -104,11 +104,11 @@ export function FriendsFeed({ lat, lng }: { lat?: number | null; lng?: number | 
                     src={friend.avatarUrl}
                     name={friend.displayName ?? friend.username}
                     size="sm"
-                    className="ring-2 ring-white dark:ring-gray-950"
+                    className="ring-2 ring-white dark:ring-black"
                   />
                 ))}
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-gray-600 dark:text-neutral-400">
                 {friendsGoingText(event.friendsGoing)}
               </p>
             </div>

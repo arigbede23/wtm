@@ -121,7 +121,7 @@ export function PushNotificationToggle() {
     <button
       onClick={handleToggle}
       disabled={loading}
-      className="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+      className="flex w-full items-center justify-between rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:hover:bg-neutral-800"
     >
       <div className="flex items-center gap-3">
         {enabled ? (
@@ -129,13 +129,13 @@ export function PushNotificationToggle() {
         ) : (
           <BellOff className="h-4 w-4 text-gray-400" />
         )}
-        <span className="font-medium text-gray-700 dark:text-gray-300">
+        <span className="font-medium text-gray-700 dark:text-neutral-300">
           Push Notifications
         </span>
       </div>
       <div
         className={`relative h-6 w-11 rounded-full transition-colors ${
-          enabled ? "bg-brand-600" : "bg-gray-300 dark:bg-gray-600"
+          enabled ? "bg-brand-600" : "bg-gray-300 dark:bg-neutral-600"
         }`}
       >
         <div

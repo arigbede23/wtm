@@ -51,7 +51,7 @@ export default function NotificationsPage() {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <Bell className="h-12 w-12 text-gray-300" />
-        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-gray-100">
+        <h2 className="mt-3 text-lg font-bold text-gray-900 dark:text-white">
           Notifications
         </h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -69,7 +69,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+      <h2 className="text-lg font-bold text-gray-900 dark:text-white">
         Notifications
       </h2>
 
@@ -80,10 +80,10 @@ export default function NotificationsPage() {
               key={i}
               className="flex items-center gap-3 rounded-xl p-3"
             >
-              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
+              <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-neutral-800" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-                <div className="h-2 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
+                <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-neutral-800" />
+                <div className="h-2 w-1/4 animate-pulse rounded bg-gray-200 dark:bg-neutral-800" />
               </div>
             </div>
           ))}

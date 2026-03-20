@@ -52,7 +52,7 @@ export function AttendeeList({ eventId, rsvpCount }: AttendeeListProps) {
                 src={attendee.avatarUrl}
                 name={attendee.displayName ?? attendee.username}
                 size="sm"
-                className="ring-2 ring-white dark:ring-gray-950"
+                className="ring-2 ring-white dark:ring-black"
               />
             ))}
           </div>
@@ -69,14 +69,14 @@ export function AttendeeList({ eventId, rsvpCount }: AttendeeListProps) {
             <Link
               key={attendee.id}
               href={`/user/${attendee.id}`}
-              className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+              className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-800"
             >
               <UserAvatar
                 src={attendee.avatarUrl}
                 name={attendee.displayName ?? attendee.username}
                 size="sm"
               />
-              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+              <span className="text-sm font-medium text-gray-900 dark:text-white">
                 {attendee.displayName ?? attendee.username ?? "Anonymous"}
               </span>
             </Link>

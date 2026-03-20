@@ -119,7 +119,7 @@ export default function RsvpButtons({ eventId, initialRsvpCount }: RsvpButtonsPr
         className={`mt-2 w-full rounded-xl border py-3.5 text-center font-semibold transition-colors ${
           status === "INTERESTED"
             ? "border-brand-400 bg-brand-50 text-brand-700 ring-2 ring-brand-400 dark:bg-brand-950 dark:text-brand-300"
-            : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            : "border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
         } disabled:opacity-50`}
       >
         {status === "INTERESTED" ? "Interested ✓" : "Interested"}

@@ -6,6 +6,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
+import { LocalTeamProvider } from "@/components/layout/LocalTeamProvider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   // Create a single QueryClient instance for the entire app.
@@ -24,10 +25,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
 
   // QueryClientProvider makes TanStack Query available to all child components.
-  // Any component can now use useQuery() to fetch and cache data.
+  // LocalTeamProvider detects the nearest sports team and injects brand colors
+  // as CSS variables — wrapping at the root ensures ALL pages get team theming.
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <LocalTeamProvider>{children}</LocalTeamProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

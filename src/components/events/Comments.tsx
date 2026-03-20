@@ -176,7 +176,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
                   <div className="flex items-baseline gap-2">
                     <Link
                       href={`/user/${comment.user.id}`}
-                      className="text-sm font-medium text-gray-900 hover:underline dark:text-gray-100"
+                      className="text-sm font-medium text-gray-900 hover:underline dark:text-white"
                     >
                       {comment.user.displayName ?? comment.user.username ?? "User"}
                     </Link>
@@ -184,7 +184,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
                       {formatRelativeTime(comment.createdAt)}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-sm text-gray-700 dark:text-gray-300">
+                  <p className="mt-0.5 text-sm text-gray-700 dark:text-neutral-300">
                     {comment.text}
                   </p>
                   {/* Like button and organizer pin */}
@@ -248,7 +248,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handlePost()}
             placeholder="Add a comment..."
-            className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
           />
           <button
             onClick={handlePost}

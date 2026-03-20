@@ -105,11 +105,12 @@ export function formatRelativeTime(date: Date | string): string {
   return `${months}mo ago`;
 }
 
-// Format price as "Free" or "$25"
+// Format price as "Free", "$25", or "See price" when unknown
 export function formatPrice(price: number | null, isFree: boolean) {
   if (isFree) return "Free";
-  if (!price) return "Free";
-  return `$${price.toFixed(0)}`;
+  if (price != null && price > 0) return `$${price.toFixed(0)}`;
+  // Price data is missing — don't claim it's free
+  return "See price";
 }
 
 // Build a Google Calendar "Add Event" URL from event data

@@ -54,12 +54,12 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="animate-pulse rounded-2xl border border-gray-100 dark:border-gray-800"
+            className="animate-pulse rounded-2xl border border-gray-100 dark:border-neutral-800"
           >
-            <div className="aspect-[2/1] rounded-t-2xl bg-gray-200 dark:bg-gray-800" />
+            <div className="aspect-[2/1] rounded-t-2xl bg-gray-200 dark:bg-neutral-800" />
             <div className="space-y-2 p-4">
-              <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-800" />
-              <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-gray-800" />
+              <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-neutral-800" />
+              <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-neutral-800" />
             </div>
           </div>
         ))}
@@ -89,7 +89,7 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-lg font-medium text-gray-900 dark:text-gray-100">
+        <p className="text-lg font-medium text-gray-900 dark:text-white">
           Something went wrong
         </p>
         <p className="mt-1 text-sm text-gray-500">{error}</p>
@@ -102,7 +102,7 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <Sparkles className="h-12 w-12 text-brand-300" />
-        <p className="mt-3 text-sm font-medium text-gray-900 dark:text-gray-100">
+        <p className="mt-3 text-sm font-medium text-gray-900 dark:text-white">
           Tell us what you like
         </p>
         <p className="mt-1 text-sm text-gray-500">
@@ -123,7 +123,7 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
         <p className="text-4xl">🎉</p>
-        <p className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">
+        <p className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
           No recommendations yet
         </p>
         <p className="mt-1 text-sm text-gray-500">

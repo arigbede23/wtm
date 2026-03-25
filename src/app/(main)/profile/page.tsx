@@ -417,15 +417,24 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Edit Profile button */}
+        {/* Edit Profile + Find People buttons */}
         {!editing && (
-          <button
-            onClick={startEditing}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
-          >
-            <Pencil className="h-3.5 w-3.5" />
-            Edit Profile
-          </button>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={startEditing}
+              className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+              Edit Profile
+            </button>
+            <Link
+              href="/people"
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
+            >
+              <Users className="h-3.5 w-3.5" />
+              Find People
+            </Link>
+          </div>
         )}
       </div>
 

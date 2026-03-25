@@ -86,6 +86,12 @@ export function FriendsFeed({ lat, lng }: { lat?: number | null; lng?: number | 
         <p className="mt-1 text-sm text-gray-500">
           Follow people to see the events they&apos;re attending
         </p>
+        <Link
+          href="/people"
+          className="mt-4 rounded-full bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+        >
+          Find People
+        </Link>
       </div>
     );
   }

@@ -78,7 +78,7 @@ export async function PATCH(
     if (updateError) {
       console.error("Event update error:", updateError);
       return NextResponse.json(
-        { error: "Failed to update event" },
+        { error: updateError.message || "Failed to update event" },
         { status: 500 }
       );
     }

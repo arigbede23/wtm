@@ -49,7 +49,7 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
   return (
     <MapContainer
       center={[centerLat, centerLng]}
-      zoom={12}
+      zoom={11}
       className="h-full w-full"
       zoomControl={false}
     >

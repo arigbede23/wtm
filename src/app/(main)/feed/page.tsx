@@ -30,10 +30,10 @@ function FeedContent() {
   // Sync Ticketmaster events near the user's location (runs once per area per 30 min)
   useLocalSync(lat, lng);
 
-  // Merge URL filters with user location + 50 mi radius for API call
+  // Merge URL filters with user location + 150 mi radius for API call
   const apiFilters: EventFilters = {
     ...filters,
-    ...(hasLocation ? { lat, lng, radius: 50 } : {}),
+    ...(hasLocation ? { lat, lng, radius: 150 } : {}),
   };
 
   return (
@@ -117,7 +117,7 @@ function FeedContent() {
                   <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-400">
                     {geoError
                       ? "Location access was denied. Please allow it in your browser settings, or tap below to try again."
-                      : "We\u2019ll show events within 50 miles of your current location."}
+                      : "We\u2019ll show events near your current location."}
                   </p>
                   <button
                     onClick={requestLocation}

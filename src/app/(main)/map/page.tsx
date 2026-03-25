@@ -10,6 +10,7 @@ import { fetchEvents, eventsQueryKey } from "@/lib/fetchEvents";
 import { CategoryFilter } from "@/components/events/CategoryFilter";
 import { useEventFilters } from "@/hooks/useEventFilters";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLocalSync } from "@/hooks/useLocalSync";
 import { MapPin } from "lucide-react";
 import type { EventFilters } from "@/types";
 
@@ -27,11 +28,14 @@ function MapContent() {
   const { filters, setFilters } = useEventFilters();
   const { lat, lng, error: geoError, requestLocation } = useGeolocation();
 
-  // 50 mi radius from user's current location
+  // Sync Ticketmaster events near user (runs once per area per 30 min)
+  useLocalSync(lat, lng);
+
+  // 150 mi radius from user's current location (wider for map view)
   const apiFilters: EventFilters = {
     ...filters,
     ...(lat != null && lng != null
-      ? { lat, lng, radius: 50 }
+      ? { lat, lng, radius: 150 }
       : {}),
   };
 
@@ -41,7 +45,7 @@ function MapContent() {
   });
 
   return (
-    <div className="relative flex h-[calc(100vh-120px)] flex-col">
+    <div className="relative flex h-[calc(100dvh-120px)] flex-col -mb-20">
       {/* Location permission banner */}
       {lat == null && lng == null && (
         <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
@@ -82,7 +86,7 @@ export default function MapPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-[calc(100vh-120px)] items-center justify-center">
+        <div className="flex h-[calc(100dvh-120px)] items-center justify-center">
           <div className="animate-pulse text-gray-400">Loading map...</div>
         </div>
       }

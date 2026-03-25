@@ -19,7 +19,9 @@ import {
   X,
   Loader2,
   MapPin,
+  Navigation,
 } from "lucide-react";
+import { buildDirectionsUrl } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -366,6 +368,22 @@ export default function CreatePage() {
               </div>
             )}
           </div>
+
+          {/* Get Directions preview */}
+          {(() => {
+            const url = buildDirectionsUrl({ lat: form.lat, lng: form.lng, address: form.address, city: form.city, state: form.state });
+            return url ? (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700"
+              >
+                <Navigation className="h-4 w-4" />
+                Preview Directions
+              </a>
+            ) : null;
+          })()}
         </div>
       )}
 

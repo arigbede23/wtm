@@ -39,38 +39,29 @@ function FeedContent() {
 
   return (
     <div>
-      {/* Team-themed welcome banner */}
-      {team && (
-        <div className="mx-4 mt-3 flex items-center gap-3 rounded-2xl bg-brand-50 p-3 dark:bg-brand-950">
+      {/* Stories + heading section */}
+      <div className="pt-3">
+        <StoryBar />
+        <div className="mt-1 border-b border-gray-100 dark:border-neutral-800" />
+      </div>
+
+      {/* Page heading with team badge */}
+      <div className="flex items-center gap-3 px-4 pt-3">
+        <div className="flex-1">
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+            Happening near you
+          </h2>
+          <p className="text-sm text-gray-500">
+            Events and things to do this week
+          </p>
+        </div>
+        {team && (
           <img
             src={getTeamLogoUrl(team)}
             alt={`${team.city} ${team.team}`}
-            className="h-10 w-10 object-contain"
+            className="h-9 w-9 object-contain opacity-60"
           />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-brand-700 dark:text-brand-300">
-              Welcome to {team.city}
-            </p>
-            <p className="text-xs text-brand-600 dark:text-brand-400">
-              Home of the {team.school ?? team.city} {team.team}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Stories */}
-      <div className="pt-3">
-        <StoryBar />
-      </div>
-
-      {/* Page heading */}
-      <div className="px-4 pt-3">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          Happening near you
-        </h2>
-        <p className="text-sm text-gray-500">
-          Events and things to do this week
-        </p>
+        )}
       </div>
 
       {/* Discover / For You / Friends pill toggle */}

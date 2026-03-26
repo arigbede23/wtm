@@ -84,7 +84,7 @@ export function StoryBar() {
 
   return (
     <>
-      <div className="flex gap-3 overflow-x-auto px-4 py-3 no-scrollbar">
+      <div className="flex gap-3 overflow-x-auto px-4 py-2 no-scrollbar">
         {/* Your Story */}
         <button
           onClick={handleYourStoryTap}
@@ -105,7 +105,7 @@ export function StoryBar() {
                   src={user.user_metadata?.avatarUrl}
                   name={user.user_metadata?.displayName ?? user.email}
                   size="md"
-                  className="h-14 w-14"
+                  className="h-12 w-12"
                 />
               </div>
             </div>
@@ -139,7 +139,7 @@ export function StoryBar() {
                     src={group.user.avatarUrl}
                     name={group.user.displayName ?? group.user.username}
                     size="md"
-                    className="h-14 w-14"
+                    className="h-12 w-12"
                   />
                 </div>
               </div>

@@ -10,6 +10,7 @@ import { useTheme } from "next-themes";
 import { Search, X, Sun, Moon } from "lucide-react";
 import Image from "next/image";
 import { NotificationBell } from "@/components/social/NotificationBell";
+import { MessageBadge } from "@/components/messages/MessageBadge";
 import { useLocalTeamContext } from "@/components/layout/LocalTeamProvider";
 import { getTeamLogoUrl } from "@/lib/localTeams";
 import { UserAvatar } from "@/components/social/UserAvatar";
@@ -261,6 +262,7 @@ export function Header() {
                   {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                 </button>
               )}
+              <MessageBadge />
               <NotificationBell />
             </div>
           </>

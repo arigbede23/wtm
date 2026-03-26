@@ -15,6 +15,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useLocalSync } from "@/hooks/useLocalSync";
 import { useLocalTeamContext } from "@/components/layout/LocalTeamProvider";
 import { getTeamLogoUrl } from "@/lib/localTeams";
+import { StoryBar } from "@/components/stories/StoryBar";
 import type { EventFilters } from "@/types";
 
 type FeedTab = "discover" | "foryou" | "friends";
@@ -57,8 +58,13 @@ function FeedContent() {
         </div>
       )}
 
+      {/* Stories */}
+      <div className="pt-3">
+        <StoryBar />
+      </div>
+
       {/* Page heading */}
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
           Happening near you
         </h2>

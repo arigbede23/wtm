@@ -24,6 +24,25 @@ export async function uploadEventImage(file: File): Promise<string> {
   return data.publicUrl;
 }
 
+export async function uploadStoryMedia(file: File): Promise<string> {
+  const supabase = createClient();
+
+  const ext = file.name.split(".").pop();
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+  const { error } = await supabase.storage
+    .from("story-media")
+    .upload(filename, file);
+
+  if (error) throw error;
+
+  const { data } = supabase.storage
+    .from("story-media")
+    .getPublicUrl(filename);
+
+  return data.publicUrl;
+}
+
 export async function uploadAvatarImage(file: File): Promise<string> {
   const supabase = createClient();
 

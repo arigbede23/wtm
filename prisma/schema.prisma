@@ -107,6 +107,15 @@ model User {
   receivedInvites    Invite[]        @relation("inviteRecipient")
   pushSubscriptions  PushSubscription[]
 
+  // Messaging
+  conversationsAsUser1 Conversation[] @relation("conversationUser1")
+  conversationsAsUser2 Conversation[] @relation("conversationUser2")
+  sentMessages         Message[]
+
+  // Stories
+  stories    Story[]
+  storyViews StoryView[]
+
   @@map("users")  // The actual table name in Postgres (lowercase convention)
 }
 
@@ -277,4 +286,75 @@ model Invite {
   @@unique([eventId, senderId, recipientId])  // One invite per sender-recipient-event combo
   @@index([recipientId])
   @@map("invites")
+}
+
+// --- MESSAGING ---
+
+// A 1-on-1 conversation between two users
+model Conversation {
+  id              String    @id @default(uuid())
+  user1Id         String    // Smaller UUID always stored here for dedup
+  user2Id         String
+  lastMessageAt   DateTime?
+  user1LastReadAt DateTime?
+  user2LastReadAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  user1    User      @relation("conversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2    User      @relation("conversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+  @@index([user1Id, lastMessageAt])
+  @@index([user2Id, lastMessageAt])
+  @@map("conversations")
+}
+
+// A single message in a conversation
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  text           String
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+// --- STORIES ---
+
+// An ephemeral photo story that expires after 24 hours
+model Story {
+  id          String   @id @default(uuid())
+  userId      String
+  mediaUrl    String
+  mediaType   String   @default("image")
+  textOverlay String?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  views StoryView[]
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("stories")
+}
+
+// Tracks who has viewed a story
+model StoryView {
+  id        String   @id @default(uuid())
+  storyId   String
+  viewerId  String
+  createdAt DateTime @default(now())
+
+  story  Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  viewer User  @relation(fields: [viewerId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, viewerId])
+  @@map("story_views")
 }

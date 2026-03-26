@@ -5,7 +5,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { FollowButton } from "@/components/social/FollowButton";
@@ -139,13 +139,30 @@ export default function PublicProfilePage() {
           </div>
         </div>
 
-        {/* Follow button */}
+        {/* Follow + Message buttons */}
         {!isSelf && (
-          <div className="mt-4">
+          <div className="mt-4 flex items-center gap-2">
             <FollowButton
               targetUserId={userId}
               onCountChange={handleFollowerCountChange}
             />
+            {currentUser && (
+              <button
+                onClick={async () => {
+                  const res = await fetch("/api/conversations", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ userId }),
+                  });
+                  const data = await res.json();
+                  if (data.id) window.location.href = `/chat/${data.id}`;
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Message
+              </button>
+            )}
           </div>
         )}
       </div>

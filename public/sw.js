@@ -2,7 +2,7 @@
 // It caches pages so the app can work offline (or load faster on slow connections).
 // This file lives in /public so the browser can access it directly.
 
-const CACHE_NAME = "wtm-v2"; // Change this version to bust the cache on updates
+const CACHE_NAME = "wtm-v3"; // Change this version to bust the cache on updates
 const OFFLINE_URL = "/feed"; // Fallback page when user is offline
 
 // Files to cache immediately when the service worker is installed

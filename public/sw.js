@@ -2,7 +2,7 @@
 // It caches pages so the app can work offline (or load faster on slow connections).
 // This file lives in /public so the browser can access it directly.
 
-const CACHE_NAME = "wtm-v1"; // Change this version to bust the cache on updates
+const CACHE_NAME = "wtm-v2"; // Change this version to bust the cache on updates
 const OFFLINE_URL = "/feed"; // Fallback page when user is offline
 
 // Files to cache immediately when the service worker is installed
@@ -73,6 +73,16 @@ self.addEventListener("notificationclick", (event) => {
 // FETCH — intercepts every network request the app makes.
 // Strategy: try network first, fall back to cache if offline.
 self.addEventListener("fetch", (event) => {
+  // Only handle GET requests — POST/PUT/DELETE can't be cached
+  if (event.request.method !== "GET") return;
+
+  // Only handle same-origin requests — don't intercept external URLs
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
+  // Skip API routes — they return dynamic data that shouldn't be stale-cached
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith("/api/")) return;
+
   // For page navigations (clicking links, typing URLs)
   if (event.request.mode === "navigate") {
     event.respondWith(
@@ -84,21 +94,20 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // For all other requests (images, API calls, CSS, JS):
+  // For static assets (CSS, JS, images):
   // Serve from cache if available, but also update the cache in the background
   event.respondWith(
     caches.match(event.request).then((cached) => {
       const fetched = fetch(event.request)
         .then((response) => {
-          // Only cache successful responses from our own origin
           if (response && response.status === 200 && response.type === "basic") {
             const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
           return response;
         })
-        .catch(() => cached); // If network fails, fall back to cached version
-      return cached || fetched; // Serve cached version first (faster), or wait for network
+        .catch(() => cached);
+      return cached || fetched;
     })
   );
 });

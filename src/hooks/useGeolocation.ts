@@ -25,34 +25,44 @@ export function useGeolocation() {
   });
   const watchId = useRef<number | null>(null);
 
-  // Restore cached position on mount, then start watching if permission exists
+  // On mount: restore cache for instant display, then get a fresh position
   useEffect(() => {
-    // 1. Restore cache so we have something immediately
+    // 1. Restore cache so we have something immediately (avoids blank state)
     try {
       const cached = localStorage.getItem(STORAGE_KEY);
       if (cached) {
         const { lat, lng } = JSON.parse(cached);
-        setState({ lat, lng, loading: false, error: null });
+        setState({ lat, lng, loading: true, error: null });
       }
     } catch {
       // ignore
     }
 
-    // 2. If permission already granted, start watching position continuously.
-    // navigator.permissions is not supported in Safari, so fall back to
-    // attempting watchPosition directly (it will silently succeed if granted).
-    if (navigator.permissions) {
-      navigator.permissions.query({ name: "geolocation" }).then((result) => {
-        if (result.state === "granted") {
+    // 2. Always request a fresh position on every app open.
+    // maximumAge: 0 forces the browser to get a new GPS fix instead of
+    // returning a stale cached position.
+    if (navigator.geolocation) {
+      setState((s) => ({ ...s, loading: true }));
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude: lat, longitude: lng } = position.coords;
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+          setState({ lat, lng, loading: false, error: null });
           startWatching();
-        }
-      }).catch(() => {
-        // Safari: permissions API unavailable, try watching directly
-        startWatching();
-      });
-    } else {
-      // Safari / older browsers: no permissions API, try watching directly
-      startWatching();
+        },
+        (err) => {
+          // Fresh position failed — keep cached position if we have one,
+          // just clear loading state
+          setState((s) => ({
+            ...s,
+            loading: false,
+            error: err.code === 1 ? "Location permission denied" : null,
+          }));
+          // Still start watching in case permission was granted but GPS timed out
+          if (err.code !== 1) startWatching();
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
     }
 
     return () => {
@@ -79,7 +89,7 @@ export function useGeolocation() {
           error: err.code === 1 ? "Location permission denied" : err.message,
         }));
       },
-      { enableHighAccuracy: false, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
     );
   }
 
@@ -110,7 +120,7 @@ export function useGeolocation() {
           error: err.code === 1 ? "Location permission denied" : err.message,
         }));
       },
-      { enableHighAccuracy: false, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   }, []);
 

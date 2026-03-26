@@ -216,10 +216,10 @@ export default async function EventDetailPage({
               <p className="font-medium text-gray-900 dark:text-white">
                 {formatDate(event.startDate)}
               </p>
-              {!isTimeMidnight(event.startDate) && (
+              {!(isExternal && isTimeMidnight(event.startDate)) && (
                 <p className="text-sm text-gray-500">
                   {formatTime(event.startDate)}
-                  {event.endDate && !isTimeMidnight(event.endDate) && ` – ${formatTime(event.endDate)}`}
+                  {event.endDate && !(isExternal && isTimeMidnight(event.endDate)) && ` – ${formatTime(event.endDate)}`}
                 </p>
               )}
             </div>

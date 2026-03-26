@@ -30,17 +30,22 @@ export function formatDate(date: Date | string) {
   });
 }
 
-// Format a time as "6:00 PM", optionally in a specific timezone
+// Format a time as "6:00 PM CT", optionally in a specific timezone.
+// Includes short timezone abbreviation so users know what timezone is shown.
 export function formatTime(date: Date | string, timeZone?: string) {
+  const tz = timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
   return toUTC(date).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
-    timeZone: timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+    timeZoneName: "short",
+    timeZone: tz,
   });
 }
 
 // Returns true if the time portion is exactly 00:00:00 UTC,
 // meaning the API didn't provide a specific time (date-only event).
+// Only reliable for imported events — user-created events can land on
+// midnight UTC by coincidence (e.g., 7 PM CDT = midnight UTC).
 export function isTimeMidnight(date: Date | string): boolean {
   const d = toUTC(date);
   return (
@@ -50,12 +55,17 @@ export function isTimeMidnight(date: Date | string): boolean {
   );
 }
 
-// Smart date+time formatter: returns "Mon, Mar 14 · 6:00 PM" for timed events,
-// or just "Mon, Mar 14" when the time is midnight UTC (date-only).
-export function formatEventDateTime(date: Date | string, timeZone?: string): string {
+// Smart date+time formatter.
+// For imported events (source != USER), hides time when it's midnight UTC
+// (sentinel for "date only"). For user-created events, always shows time.
+export function formatEventDateTime(
+  date: Date | string,
+  options?: { timeZone?: string; source?: string }
+): string {
   const formatted = formatDate(date);
-  if (isTimeMidnight(date)) return formatted;
-  return `${formatted} · ${formatTime(date, timeZone)}`;
+  const isImported = options?.source && options.source !== "USER";
+  if (isImported && isTimeMidnight(date)) return formatted;
+  return `${formatted} · ${formatTime(date, options?.timeZone)}`;
 }
 
 // Returns true if the event has already ended (or started, if no endDate)

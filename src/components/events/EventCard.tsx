@@ -75,7 +75,7 @@ export function EventCard({
           {/* Date and time */}
           <div className="mt-2 flex items-center gap-1.5 text-sm text-gray-500 dark:text-neutral-400">
             <Calendar className="h-3.5 w-3.5" />
-            <span>{formatEventDateTime(event.startDate)}</span>
+            <span>{formatEventDateTime(event.startDate, { source: event.source })}</span>
           </div>
 
           {/* Location */}

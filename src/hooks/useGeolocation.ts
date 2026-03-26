@@ -43,26 +43,46 @@ export function useGeolocation() {
     // returning a stale cached position.
     if (navigator.geolocation) {
       setState((s) => ({ ...s, loading: true }));
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude: lat, longitude: lng } = position.coords;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
-          setState({ lat, lng, loading: false, error: null });
-          startWatching();
-        },
-        (err) => {
-          // Fresh position failed — keep cached position if we have one,
-          // just clear loading state
-          setState((s) => ({
-            ...s,
-            loading: false,
-            error: err.code === 1 ? "Location permission denied" : null,
-          }));
-          // Still start watching in case permission was granted but GPS timed out
-          if (err.code !== 1) startWatching();
-        },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-      );
+
+      // Try high accuracy first, fall back to low accuracy if it fails
+      const onSuccess = (position: GeolocationPosition) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+        setState({ lat, lng, loading: false, error: null });
+        startWatching();
+      };
+
+      const onError = (err: GeolocationPositionError) => {
+        // If high accuracy timed out, retry with low accuracy (WiFi/IP-based)
+        if (err.code === 3) {
+          navigator.geolocation.getCurrentPosition(
+            onSuccess,
+            (fallbackErr) => {
+              setState((s) => ({
+                ...s,
+                loading: false,
+                error: fallbackErr.code === 1 ? "Location permission denied" : null,
+              }));
+              if (fallbackErr.code !== 1) startWatching();
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+          );
+          return;
+        }
+
+        setState((s) => ({
+          ...s,
+          loading: false,
+          error: err.code === 1 ? "Location permission denied" : null,
+        }));
+        if (err.code !== 1) startWatching();
+      };
+
+      navigator.geolocation.getCurrentPosition(onSuccess, onError, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      });
     }
 
     return () => {

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Users } from "lucide-react";
 import Link from "next/link";
@@ -20,7 +20,7 @@ type SearchUser = {
   isCurrentUser?: boolean;
 };
 
-export default function PeoplePage() {
+function PeopleContent() {
   const { user, loading: authLoading } = useAuth();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
@@ -143,5 +143,13 @@ export default function PeoplePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function PeoplePage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-sm text-gray-400">Loading...</div>}>
+      <PeopleContent />
+    </Suspense>
   );
 }

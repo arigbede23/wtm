@@ -3,6 +3,7 @@
 // POST: create a new story (expires in 24 hours)
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 
@@ -149,6 +150,7 @@ export async function POST(request: NextRequest) {
     const { data: story, error } = await db
       .from("stories")
       .insert({
+        id: randomUUID(),
         userId: user.id,
         mediaUrl,
         mediaType: mediaType ?? "image",

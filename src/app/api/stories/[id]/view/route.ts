@@ -2,6 +2,7 @@
 // POST: upsert a view record for the current user
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 
@@ -33,7 +34,7 @@ export async function POST(
     const { error } = await db
       .from("story_views")
       .upsert(
-        { storyId: params.id, viewerId: user.id },
+        { id: randomUUID(), storyId: params.id, viewerId: user.id },
         { onConflict: "storyId,viewerId", ignoreDuplicates: true }
       );
 

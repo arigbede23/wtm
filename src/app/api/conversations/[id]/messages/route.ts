@@ -3,6 +3,7 @@
 // POST: send a new message
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 
@@ -155,6 +156,7 @@ export async function POST(
     const { data: message, error: msgError } = await db
       .from("messages")
       .insert({
+        id: randomUUID(),
         conversationId: params.id,
         senderId: user.id,
         text,

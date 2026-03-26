@@ -3,6 +3,7 @@
 // POST: get or create a conversation with another user
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
     // Create new conversation
     const { data: conversation, error: insertError } = await db
       .from("conversations")
-      .insert({ user1Id: u1, user2Id: u2 })
+      .insert({ id: randomUUID(), user1Id: u1, user2Id: u2 })
       .select("*")
       .single();
 

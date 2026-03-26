@@ -153,10 +153,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ followed: false });
     } else {
       // Follow — insert new row
+      const now = new Date().toISOString();
       const { error } = await db.from("follows").insert({
         id: randomUUID(),
         followerId: user.id,
         followingId: targetUserId,
+        createdAt: now,
       });
 
       if (error) throw error;
@@ -168,6 +170,7 @@ export async function POST(request: NextRequest) {
           userId: targetUserId,
           actorId: user.id,
           type: "NEW_FOLLOWER",
+          createdAt: now,
         });
         if (notifError) console.error("Follow notification insert error:", notifError);
       } catch (err) {
@@ -176,10 +179,10 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ followed: true });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Follow POST error:", error);
     return NextResponse.json(
-      { error: "Failed to update follow status" },
+      { error: error?.message || "Failed to update follow status" },
       { status: 500 }
     );
   }

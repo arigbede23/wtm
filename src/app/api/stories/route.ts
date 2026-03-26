@@ -156,6 +156,7 @@ export async function POST(request: NextRequest) {
         mediaType: mediaType ?? "image",
         textOverlay: textOverlay ?? null,
         expiresAt,
+        createdAt: new Date().toISOString(),
       })
       .select()
       .single();

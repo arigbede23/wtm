@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     // Create new conversation
     const { data: conversation, error: insertError } = await db
       .from("conversations")
-      .insert({ id: randomUUID(), user1Id: u1, user2Id: u2 })
+      .insert({ id: randomUUID(), user1Id: u1, user2Id: u2, createdAt: new Date().toISOString() })
       .select("*")
       .single();
 

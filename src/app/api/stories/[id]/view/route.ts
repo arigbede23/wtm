@@ -34,7 +34,7 @@ export async function POST(
     const { error } = await db
       .from("story_views")
       .upsert(
-        { id: randomUUID(), storyId: params.id, viewerId: user.id },
+        { id: randomUUID(), storyId: params.id, viewerId: user.id, createdAt: new Date().toISOString() },
         { onConflict: "storyId,viewerId", ignoreDuplicates: true }
       );
 

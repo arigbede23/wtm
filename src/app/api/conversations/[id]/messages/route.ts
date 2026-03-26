@@ -160,6 +160,7 @@ export async function POST(
         conversationId: params.id,
         senderId: user.id,
         text,
+        createdAt: new Date().toISOString(),
       })
       .select("id, conversationId, senderId, text, createdAt")
       .single();

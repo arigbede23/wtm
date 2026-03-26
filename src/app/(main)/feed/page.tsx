@@ -51,7 +51,7 @@ function FeedContent() {
               Welcome to {team.city}
             </p>
             <p className="text-xs text-brand-600 dark:text-brand-400">
-              Home of the {team.city} {team.team}
+              Home of the {team.school ?? team.city} {team.team}
             </p>
           </div>
         </div>

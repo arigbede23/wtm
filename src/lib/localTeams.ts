@@ -5,6 +5,7 @@
 export type LocalTeam = {
   city: string;
   team: string;
+  school?: string; // For college teams — e.g. "Arkansas" for "Fayetteville"
   league: string;
   espnId: string; // ESPN abbreviation — used to build logo URL
   colors: {
@@ -75,6 +76,58 @@ export const LOCAL_TEAMS: LocalTeam[] = [
   { city: "Orlando", team: "Magic", league: "NBA", espnId: "orl", colors: { primary: "#0077C0", secondary: "#C4CED4", primaryHSL: "200 100% 38%" }, lat: 28.5383, lng: -81.3792, radius: 50 },
   { city: "San Antonio", team: "Spurs", league: "NBA", espnId: "sa", colors: { primary: "#C4CED4", secondary: "#000000", primaryHSL: "200 10% 80%" }, lat: 29.4241, lng: -98.4936, radius: 50 },
   { city: "Toronto", team: "Raptors", league: "NBA", espnId: "tor", colors: { primary: "#CE1141", secondary: "#000000", primaryHSL: "347 87% 44%" }, lat: 43.6532, lng: -79.3832, radius: 40 },
+
+  // --- College Teams ---
+  // Power conferences + notable programs, especially in areas without pro teams.
+  // Smaller radii so they don't override nearby pro teams.
+
+  // SEC
+  { city: "Fayetteville", team: "Razorbacks", school: "Arkansas", league: "ncaa", espnId: "8", colors: { primary: "#9D2235", secondary: "#FFFFFF", primaryHSL: "350 66% 37%" }, lat: 36.0822, lng: -94.1719, radius: 40 },
+  { city: "Tuscaloosa", team: "Crimson Tide", school: "Alabama", league: "ncaa", espnId: "333", colors: { primary: "#9E1B32", secondary: "#FFFFFF", primaryHSL: "349 72% 36%" }, lat: 33.2098, lng: -87.5692, radius: 40 },
+  { city: "Auburn", team: "Tigers", school: "Auburn", league: "ncaa", espnId: "2", colors: { primary: "#0C2340", secondary: "#E87722", primaryHSL: "213 68% 15%" }, lat: 32.6099, lng: -85.4808, radius: 35 },
+  { city: "Athens", team: "Bulldogs", school: "Georgia", league: "ncaa", espnId: "61", colors: { primary: "#BA0C2F", secondary: "#000000", primaryHSL: "349 90% 39%" }, lat: 33.9519, lng: -83.3576, radius: 35 },
+  { city: "Gainesville", team: "Gators", school: "Florida", league: "ncaa", espnId: "57", colors: { primary: "#0021A5", secondary: "#FA4616", primaryHSL: "228 100% 32%" }, lat: 29.6516, lng: -82.3248, radius: 35 },
+  { city: "Baton Rouge", team: "Tigers", school: "LSU", league: "ncaa", espnId: "99", colors: { primary: "#461D7C", secondary: "#FDD023", primaryHSL: "267 61% 30%" }, lat: 30.4515, lng: -91.1871, radius: 35 },
+  { city: "Knoxville", team: "Volunteers", school: "Tennessee", league: "ncaa", espnId: "2633", colors: { primary: "#FF8200", secondary: "#FFFFFF", primaryHSL: "31 100% 50%" }, lat: 35.9606, lng: -83.9207, radius: 35 },
+  { city: "College Station", team: "Aggies", school: "Texas A&M", league: "ncaa", espnId: "245", colors: { primary: "#500000", secondary: "#FFFFFF", primaryHSL: "0 100% 16%" }, lat: 30.6280, lng: -96.3344, radius: 35 },
+  { city: "Columbia", team: "Gamecocks", school: "South Carolina", league: "ncaa", espnId: "2579", colors: { primary: "#73000A", secondary: "#000000", primaryHSL: "356 100% 23%" }, lat: 34.0007, lng: -81.0348, radius: 35 },
+  { city: "Lexington", team: "Wildcats", school: "Kentucky", league: "ncaa", espnId: "96", colors: { primary: "#0033A0", secondary: "#FFFFFF", primaryHSL: "220 100% 31%" }, lat: 38.0406, lng: -84.5037, radius: 35 },
+  { city: "Oxford", team: "Rebels", school: "Ole Miss", league: "ncaa", espnId: "145", colors: { primary: "#CE1126", secondary: "#14213D", primaryHSL: "354 85% 44%" }, lat: 34.3665, lng: -89.5192, radius: 30 },
+  { city: "Starkville", team: "Bulldogs", school: "Mississippi State", league: "ncaa", espnId: "344", colors: { primary: "#660000", secondary: "#FFFFFF", primaryHSL: "0 100% 20%" }, lat: 33.4504, lng: -88.8184, radius: 30 },
+
+  // Big Ten
+  { city: "Columbus", team: "Buckeyes", school: "Ohio State", league: "ncaa", espnId: "194", colors: { primary: "#BB0000", secondary: "#666666", primaryHSL: "0 100% 37%" }, lat: 39.9612, lng: -82.9988, radius: 35 },
+  { city: "Ann Arbor", team: "Wolverines", school: "Michigan", league: "ncaa", espnId: "130", colors: { primary: "#00274C", secondary: "#FFCB05", primaryHSL: "209 100% 15%" }, lat: 42.2808, lng: -83.7430, radius: 30 },
+  { city: "State College", team: "Nittany Lions", school: "Penn State", league: "ncaa", espnId: "213", colors: { primary: "#041E42", secondary: "#FFFFFF", primaryHSL: "214 91% 14%" }, lat: 40.7934, lng: -77.8600, radius: 35 },
+  { city: "Lincoln", team: "Cornhuskers", school: "Nebraska", league: "ncaa", espnId: "158", colors: { primary: "#E41C38", secondary: "#FFFFFF", primaryHSL: "352 79% 50%" }, lat: 40.8136, lng: -96.7026, radius: 40 },
+  { city: "Madison", team: "Badgers", school: "Wisconsin", league: "ncaa", espnId: "275", colors: { primary: "#C5050C", secondary: "#FFFFFF", primaryHSL: "358 93% 40%" }, lat: 43.0731, lng: -89.4012, radius: 30 },
+  { city: "Iowa City", team: "Hawkeyes", school: "Iowa", league: "ncaa", espnId: "2294", colors: { primary: "#FFCD00", secondary: "#000000", primaryHSL: "48 100% 50%" }, lat: 41.6611, lng: -91.5302, radius: 35 },
+  { city: "Eugene", team: "Ducks", school: "Oregon", league: "ncaa", espnId: "2483", colors: { primary: "#154733", secondary: "#FEE123", primaryHSL: "155 53% 18%" }, lat: 44.0521, lng: -123.0868, radius: 35 },
+  { city: "Los Angeles", team: "Trojans", school: "USC", league: "ncaa", espnId: "30", colors: { primary: "#990000", secondary: "#FFC72C", primaryHSL: "0 100% 30%" }, lat: 34.0224, lng: -118.2851, radius: 15 },
+  { city: "Los Angeles", team: "Bruins", school: "UCLA", league: "ncaa", espnId: "26", colors: { primary: "#2D68C4", secondary: "#F2A900", primaryHSL: "216 63% 47%" }, lat: 34.0689, lng: -118.4452, radius: 10 },
+
+  // Big 12
+  { city: "Austin", team: "Longhorns", school: "Texas", league: "ncaa", espnId: "251", colors: { primary: "#BF5700", secondary: "#FFFFFF", primaryHSL: "23 100% 37%" }, lat: 30.2672, lng: -97.7431, radius: 35 },
+  { city: "Norman", team: "Sooners", school: "Oklahoma", league: "ncaa", espnId: "201", colors: { primary: "#841617", secondary: "#FFFFFF", primaryHSL: "0 72% 30%" }, lat: 35.2226, lng: -97.4395, radius: 30 },
+  { city: "Lubbock", team: "Red Raiders", school: "Texas Tech", league: "ncaa", espnId: "2641", colors: { primary: "#CC0000", secondary: "#000000", primaryHSL: "0 100% 40%" }, lat: 33.5779, lng: -101.8552, radius: 40 },
+  { city: "Waco", team: "Bears", school: "Baylor", league: "ncaa", espnId: "239", colors: { primary: "#154734", secondary: "#FFB81C", primaryHSL: "155 55% 18%" }, lat: 31.5493, lng: -97.1467, radius: 30 },
+  { city: "Stillwater", team: "Cowboys", school: "Oklahoma State", league: "ncaa", espnId: "197", colors: { primary: "#FF7300", secondary: "#000000", primaryHSL: "27 100% 50%" }, lat: 36.1156, lng: -97.0584, radius: 30 },
+  { city: "Boulder", team: "Buffaloes", school: "Colorado", league: "ncaa", espnId: "38", colors: { primary: "#CFB87C", secondary: "#000000", primaryHSL: "42 42% 65%" }, lat: 40.0150, lng: -105.2705, radius: 30 },
+  { city: "Provo", team: "Cougars", school: "BYU", league: "ncaa", espnId: "252", colors: { primary: "#002E5D", secondary: "#FFFFFF", primaryHSL: "211 100% 18%" }, lat: 40.2338, lng: -111.6585, radius: 30 },
+  { city: "Morgantown", team: "Mountaineers", school: "West Virginia", league: "ncaa", espnId: "277", colors: { primary: "#002855", secondary: "#EAAA00", primaryHSL: "210 100% 17%" }, lat: 39.6295, lng: -79.9559, radius: 35 },
+
+  // ACC
+  { city: "Clemson", team: "Tigers", school: "Clemson", league: "ncaa", espnId: "228", colors: { primary: "#F56600", secondary: "#522D80", primaryHSL: "25 100% 48%" }, lat: 34.6834, lng: -82.8374, radius: 30 },
+  { city: "Tallahassee", team: "Seminoles", school: "Florida State", league: "ncaa", espnId: "52", colors: { primary: "#782F40", secondary: "#CEB888", primaryHSL: "345 44% 33%" }, lat: 30.4383, lng: -84.2807, radius: 35 },
+  { city: "Chapel Hill", team: "Tar Heels", school: "UNC", league: "ncaa", espnId: "153", colors: { primary: "#7BAFD4", secondary: "#FFFFFF", primaryHSL: "202 50% 65%" }, lat: 35.9132, lng: -79.0558, radius: 25 },
+  { city: "Durham", team: "Blue Devils", school: "Duke", league: "ncaa", espnId: "150", colors: { primary: "#003087", secondary: "#FFFFFF", primaryHSL: "218 100% 27%" }, lat: 35.9940, lng: -78.8986, radius: 20 },
+  { city: "Blacksburg", team: "Hokies", school: "Virginia Tech", league: "ncaa", espnId: "259", colors: { primary: "#630031", secondary: "#CF4420", primaryHSL: "330 100% 19%" }, lat: 37.2296, lng: -80.4139, radius: 30 },
+  { city: "Louisville", team: "Cardinals", school: "Louisville", league: "ncaa", espnId: "97", colors: { primary: "#AD0000", secondary: "#000000", primaryHSL: "0 100% 34%" }, lat: 38.2527, lng: -85.7585, radius: 35 },
+  { city: "Syracuse", team: "Orange", school: "Syracuse", league: "ncaa", espnId: "183", colors: { primary: "#D44500", secondary: "#FFFFFF", primaryHSL: "19 100% 42%" }, lat: 43.0481, lng: -76.1474, radius: 35 },
+
+  // Other notable programs
+  { city: "South Bend", team: "Fighting Irish", school: "Notre Dame", league: "ncaa", espnId: "87", colors: { primary: "#0C2340", secondary: "#C99700", primaryHSL: "213 68% 15%" }, lat: 41.7002, lng: -86.2380, radius: 30 },
+  { city: "Tucson", team: "Wildcats", school: "Arizona", league: "ncaa", espnId: "12", colors: { primary: "#CC0033", secondary: "#003366", primaryHSL: "347 100% 40%" }, lat: 32.2226, lng: -110.9747, radius: 35 },
 ];
 
 // Haversine distance in miles

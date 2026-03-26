@@ -135,7 +135,7 @@ export default function CreatePage() {
           coverImageUrl: coverImageUrl || null,
           isFree: form.isFree,
           price: form.isFree ? null : parseFloat(form.price) || null,
-          url: form.url || null,
+          url: form.url ? (form.url.match(/^https?:\/\//) ? form.url : `https://${form.url}`) : null,
         }),
       });
 

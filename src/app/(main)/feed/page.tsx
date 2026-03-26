@@ -3,8 +3,9 @@
 
 "use client";
 
-import { Suspense, useState } from "react";
-import { MapPin } from "lucide-react";
+import { Suspense, useState, useRef, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { MapPin, Loader2 } from "lucide-react";
 import { EventList } from "@/components/events/EventList";
 import { CategoryFilter } from "@/components/events/CategoryFilter";
 import { FilterBar } from "@/components/events/FilterBar";
@@ -25,6 +26,54 @@ function FeedContent() {
   const { filters, setFilters } = useEventFilters();
   const { lat, lng, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
   const team = useLocalTeamContext();
+  const queryClient = useQueryClient();
+
+  // Pull-to-refresh state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const touchStartY = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const PULL_THRESHOLD = 60;
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    // Only activate when scrolled to the top
+    if (containerRef.current && containerRef.current.scrollTop <= 0) {
+      touchStartY.current = e.touches[0].clientY;
+    } else {
+      touchStartY.current = null;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartY.current === null || refreshing) return;
+      const delta = e.touches[0].clientY - touchStartY.current;
+      if (delta > 0) {
+        // Apply diminishing resistance so it feels natural
+        setPullDistance(Math.min(delta * 0.5, 120));
+      }
+    },
+    [refreshing],
+  );
+
+  const handleTouchEnd = useCallback(async () => {
+    if (touchStartY.current === null) return;
+    touchStartY.current = null;
+
+    if (pullDistance >= PULL_THRESHOLD && !refreshing) {
+      setRefreshing(true);
+      setPullDistance(PULL_THRESHOLD); // Hold at threshold while refreshing
+      try {
+        await queryClient.invalidateQueries({ queryKey: ["events"] });
+      } finally {
+        setRefreshing(false);
+        setPullDistance(0);
+      }
+    } else {
+      setPullDistance(0);
+    }
+  }, [pullDistance, refreshing, queryClient]);
 
   const hasLocation = lat != null && lng != null;
 
@@ -38,7 +87,29 @@ function FeedContent() {
   };
 
   return (
-    <div>
+    <div
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="flex items-center justify-center overflow-hidden transition-[height] duration-200 ease-out"
+        style={{
+          height: pullDistance > 0 || refreshing ? `${Math.max(pullDistance, refreshing ? PULL_THRESHOLD : 0)}px` : "0px",
+        }}
+      >
+        <Loader2
+          className={`h-5 w-5 text-brand-600 ${
+            refreshing ? "animate-spin" : ""
+          }`}
+          style={{
+            opacity: Math.min(pullDistance / PULL_THRESHOLD, 1),
+            transform: `rotate(${(pullDistance / PULL_THRESHOLD) * 360}deg)`,
+          }}
+        />
+      </div>
       {/* Stories + heading section */}
       <div className="pt-3">
         <StoryBar />

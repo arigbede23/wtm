@@ -3,6 +3,8 @@
 // The [id] folder name is a dynamic route — /event/abc123 passes "abc123" as params.id.
 // Docs: https://nextjs.org/docs/app/building-your-application/routing/dynamic-routes
 
+import type { Metadata } from "next";
+
 // Always fetch fresh data (don't use a cached/static version)
 export const dynamic = "force-dynamic";
 
@@ -31,6 +33,65 @@ import { UserAvatar } from "@/components/social/UserAvatar";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
 import { InviteFriendsButton } from "@/components/events/InviteFriendsButton";
 import { MobileContainer } from "@/components/layout/MobileContainer";
+
+// Generate dynamic Open Graph metadata so shared links show a branded card image.
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("title, description, category, startDate, city, state")
+    .eq("id", params.id)
+    .single();
+
+  if (!event) {
+    return { title: "Event Not Found" };
+  }
+
+  const category = event.category as EventCategory;
+  const location = [event.city, event.state].filter(Boolean).join(", ");
+  const description =
+    event.description?.slice(0, 160) ??
+    `${CATEGORY_EMOJI[category]} ${category.charAt(0) + category.slice(1).toLowerCase()} event${location ? ` in ${location}` : ""}`;
+
+  // Next.js resolves relative URLs against metadataBase (auto-detected on Vercel).
+  // Use NEXT_PUBLIC_APP_URL if set, otherwise fall back to VERCEL_URL, then localhost.
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  const ogImageUrl = `${baseUrl}/api/events/${params.id}/og`;
+
+  return {
+    title: event.title,
+    description,
+    openGraph: {
+      title: event.title,
+      description,
+      type: "website",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: event.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: event.title,
+      description,
+      images: [ogImageUrl],
+    },
+  };
+}
 
 export default async function EventDetailPage({
   params,

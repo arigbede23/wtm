@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { formatDate, formatTime } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory, type EventWithCounts } from "@/types";
 
@@ -107,9 +108,16 @@ type EventMapProps = {
   userLng?: number | null;
 };
 
+const TILE_LIGHT =
+  "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+const TILE_DARK =
+  "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+
 export default function EventMap({ events, userLat, userLng }: EventMapProps) {
   const centerLat = userLat ?? 40.7128;
   const centerLng = userLng ?? -74.006;
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
     <MapContainer
@@ -118,10 +126,11 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
       className="h-full w-full"
       zoomControl={false}
     >
-      {/* Clean modern tile style — CartoDB Voyager */}
+      {/* Map tiles — switch between Voyager (light) and Dark Matter (dark) */}
       <TileLayer
+        key={isDark ? "dark" : "light"}
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        url={isDark ? TILE_DARK : TILE_LIGHT}
       />
 
       {/* Recenter on user */}

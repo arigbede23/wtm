@@ -1,5 +1,5 @@
-// Attendees API Route — list of users who RSVP'd GOING to an event.
-// GET: returns attendee list with avatar, displayName, username
+// Attendees API Route — list of users who RSVP'd GOING or INTERESTED to an event.
+// GET: returns attendee list with avatar, displayName, username, and rsvp status
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -13,22 +13,23 @@ export async function GET(
   const supabase = createClient();
 
   try {
-    // Fetch RSVPs with GOING status, join user data
+    // Fetch RSVPs with GOING or INTERESTED status, join user data
     const { data: rsvps, error } = await supabase
       .from("rsvps")
-      .select("userId, users:userId(id, displayName, username, avatarUrl)")
+      .select("userId, status, users:userId(id, displayName, username, avatarUrl)")
       .eq("eventId", params.id)
-      .eq("status", "GOING")
-      .limit(50);
+      .in("status", ["GOING", "INTERESTED"])
+      .limit(100);
 
     if (error) throw error;
 
-    // Extract user objects from the join
+    // Extract user objects from the join, include rsvp status
     const attendees = (rsvps ?? []).map((rsvp: any) => ({
       id: rsvp.users?.id ?? rsvp.userId,
       displayName: rsvp.users?.displayName ?? null,
       username: rsvp.users?.username ?? null,
       avatarUrl: rsvp.users?.avatarUrl ?? null,
+      status: rsvp.status as "GOING" | "INTERESTED",
     }));
 
     return NextResponse.json(attendees);

@@ -155,7 +155,8 @@ export function StoryBar() {
         <StoryViewer
           stories={viewerGroups}
           initialUserIndex={viewerIndex}
-          onClose={() => setViewerOpen(false)}
+          onClose={() => { setViewerOpen(false); fetchStories(); }}
+          onDeleted={() => fetchStories()}
         />
       )}
 

@@ -132,7 +132,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
   // Camera mode
   if (!preview) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col bg-black">
+      <div className="fixed inset-0 z-[9999] flex flex-col bg-black">
         <canvas ref={canvasRef} className="hidden" />
 
         {/* Camera viewfinder */}
@@ -172,7 +172,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           </div>
 
           {/* Bottom controls */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-6 pb-8 pt-12">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-6 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] pt-12">
             <div className="flex items-end justify-between">
               {/* Gallery picker */}
               <button
@@ -222,7 +222,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
   // Preview + edit mode
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-black">
       <div className="relative flex-1">
         <img
           src={preview}
@@ -285,7 +285,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         )}
 
         {/* Bottom share bar */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-8 pt-12">
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] pt-12">
           <div className="flex items-center gap-3">
             <div className="flex-1 rounded-full bg-white/15 px-4 py-2.5 text-sm text-white/50 backdrop-blur-sm">
               Your story

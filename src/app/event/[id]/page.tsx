@@ -21,7 +21,8 @@ import {
   Ticket,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
-import { formatDate, formatTime, formatPrice, isTimeMidnight, isEventPast, buildCalendarUrl, buildDirectionsUrl } from "@/lib/utils";
+import { formatPrice, isEventPast, buildCalendarUrl, buildDirectionsUrl } from "@/lib/utils";
+import { EventDateTime } from "@/components/events/EventDateTime";
 import { CATEGORY_EMOJI, type EventCategory } from "@/types";
 import RsvpButtons from "@/components/events/RsvpButtons";
 import SaveButton from "@/components/events/SaveButton";
@@ -209,20 +210,14 @@ export default async function EventDetailPage({
 
         {/* Date, location, and price details */}
         <div className="mt-4 space-y-3">
-          {/* Date and time */}
+          {/* Date and time — client component so it uses browser timezone */}
           <div className="flex items-start gap-3">
             <Calendar className="mt-0.5 h-5 w-5 text-gray-400" />
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
-                {formatDate(event.startDate)}
-              </p>
-              {!(isExternal && isTimeMidnight(event.startDate)) && (
-                <p className="text-sm text-gray-500">
-                  {formatTime(event.startDate)}
-                  {event.endDate && !(isExternal && isTimeMidnight(event.endDate)) && ` – ${formatTime(event.endDate)}`}
-                </p>
-              )}
-            </div>
+            <EventDateTime
+              startDate={event.startDate}
+              endDate={event.endDate}
+              isExternal={isExternal}
+            />
           </div>
 
           {/* Location */}

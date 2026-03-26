@@ -59,7 +59,7 @@ function FeedContent() {
           <img
             src={getTeamLogoUrl(team)}
             alt={`${team.city} ${team.team}`}
-            className="h-9 w-9 object-contain opacity-60"
+            className="h-12 w-12 object-contain opacity-80"
           />
         )}
       </div>

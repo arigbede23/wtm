@@ -31,14 +31,14 @@ export async function uploadStoryMedia(file: File): Promise<string> {
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   const { error } = await supabase.storage
-    .from("story-media")
-    .upload(filename, file);
+    .from("event-images")
+    .upload(`stories/${filename}`, file);
 
   if (error) throw error;
 
   const { data } = supabase.storage
-    .from("story-media")
-    .getPublicUrl(filename);
+    .from("event-images")
+    .getPublicUrl(`stories/${filename}`);
 
   return data.publicUrl;
 }

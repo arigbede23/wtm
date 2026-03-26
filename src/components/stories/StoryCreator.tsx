@@ -32,7 +32,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1920 } },
+        video: { facingMode: facing },
         audio: false,
       });
       streamRef.current = stream;
@@ -105,12 +105,21 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
     startCamera(facingMode);
   };
 
+  const [error, setError] = useState("");
+
   const handlePost = async () => {
     if (!file) return;
     setLoading(true);
+    setError("");
 
     try {
-      const mediaUrl = await uploadStoryMedia(file);
+      let mediaUrl: string;
+      try {
+        mediaUrl = await uploadStoryMedia(file);
+      } catch (uploadErr: any) {
+        throw new Error(`Upload failed: ${uploadErr?.message || "unknown error"}`);
+      }
+
       const res = await fetch("/api/stories", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,11 +129,17 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           textOverlay: textOverlay.trim() || null,
         }),
       });
-      if (!res.ok) throw new Error("Failed to create story");
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to create story");
+      }
+
       onCreated();
       onClose();
-    } catch (error) {
-      console.error("Story creation error:", error);
+    } catch (err: any) {
+      console.error("Story creation error:", err);
+      setError(err.message || "Something went wrong");
       setLoading(false);
     }
   };
@@ -286,6 +301,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
         {/* Bottom share bar */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-[max(2rem,env(safe-area-inset-bottom,2rem))] pt-12">
+          {error && (
+            <p className="mb-3 rounded-lg bg-red-500/80 px-3 py-2 text-center text-xs text-white">
+              {error}
+            </p>
+          )}
           <div className="flex items-center gap-3">
             <div className="flex-1 rounded-full bg-white/15 px-4 py-2.5 text-sm text-white/50 backdrop-blur-sm">
               Your story

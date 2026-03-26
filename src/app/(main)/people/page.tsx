@@ -3,6 +3,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, Users } from "lucide-react";
 import Link from "next/link";
 import { UserAvatar } from "@/components/social/UserAvatar";
@@ -21,7 +22,8 @@ type SearchUser = {
 
 export default function PeoplePage() {
   const { user, loading: authLoading } = useAuth();
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const [users, setUsers] = useState<SearchUser[]>([]);
   const [loading, setLoading] = useState(true);
 

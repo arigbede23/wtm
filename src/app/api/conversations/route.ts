@@ -4,6 +4,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
+
+function getDirectClient() {
+  return createAnonClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +26,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const db = getDirectClient();
+
   try {
     // Fetch conversations where user is either user1 or user2
-    const { data: conversations, error } = await supabase
+    const { data: conversations, error } = await db
       .from("conversations")
       .select(
         "id, user1Id, user2Id, user1LastReadAt, user2LastReadAt, lastMessageAt, user1:user1Id(id, displayName, username, avatarUrl), user2:user2Id(id, displayName, username, avatarUrl)"
@@ -37,7 +47,7 @@ export async function GET(request: NextRequest) {
     // Fetch the latest message for each conversation
     const conversationIds = conversations.map((c: any) => c.id);
 
-    const { data: allMessages, error: msgError } = await supabase
+    const { data: allMessages, error: msgError } = await db
       .from("messages")
       .select("id, conversationId, text, createdAt, senderId")
       .in("conversationId", conversationIds)
@@ -117,12 +127,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const db = getDirectClient();
+
   try {
     // Always put the lexicographically smaller UUID in user1Id for deduplication
     const [u1, u2] = [user.id, userId].sort();
 
     // Try to find existing conversation
-    const { data: existing, error: selectError } = await supabase
+    const { data: existing, error: selectError } = await db
       .from("conversations")
       .select("*")
       .eq("user1Id", u1)
@@ -136,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new conversation
-    const { data: conversation, error: insertError } = await supabase
+    const { data: conversation, error: insertError } = await db
       .from("conversations")
       .insert({ user1Id: u1, user2Id: u2 })
       .select("*")

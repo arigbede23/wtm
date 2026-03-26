@@ -4,6 +4,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
+
+function getDirectClient() {
+  return createAnonClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export const dynamic = "force-dynamic";
 
@@ -21,9 +29,11 @@ export async function GET(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const db = getDirectClient();
+
   try {
     // Verify user is a participant
-    const { data: conversation, error: convError } = await supabase
+    const { data: conversation, error: convError } = await db
       .from("conversations")
       .select("id, user1Id, user2Id")
       .eq("id", params.id)
@@ -50,7 +60,7 @@ export async function GET(
     const { searchParams } = request.nextUrl;
     const before = searchParams.get("before");
 
-    let query = supabase
+    let query = db
       .from("messages")
       .select("id, conversationId, senderId, text, createdAt")
       .eq("conversationId", params.id)
@@ -69,7 +79,7 @@ export async function GET(
     const isUser1 = conversation.user1Id === user.id;
     const updateField = isUser1 ? "user1LastReadAt" : "user2LastReadAt";
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from("conversations")
       .update({ [updateField]: new Date().toISOString() })
       .eq("id", params.id);
@@ -102,9 +112,11 @@ export async function POST(
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
+  const db = getDirectClient();
+
   try {
     // Verify user is a participant
-    const { data: conversation, error: convError } = await supabase
+    const { data: conversation, error: convError } = await db
       .from("conversations")
       .select("id, user1Id, user2Id")
       .eq("id", params.id)
@@ -140,7 +152,7 @@ export async function POST(
     // Insert the message
     const now = new Date().toISOString();
 
-    const { data: message, error: msgError } = await supabase
+    const { data: message, error: msgError } = await db
       .from("messages")
       .insert({
         conversationId: params.id,
@@ -156,7 +168,7 @@ export async function POST(
     const isUser1 = conversation.user1Id === user.id;
     const updateField = isUser1 ? "user1LastReadAt" : "user2LastReadAt";
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await db
       .from("conversations")
       .update({
         lastMessageAt: now,

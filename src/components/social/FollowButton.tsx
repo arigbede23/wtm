@@ -63,8 +63,13 @@ export function FollowButton({ targetUserId, onCountChange }: FollowButtonProps)
         body: JSON.stringify({ targetUserId }),
       });
 
-      if (!res.ok) throw new Error();
-    } catch {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error("Follow error:", res.status, data);
+        throw new Error(data.error || "Follow failed");
+      }
+    } catch (err) {
+      console.error("Follow toggle error:", err);
       setIsFollowing(wasFollowing); // Revert
       onCountChange?.(wasFollowing ? 1 : -1);
     } finally {

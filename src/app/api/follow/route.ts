@@ -3,9 +3,18 @@
 // POST: toggle follow/unfollow, creates NEW_FOLLOWER notification on follow
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+
+function getDirectClient() {
+  return createAnonClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 export async function GET(request: NextRequest) {
   const supabase = createClient();
@@ -24,7 +33,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const { data: follows, error } = await supabase
+      const db = getDirectClient();
+      const { data: follows, error } = await db
         .from("follows")
         .select("following:followingId(id, displayName, username, avatarUrl)")
         .eq("followerId", user.id);
@@ -52,14 +62,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const db = getDirectClient();
+
     // Get follower/following counts
     const [{ count: followerCount }, { count: followingCount }] =
       await Promise.all([
-        supabase
+        db
           .from("follows")
           .select("*", { count: "exact", head: true })
           .eq("followingId", userId),
-        supabase
+        db
           .from("follows")
           .select("*", { count: "exact", head: true })
           .eq("followerId", userId),
@@ -68,7 +80,7 @@ export async function GET(request: NextRequest) {
     // Check if current user follows this user
     let isFollowing = false;
     if (user) {
-      const { data } = await supabase
+      const { data } = await db
         .from("follows")
         .select("id")
         .eq("followerId", user.id)
@@ -120,8 +132,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const db = getDirectClient();
+
     // Check if already following
-    const { data: existing } = await supabase
+    const { data: existing } = await db
       .from("follows")
       .select("id")
       .eq("followerId", user.id)
@@ -130,7 +144,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // Unfollow — delete the follow row
-      const { error } = await supabase
+      const { error } = await db
         .from("follows")
         .delete()
         .eq("id", existing.id);
@@ -139,7 +153,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ followed: false });
     } else {
       // Follow — insert new row
-      const { error } = await supabase.from("follows").insert({
+      const { error } = await db.from("follows").insert({
+        id: randomUUID(),
         followerId: user.id,
         followingId: targetUserId,
       });
@@ -148,7 +163,8 @@ export async function POST(request: NextRequest) {
 
       // Create NEW_FOLLOWER notification (non-blocking)
       try {
-        const { error: notifError } = await supabase.from("notifications").insert({
+        const { error: notifError } = await db.from("notifications").insert({
+          id: randomUUID(),
           userId: targetUserId,
           actorId: user.id,
           type: "NEW_FOLLOWER",

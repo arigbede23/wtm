@@ -2,6 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+  if (!rateLimit(ip, 30).success) return rateLimitResponse();
+
   const supabase = createClient();
 
   const {

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { haversineDistance } from "@/lib/geo";
+import { rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,8 @@ export async function GET(request: NextRequest) {
   const dateFrom = searchParams.get("dateFrom");
   const dateTo = searchParams.get("dateTo");
   const organizerId = searchParams.get("organizerId");
+  const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10) || 50, 100);
+  const offset = parseInt(searchParams.get("offset") ?? "0", 10) || 0;
 
   try {
     // Build Supabase query with filters
@@ -63,12 +66,19 @@ export async function GET(request: NextRequest) {
       query = query.lte("startDate", dateTo);
     }
 
-    // Text search — matches title or description
+    // Text search — matches title or description.
+    // Sanitize the search string to prevent filter injection via Supabase PostgREST syntax.
     if (search) {
-      query = query.or(
-        `title.ilike.%${search}%,description.ilike.%${search}%`
-      );
+      const sanitized = search.replace(/[%_,().*\\]/g, "");
+      if (sanitized.length > 0) {
+        query = query.or(
+          `title.ilike.%${sanitized}%,description.ilike.%${sanitized}%`
+        );
+      }
     }
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
 
     const { data: events, error } = await query;
 
@@ -204,6 +214,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+  if (!rateLimit(ip, 10).success) return rateLimitResponse();
+
   const supabase = createClient();
 
   // Auth check

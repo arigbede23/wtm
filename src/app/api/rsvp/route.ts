@@ -3,12 +3,16 @@
 // GET:  get current user's RSVP for a specific event
 
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/pushNotifications";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+  if (!rateLimit(ip, 30).success) return rateLimitResponse();
+
   const supabase = createClient();
 
   // Auth check

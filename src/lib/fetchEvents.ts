@@ -14,6 +14,8 @@ export function buildEventQueryString(filters: EventFilters): string {
   if (filters.isFree) params.set("isFree", "true");
   if (filters.dateFrom) params.set("dateFrom", filters.dateFrom);
   if (filters.dateTo) params.set("dateTo", filters.dateTo);
+  if (filters.limit != null) params.set("limit", String(filters.limit));
+  if (filters.offset != null) params.set("offset", String(filters.offset));
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 }

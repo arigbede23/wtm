@@ -23,9 +23,12 @@ export async function GET(request: NextRequest) {
       .limit(50);
 
     if (query) {
-      usersQuery = usersQuery.or(
-        `displayName.ilike.%${query}%,username.ilike.%${query}%`
-      );
+      const sanitized = query.replace(/[%_,().*\\]/g, "");
+      if (sanitized.length > 0) {
+        usersQuery = usersQuery.or(
+          `displayName.ilike.%${sanitized}%,username.ilike.%${sanitized}%`
+        );
+      }
     }
 
     const { data: users, error } = await usersQuery;

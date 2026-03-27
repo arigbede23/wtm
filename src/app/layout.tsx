@@ -25,14 +25,10 @@ export const metadata: Metadata = {
 };
 
 // Viewport — controls how the page scales on mobile devices.
-// maximumScale: 1 and userScalable: false prevent pinch-to-zoom
-// which makes the app feel more like a native mobile app.
 export const viewport: Viewport = {
   themeColor: "#C8102E",    // Browser toolbar color (our brand red)
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 // The actual layout component — renders on every page

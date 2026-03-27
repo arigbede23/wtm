@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,6 +82,16 @@ export default function CreatePage() {
   const [error, setError] = useState("");
   const [showMap, setShowMap] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const imagePreviewRef = useRef<string | null>(null);
+
+  // Revoke object URL on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (imagePreviewRef.current) {
+        URL.revokeObjectURL(imagePreviewRef.current);
+      }
+    };
+  }, []);
 
   const updateField = useCallback(
     <K extends keyof FormData>(key: K, value: FormData[K]) => {
@@ -93,17 +103,21 @@ export default function CreatePage() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (imagePreviewRef.current) URL.revokeObjectURL(imagePreviewRef.current);
     updateField("coverImageFile", file);
-    setImagePreview(URL.createObjectURL(file));
+    const url = URL.createObjectURL(file);
+    imagePreviewRef.current = url;
+    setImagePreview(url);
   };
 
   const removeImage = () => {
     updateField("coverImageFile", null);
     updateField("coverImageUrl", "");
-    if (imagePreview) {
-      URL.revokeObjectURL(imagePreview);
-      setImagePreview(null);
+    if (imagePreviewRef.current) {
+      URL.revokeObjectURL(imagePreviewRef.current);
+      imagePreviewRef.current = null;
     }
+    setImagePreview(null);
   };
 
   const handleSubmit = async () => {

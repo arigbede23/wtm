@@ -52,6 +52,8 @@ export type EventFilters = {
   dateFrom?: string;
   dateTo?: string;
   datePreset?: string; // tracks which date filter button is active
+  limit?: number;
+  offset?: number;
 };
 
 // Public user profile shape

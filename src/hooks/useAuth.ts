@@ -4,16 +4,27 @@
 
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);     // Current logged-in user (or null)
   const [loading, setLoading] = useState(true);             // True while we're checking auth status
-  const supabase = useMemo(() => createClient(), []);
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+
+  // Lazily create the Supabase client only in the browser to avoid
+  // @supabase/ssr throwing during Next.js static prerendering.
+  function getSupabase() {
+    if (!supabaseRef.current) {
+      supabaseRef.current = createClient();
+    }
+    return supabaseRef.current;
+  }
 
   useEffect(() => {
+    const supabase = getSupabase();
+
     // On mount, check if there's already a logged-in user
     const getUser = async () => {
       const {
@@ -40,7 +51,7 @@ export function useAuth() {
 
   // Sign up with email and password — creates a new account
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { error } = await getSupabase().auth.signUp({
       email,
       password,
     });
@@ -49,7 +60,7 @@ export function useAuth() {
 
   // Sign in with existing email and password
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await getSupabase().auth.signInWithPassword({
       email,
       password,
     });
@@ -60,7 +71,7 @@ export function useAuth() {
   const signInWithOAuth = async (
     provider: "google" | "apple" | "facebook"
   ) => {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await getSupabase().auth.signInWithOAuth({
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -71,7 +82,7 @@ export function useAuth() {
 
   // Sign out — clears the session cookie
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await getSupabase().auth.signOut();
   };
 
   return { user, loading, signUp, signIn, signInWithOAuth, signOut };

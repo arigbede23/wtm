@@ -7,11 +7,11 @@ const requests = new Map<string, { count: number; resetAt: number }>();
 // Clean up expired entries periodically
 setInterval(() => {
   const now = Date.now();
-  for (const [key, value] of requests) {
+  requests.forEach((value, key) => {
     if (now > value.resetAt) {
       requests.delete(key);
     }
-  }
+  });
 }, 60 * 1000);
 
 export function rateLimit(

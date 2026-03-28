@@ -148,8 +148,9 @@ export default async function EventDetailPage({
   const category = event.category as EventCategory;
   const past = isEventPast(event.startDate, event.endDate);
   const isExternal = !!event.source && event.source !== "USER";
+  const isGenericImage = !event.coverImageUrl || event.coverImageUrl.includes("/dam/c/");
   const matchup = category === "SPORTS" ? parseMatchup(event.title) : null;
-  const singleTeam = !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+  const singleTeam = !matchup && isGenericImage ? findTeamInTitle(event.title) : null;
 
   return (
     <MobileContainer>

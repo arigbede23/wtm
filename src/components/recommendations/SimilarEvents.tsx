@@ -58,8 +58,9 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
       </h2>
       <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
         {events.map((event) => {
+          const isGenericImage = !event.coverImageUrl || event.coverImageUrl.includes("/dam/c/");
           const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
-          const singleTeam = !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+          const singleTeam = !matchup && isGenericImage ? findTeamInTitle(event.title) : null;
           return (
           <Link
             key={event.id}

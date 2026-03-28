@@ -168,8 +168,9 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
       {/* Event markers */}
       {events.map((event) => {
         if (event.lat == null || event.lng == null) return null;
+        const isGenericImage = !event.coverImageUrl || event.coverImageUrl.includes("/dam/c/");
         const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
-        const singleTeam = !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+        const singleTeam = !matchup && isGenericImage ? findTeamInTitle(event.title) : null;
         return (
           <Marker
             key={event.id}

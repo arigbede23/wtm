@@ -301,6 +301,38 @@ const TEAMS: SportTeam[] = [
   { name: "Cardinals", city: "Lamar University", league: "ncaa", espnId: "2320" },
   { name: "Mens", city: "Kennesaw State", league: "ncaa", espnId: "338" },
   { name: "Owls", city: "Kennesaw State", league: "ncaa", espnId: "338" },
+  // HBCUs
+  { name: "Golden Lions", city: "UAPB", league: "ncaa", espnId: "2029" },
+  { name: "Golden Lions", city: "Arkansas-Pine Bluff", league: "ncaa", espnId: "2029" },
+  { name: "Golden Lions", city: "Arkansas Pine Bluff", league: "ncaa", espnId: "2029" },
+  { name: "Tigers", city: "Jackson State", league: "ncaa", espnId: "2296" },
+  { name: "Tigers", city: "Grambling", league: "ncaa", espnId: "2755" },
+  { name: "Tigers", city: "Grambling State", league: "ncaa", espnId: "2755" },
+  { name: "Jaguars", city: "Southern", league: "ncaa", espnId: "2582" },
+  { name: "Jaguars", city: "Southern University", league: "ncaa", espnId: "2582" },
+  { name: "Panthers", city: "Prairie View", league: "ncaa", espnId: "2504" },
+  { name: "Panthers", city: "Prairie View A&M", league: "ncaa", espnId: "2504" },
+  { name: "Tigers", city: "Texas Southern", league: "ncaa", espnId: "2640" },
+  { name: "Pirates", city: "Hampton", league: "ncaa", espnId: "2272" },
+  { name: "Spartans", city: "Norfolk State", league: "ncaa", espnId: "2450" },
+  { name: "Bears", city: "Morgan State", league: "ncaa", espnId: "2424" },
+  { name: "Aggies", city: "North Carolina A&T", league: "ncaa", espnId: "2448" },
+  { name: "Aggies", city: "NC A&T", league: "ncaa", espnId: "2448" },
+  { name: "Bulldogs", city: "South Carolina State", league: "ncaa", espnId: "2569" },
+  { name: "Bulldogs", city: "SC State", league: "ncaa", espnId: "2569" },
+  { name: "Eagles", city: "Coppin State", league: "ncaa", espnId: "2154" },
+  { name: "Rattlers", city: "Florida A&M", league: "ncaa", espnId: "50" },
+  { name: "Rattlers", city: "FAMU", league: "ncaa", espnId: "50" },
+  { name: "Bison", city: "Howard", league: "ncaa", espnId: "47" },
+  { name: "Bulldogs", city: "Alabama A&M", league: "ncaa", espnId: "2010" },
+  { name: "Hornets", city: "Alabama State", league: "ncaa", espnId: "2011" },
+  { name: "Braves", city: "Alcorn State", league: "ncaa", espnId: "2016" },
+  { name: "Wildcats", city: "Bethune-Cookman", league: "ncaa", espnId: "2065" },
+  { name: "Wildcats", city: "Bethune Cookman", league: "ncaa", espnId: "2065" },
+  { name: "Hornets", city: "Delaware State", league: "ncaa", espnId: "2169" },
+  { name: "Bulldogs", city: "Mississippi Valley State", league: "ncaa", espnId: "2400" },
+  { name: "Delta Devils", city: "Mississippi Valley State", league: "ncaa", espnId: "2400" },
+  { name: "Demons", city: "Northwestern State", league: "ncaa", espnId: "2466" },
 ];
 
 // Build lookup maps for fast matching
@@ -348,7 +380,9 @@ const SPORT_SUFFIXES = /\s+(?:Baseball|Softball|Basketball|Football|Soccer|Volle
 // Parse a sports event title to extract two teams and their logos
 export function parseMatchup(title: string): MatchupTeams | null {
   // Match patterns: "Team A vs. Team B", "Team A v. Team B", "Team A Vs Team B"
-  const match = title.match(/^(.+?)\s+(?:vs?\.?)\s+(.+?)(?:\s*[—\-:(\[].*)?$/i);
+  // The trailing group captures suffixes like "— NBA Regular Season" or ": 5-Borough Race"
+  // but NOT hyphens inside team names (e.g. "Bethune-Cookman")
+  const match = title.match(/^(.+?)\s+(?:vs?\.?)\s+(.+?)(?:\s*[—:(\[].*)?$/i);
   if (!match) return null;
 
   const [, rawHome, rawAway] = match;

@@ -162,13 +162,16 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
               <Link href={`/event/${event.id}`} className="block -m-1">
                 {/* Cover image */}
                 {matchup && (matchup.home || matchup.away) ? (
-                  <div className="flex h-28 items-center justify-center gap-3 bg-white rounded-t-lg -mt-[13px] -mx-[1px]" style={{ marginBottom: 8, width: "calc(100% + 2px)" }}>
+                  <div
+                    className="flex h-28 items-center justify-center gap-3 rounded-t-lg -mt-[13px] -mx-[1px]"
+                    style={{ marginBottom: 8, width: "calc(100% + 2px)", background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
+                  >
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain" />
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}
-                    <span className="text-sm font-bold text-gray-400">vs</span>
+                    <span className="text-sm font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain" />
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}
                   </div>
                 ) : event.coverImageUrl ? (

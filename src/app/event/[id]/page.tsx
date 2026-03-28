@@ -153,15 +153,20 @@ export default async function EventDetailPage({
       {/* Hero Image Section */}
       <div className="relative">
         {matchup && (matchup.home || matchup.away) ? (
-          <div className="flex aspect-[16/9] w-full items-center justify-center gap-8 bg-white dark:bg-neutral-900">
+          <div
+            className="flex aspect-[16/9] w-full items-center justify-center gap-8"
+            style={{
+              background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)`,
+            }}
+          >
             {matchup.home ? (
-              <img src={matchup.home.logo} alt={matchup.home.name} className="h-28 w-28 object-contain" />
+              <img src={matchup.home.logo} alt={matchup.home.name} className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
             ) : (
               <div className="h-28 w-28" />
             )}
-            <span className="text-2xl font-bold text-gray-400 dark:text-neutral-500">vs</span>
+            <span className="text-2xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
             {matchup.away ? (
-              <img src={matchup.away.logo} alt={matchup.away.name} className="h-28 w-28 object-contain" />
+              <img src={matchup.away.logo} alt={matchup.away.name} className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
             ) : (
               <div className="h-28 w-28" />
             )}

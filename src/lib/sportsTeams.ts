@@ -361,17 +361,95 @@ uniqueMascots.forEach((team, name) => {
   if (team !== null) teamByUniqueName.set(name, team);
 });
 
+// Team colors keyed by "league/espnId" — primary brand color hex
+const TEAM_COLORS: Record<string, string> = {
+  // NBA
+  "nba/atl": "#E03A3E", "nba/bos": "#007A33", "nba/bkn": "#000000", "nba/cha": "#1D1160",
+  "nba/chi": "#CE1141", "nba/cle": "#6F263D", "nba/dal": "#00538C", "nba/den": "#0E2240",
+  "nba/det": "#C8102E", "nba/gs": "#1D428A", "nba/hou": "#CE1141", "nba/ind": "#002D62",
+  "nba/lac": "#C8102E", "nba/lal": "#552583", "nba/mem": "#5D76A9", "nba/mia": "#98002E",
+  "nba/mil": "#00471B", "nba/min": "#0C2340", "nba/no": "#0C2340", "nba/ny": "#006BB6",
+  "nba/okc": "#007AC1", "nba/orl": "#0077C0", "nba/phi": "#006BB6", "nba/phx": "#1D1160",
+  "nba/por": "#E03A3E", "nba/sac": "#5A2D81", "nba/sa": "#C4CED4", "nba/tor": "#CE1141",
+  "nba/uta": "#002B5C", "nba/wsh": "#002B5C",
+  // NFL
+  "nfl/ari": "#97233F", "nfl/atl": "#A71930", "nfl/bal": "#241773", "nfl/buf": "#00338D",
+  "nfl/car": "#0085CA", "nfl/chi": "#0B162A", "nfl/cin": "#FB4F14", "nfl/cle": "#311D00",
+  "nfl/dal": "#003594", "nfl/den": "#FB4F14", "nfl/det": "#0076B6", "nfl/gb": "#203731",
+  "nfl/hou": "#03202F", "nfl/ind": "#002C5F", "nfl/jax": "#006778", "nfl/kc": "#E31837",
+  "nfl/lv": "#000000", "nfl/lac": "#0080C6", "nfl/lar": "#003594", "nfl/mia": "#008E97",
+  "nfl/min": "#4F2683", "nfl/ne": "#002244", "nfl/no": "#D3BC8D", "nfl/nyg": "#0B2265",
+  "nfl/nyj": "#125740", "nfl/phi": "#004C54", "nfl/pit": "#FFB612", "nfl/sf": "#AA0000",
+  "nfl/sea": "#002244", "nfl/tb": "#D50A0A", "nfl/ten": "#4B92DB", "nfl/wsh": "#5A1414",
+  // MLB
+  "mlb/ari": "#A71930", "mlb/atl": "#CE1141", "mlb/bal": "#DF4601", "mlb/bos": "#BD3039",
+  "mlb/chc": "#0E3386", "mlb/chw": "#27251F", "mlb/cin": "#C6011F", "mlb/cle": "#00385D",
+  "mlb/col": "#333366", "mlb/det": "#0C2340", "mlb/hou": "#002D62", "mlb/kc": "#004687",
+  "mlb/laa": "#BA0021", "mlb/lad": "#005A9C", "mlb/mia": "#00A3E0", "mlb/mil": "#12284B",
+  "mlb/min": "#002B5C", "mlb/nym": "#002D72", "mlb/nyy": "#003087", "mlb/oak": "#003831",
+  "mlb/phi": "#E81828", "mlb/pit": "#27251F", "mlb/sd": "#2F241D", "mlb/sf": "#FD5A1E",
+  "mlb/sea": "#0C2C56", "mlb/stl": "#C41E3A", "mlb/tb": "#092C5C", "mlb/tex": "#003278",
+  "mlb/tor": "#134A8E", "mlb/wsh": "#AB0003",
+  // NHL
+  "nhl/ana": "#F47A38", "nhl/ari": "#8C2633", "nhl/bos": "#FFB81C", "nhl/buf": "#002654",
+  "nhl/cgy": "#D2001C", "nhl/car": "#CC0000", "nhl/chi": "#CF0A2C", "nhl/col": "#6F263D",
+  "nhl/cbj": "#002654", "nhl/dal": "#006847", "nhl/det": "#CE1126", "nhl/edm": "#041E42",
+  "nhl/fla": "#041E42", "nhl/la": "#111111", "nhl/min": "#154734", "nhl/mtl": "#AF1E2D",
+  "nhl/nsh": "#FFB81C", "nhl/njd": "#CE1126", "nhl/nyi": "#00539B", "nhl/nyr": "#0038A8",
+  "nhl/ott": "#C52032", "nhl/phi": "#F74902", "nhl/pit": "#FCB514", "nhl/sj": "#006D75",
+  "nhl/sea": "#99D9D9", "nhl/stl": "#002F87", "nhl/tb": "#002868", "nhl/tor": "#00205B",
+  "nhl/uta": "#69B3E7", "nhl/van": "#00205B", "nhl/vgk": "#B4975A", "nhl/wsh": "#041E42",
+  "nhl/wpg": "#041E42",
+};
+
+// NCAA colors from localTeams.ts
+const NCAA_COLORS: Record<string, string> = {
+  "8": "#9D2235", "333": "#9E1B32", "2": "#0C2340", "61": "#BA0C2F", "57": "#0021A5",
+  "99": "#461D7C", "2633": "#FF8200", "245": "#500000", "2579": "#73000A", "96": "#0033A0",
+  "145": "#CE1126", "344": "#660000", "194": "#BB0000", "130": "#00274C", "213": "#041E42",
+  "158": "#E41C38", "275": "#C5050C", "2294": "#FFCD00", "2483": "#154733", "30": "#990000",
+  "26": "#2D68C4", "251": "#BF5700", "201": "#841617", "2641": "#CC0000", "239": "#154734",
+  "197": "#FF7300", "38": "#CFB87C", "252": "#002E5D", "277": "#002855", "228": "#F56600",
+  "52": "#782F40", "153": "#7BAFD4", "150": "#003087", "259": "#630031", "97": "#AD0000",
+  "183": "#D44500", "87": "#0C2340", "12": "#CC0033", "2029": "#FFD700", "2296": "#1A2857",
+  "2755": "#000000", "2582": "#0033A0", "2504": "#4B0082", "2640": "#800000", "2272": "#003DA5",
+  "2450": "#007A33", "2424": "#FF4500", "2448": "#003DA5", "2569": "#003DA5", "50": "#FF4500",
+  "47": "#003DA5", "2010": "#800000", "2011": "#000000", "2016": "#4B0082", "2065": "#800000",
+  "142": "#F1B82D", "238": "#866D4B", "84": "#990000", "120": "#E03A3E", "127": "#18453B",
+  "135": "#7A0019", "77": "#4E2A84", "2509": "#CFB991", "164": "#CC0033", "356": "#E84A27",
+  "9": "#8C1D40", "2132": "#E00122", "66": "#C8102E", "2305": "#0051BA", "2306": "#512888",
+  "2628": "#4D1979", "248": "#C8102E", "2116": "#BA9B37", "103": "#98002E", "59": "#003057",
+  "2390": "#F47321", "152": "#CC0000", "221": "#003594", "154": "#9E7E38", "258": "#232D4B",
+  "24": "#8C1515", "25": "#003262", "2567": "#0033A0", "2250": "#002967", "222": "#003366",
+  "326": "#501214", "2636": "#0C2340", "2534": "#F47321", "2166": "#002D62", "2547": "#AA0000",
+  "265": "#981E32", "2623": "#800000", "276": "#00B140", "2247": "#0039A6", "300": "#0064A4",
+  "299": "#000000", "2624": "#4B0082", "2226": "#003366", "526": "#002D62", "2229": "#002D62",
+  "290": "#011E41", "151": "#592A8A", "55": "#CC0000", "2239": "#00274C", "58": "#006747",
+  "2908": "#00573F", "2453": "#4B0082", "302": "#002855", "357": "#0067C5", "2638": "#003015",
+  "2439": "#CF0A2C", "2031": "#8B0000", "2653": "#8B0000", "2320": "#C8102E", "338": "#FDBB30",
+  "2400": "#006341", "2466": "#4B0082", "2169": "#CC0000", "2154": "#003399",
+};
+
+function getTeamColor(team: SportTeam): string {
+  const key = `${team.league}/${team.espnId}`;
+  if (TEAM_COLORS[key]) return TEAM_COLORS[key];
+  if (team.league === "ncaa" && NCAA_COLORS[team.espnId]) return NCAA_COLORS[team.espnId];
+  return "#333333";
+}
+
 function getLogoUrl(team: SportTeam): string {
   return `https://a.espncdn.com/i/teamlogos/${team.league}/500/${team.espnId}.png`;
 }
 
-function makeResult(team: SportTeam): { name: string; logo: string } {
-  return { name: team.name, logo: getLogoUrl(team) };
+type TeamResult = { name: string; logo: string; color: string };
+
+function makeResult(team: SportTeam): TeamResult {
+  return { name: team.name, logo: getLogoUrl(team), color: getTeamColor(team) };
 }
 
 export type MatchupTeams = {
-  home: { name: string; logo: string } | null;
-  away: { name: string; logo: string } | null;
+  home: TeamResult | null;
+  away: TeamResult | null;
 };
 
 // Strip sport suffixes that Ticketmaster appends to college team names

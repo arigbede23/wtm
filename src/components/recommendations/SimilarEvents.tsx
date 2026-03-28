@@ -67,13 +67,16 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
             <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
               <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-neutral-800">
                 {matchup && (matchup.home || matchup.away) ? (
-                  <div className="flex h-full items-center justify-center gap-2 bg-white dark:bg-neutral-900">
+                  <div
+                    className="flex h-full items-center justify-center gap-2"
+                    style={{ background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
+                  >
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain" />
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}
-                    <span className="text-sm font-bold text-gray-400 dark:text-neutral-500">vs</span>
+                    <span className="text-sm font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain" />
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}
                   </div>
                 ) : event.coverImageUrl ? (

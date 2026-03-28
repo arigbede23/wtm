@@ -29,6 +29,12 @@ export async function GET(request: NextRequest) {
 
   try {
     // Build Supabase query with filters
+    // Pre-compute a lat/lng bounding box so the DB only returns nearby events.
+    // 1 degree of latitude ≈ 69 miles; longitude varies by latitude.
+    const userLat = lat ? parseFloat(lat) : null;
+    const userLng = lng ? parseFloat(lng) : null;
+    const maxRadius = radius ? parseFloat(radius) : null;
+
     let query = supabase
       .from("events")
       .select("*, rsvps(count)")
@@ -39,6 +45,17 @@ export async function GET(request: NextRequest) {
     // Only filter by future dates when not fetching organizer's events
     if (!organizerId) {
       query = query.gte("startDate", new Date().toISOString());
+    }
+
+    // Bounding box filter — narrow rows at the DB level before JS distance calc
+    if (userLat != null && userLng != null && maxRadius != null) {
+      const latDelta = maxRadius / 69;
+      const lngDelta = maxRadius / (69 * Math.cos((userLat * Math.PI) / 180));
+      query = query
+        .gte("lat", userLat - latDelta)
+        .lte("lat", userLat + latDelta)
+        .gte("lng", userLng - lngDelta)
+        .lte("lng", userLng + lngDelta);
     }
 
     // Organizer filter (for "My Events" on profile)
@@ -83,11 +100,7 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    // Location-based distance filtering (done in JS after Supabase query)
-    const userLat = lat ? parseFloat(lat) : null;
-    const userLng = lng ? parseFloat(lng) : null;
-    const maxRadius = radius ? parseFloat(radius) : null;
-
+    // Location-based distance filtering (precise haversine after DB bounding box)
     if (userLat != null && userLng != null) {
       // Attach distance to each event that has coordinates
       shaped = shaped.map((event: any) => {

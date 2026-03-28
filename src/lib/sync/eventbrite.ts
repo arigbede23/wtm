@@ -1,121 +1,227 @@
-// Eventbrite API client — org-based polling.
-// Since Eventbrite deprecated public search in 2020, we poll specific
-// organization IDs for their live events.
-// Docs: https://www.eventbrite.com/platform/api
+// Eventbrite sync — uses their public destination search API.
+// No API key needed; uses a CSRF token from the search page.
+// Fetches events by place IDs for major US metros.
 
-import { type NormalizedEvent, mapEventbriteCategory } from "./normalize";
+import { type NormalizedEvent } from "./normalize";
+import type { EventCategory } from "@/types";
 
-const EB_BASE = "https://www.eventbriteapi.com/v3";
+const EB_SEARCH_URL = "https://www.eventbrite.com/api/v3/destination/search/";
+const EB_PAGE_URL = "https://www.eventbrite.com/d/united-states/events/";
+const MAX_PAGES = 4;
+const PAGE_SIZE = 50;
+const DELAY_MS = 500;
+
+// Who's On First place IDs for major US metros
+const METRO_PLACE_IDS: Record<string, string> = {
+  "New York": "85977539",
+  "Los Angeles": "85923517",
+  "Chicago": "85940195",
+  "Houston": "101725629",
+  "Miami": "85933669",
+  "Atlanta": "85936429",
+  "Dallas": "101724385",
+  "San Francisco": "85922583",
+  "Seattle": "101730401",
+  "Boston": "85950361",
+  "Denver": "85928879",
+  "Nashville": "101723183",
+  "Austin": "101724577",
+  "Phoenix": "85917479",
+  "Philadelphia": "101718083",
+};
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function getCsrfToken(): Promise<string | null> {
+  try {
+    const res = await fetch(EB_PAGE_URL, {
+      headers: { "User-Agent": "Mozilla/5.0", Accept: "text/html" },
+    });
+    if (!res.ok) return null;
+    // Get CSRF from cookie header
+    const setCookie = res.headers.get("set-cookie") ?? "";
+    const match = setCookie.match(/csrftoken=([^;]+)/);
+    if (match) return match[1];
+    // Fallback: get from HTML
+    const html = await res.text();
+    const htmlMatch = html.match(/name='csrfmiddlewaretoken'\s+value='([^']+)'/);
+    return htmlMatch?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function fetchEventbriteEvents(): Promise<NormalizedEvent[]> {
-  const token = process.env.EVENTBRITE_TOKEN;
-  const orgIds = process.env.EVENTBRITE_ORG_IDS;
-
-  if (!token || !orgIds) {
-    console.warn(
-      "[Sync] EVENTBRITE_TOKEN or EVENTBRITE_ORG_IDS not set, skipping Eventbrite"
-    );
+  const csrfToken = await getCsrfToken();
+  if (!csrfToken) {
+    console.warn("[Sync] Could not get Eventbrite CSRF token, skipping");
     return [];
   }
 
-  const organizations = orgIds
-    .split(",")
-    .map((id) => id.trim())
-    .filter(Boolean);
-
   const allEvents: NormalizedEvent[] = [];
+  const seenIds = new Set<string>();
 
-  for (const orgId of organizations) {
+  // Fetch for each metro
+  for (const [city, placeId] of Object.entries(METRO_PLACE_IDS)) {
     try {
-      const events = await fetchOrgEvents(orgId, token);
-      allEvents.push(...events);
+      const events = await fetchPlaceEvents(placeId, csrfToken);
+      for (const ev of events) {
+        if (!seenIds.has(ev.externalId)) {
+          seenIds.add(ev.externalId);
+          allEvents.push(ev);
+        }
+      }
     } catch (err) {
-      console.error(`[Sync] Eventbrite org ${orgId} error:`, err);
-      // Continue to next org
+      console.error(`[Sync] Eventbrite ${city} error:`, err);
     }
+    await sleep(DELAY_MS);
   }
 
   console.log(`[Sync] Eventbrite: fetched ${allEvents.length} events`);
   return allEvents;
 }
 
-async function fetchOrgEvents(
-  orgId: string,
-  token: string
+async function fetchPlaceEvents(
+  placeId: string,
+  csrfToken: string
 ): Promise<NormalizedEvent[]> {
   const events: NormalizedEvent[] = [];
-  let continuation: string | null = null;
+  let continuation: string | undefined;
 
-  do {
-    const params = new URLSearchParams({
-      status: "live",
-      time_filter: "current_future",
-      expand: "venue",
-      order_by: "start_asc",
-    });
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const body: any = {
+      event_search: {
+        dates: "current_future",
+        dedup: true,
+        places: [placeId],
+        page_size: PAGE_SIZE,
+        page: page + 1,
+      },
+      "expand.destination_event": [
+        "primary_venue",
+        "image",
+        "ticket_availability",
+      ],
+    };
+
     if (continuation) {
-      params.set("continuation", continuation);
+      body.event_search.continuation = continuation;
     }
 
-    const res = await fetch(
-      `${EB_BASE}/organizations/${orgId}/events/?${params}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await fetch(EB_SEARCH_URL, {
+      method: "POST",
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Referer: "https://www.eventbrite.com/d/united-states/events/",
+        "X-CSRFToken": csrfToken,
+        Cookie: `csrftoken=${csrfToken}`,
+      },
+      body: JSON.stringify(body),
+    });
 
     if (!res.ok) {
-      console.error(
-        `[Sync] Eventbrite org ${orgId} page failed: ${res.status} ${res.statusText}`
-      );
+      console.error(`[Sync] Eventbrite place ${placeId} page ${page + 1} failed: ${res.status}`);
       break;
     }
 
     const json = await res.json();
-    const pageEvents = json.events;
-    if (!pageEvents || pageEvents.length === 0) break;
+    const results = json?.events?.results;
+    if (!results || results.length === 0) break;
 
-    for (const ev of pageEvents) {
+    for (const ev of results) {
       const normalized = normalizeEBEvent(ev);
       if (normalized) events.push(normalized);
     }
 
-    // Eventbrite uses continuation tokens for pagination
-    continuation = json.pagination?.has_more_items
-      ? json.pagination.continuation
-      : null;
-  } while (continuation);
+    const pagination = json?.events?.pagination;
+    if (!pagination?.continuation || page + 1 >= (pagination?.page_count ?? 0)) break;
+    continuation = pagination.continuation;
+
+    if (page < MAX_PAGES - 1) await sleep(DELAY_MS);
+  }
 
   return events;
 }
 
+// Map Eventbrite tags to our categories
+const EB_TAG_MAP: Record<string, EventCategory> = {
+  "EventbriteCategory/103": "MUSIC",
+  "EventbriteCategory/108": "SPORTS",
+  "EventbriteCategory/105": "ARTS",
+  "EventbriteCategory/110": "FOOD",
+  "EventbriteCategory/102": "TECH",
+  "EventbriteCategory/107": "WELLNESS",
+  "EventbriteCategory/109": "OUTDOORS",
+  "EventbriteCategory/113": "COMMUNITY",
+  "EventbriteSubCategory/13003": "COMEDY",
+  "EventbriteSubCategory/13004": "NIGHTLIFE",
+};
+
+function mapEBCategory(tags?: Array<{ tag: string }>): EventCategory {
+  if (!tags) return "OTHER";
+  for (const t of tags) {
+    if (t.tag.startsWith("EventbriteSubCategory/") && EB_TAG_MAP[t.tag]) {
+      return EB_TAG_MAP[t.tag];
+    }
+  }
+  for (const t of tags) {
+    if (t.tag.startsWith("EventbriteCategory/") && EB_TAG_MAP[t.tag]) {
+      return EB_TAG_MAP[t.tag];
+    }
+  }
+  return "OTHER";
+}
+
 function normalizeEBEvent(ev: any): NormalizedEvent | null {
-  const id = ev.id;
-  const title = ev.name?.text;
+  const id = ev.id ?? ev.eventbrite_event_id;
+  const title = ev.name;
   if (!id || !title) return null;
+  if (ev.is_online_event) return null;
 
-  const venue = ev.venue;
-  const isFree = ev.is_free ?? false;
+  const venue = ev.primary_venue;
+  const addr = venue?.address;
+  const lat = addr?.latitude ? parseFloat(addr.latitude) : null;
+  const lng = addr?.longitude ? parseFloat(addr.longitude) : null;
 
-  // If Eventbrite doesn't provide a start time, skip the event
-  if (!ev.start?.utc) return null;
+  const startDate =
+    ev.start_date && ev.start_time
+      ? `${ev.start_date}T${ev.start_time}:00`
+      : ev.start_date
+        ? `${ev.start_date}T00:00:00`
+        : null;
+  if (!startDate) return null;
+
+  const endDate =
+    ev.end_date && ev.end_time
+      ? `${ev.end_date}T${ev.end_time}:00`
+      : null;
+
+  const ta = ev.ticket_availability ?? {};
+  const isFree = ta.is_free === true;
+  const minPrice = ta.minimum_ticket_price?.value
+    ? ta.minimum_ticket_price.value / 100
+    : null;
 
   return {
     source: "EVENTBRITE",
     externalId: String(id),
     title,
-    description: ev.description?.text ?? ev.summary ?? null,
-    category: mapEventbriteCategory(ev.category_id),
-    address: venue?.address?.address_1 ?? null,
-    city: venue?.address?.city ?? null,
-    state: venue?.address?.region ?? null,
-    lat: venue?.latitude ? parseFloat(venue.latitude) : null,
-    lng: venue?.longitude ? parseFloat(venue.longitude) : null,
-    startDate: ev.start.utc,
-    endDate: ev.end?.utc ?? null,
-    coverImageUrl: ev.logo?.original?.url ?? ev.logo?.url ?? null,
+    description: ev.summary ?? null,
+    category: mapEBCategory(ev.tags),
+    address: null,
+    city: addr?.city ?? null,
+    state: addr?.region ?? null,
+    lat,
+    lng,
+    startDate,
+    endDate,
+    coverImageUrl: ev.image?.url ?? null,
     isFree,
-    price: null, // EB doesn't include price in list endpoint
+    price: isFree ? null : minPrice,
     url: ev.url ?? null,
     status: "PUBLISHED",
   };

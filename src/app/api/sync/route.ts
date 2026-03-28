@@ -107,7 +107,7 @@ async function handleSync() {
   const activeCities = Array.from(cityMap.keys());
   const cityCoords = Array.from(cityMap.values());
 
-  // Fetch Ticketmaster events for each active city + Instagram for those cities
+  // Fetch events from all sources for each active city
   const tmPromises = cityCoords.map((c) =>
     fetchTicketmasterEvents(c.lat, c.lng)
   );

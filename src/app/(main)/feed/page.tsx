@@ -80,10 +80,10 @@ function FeedContent() {
   // Sync Ticketmaster events near the user's location (runs once per area per 30 min)
   useLocalSync(lat, lng);
 
-  // Merge URL filters with user location + 150 mi radius for API call
+  // Merge URL filters with user location + 100 mi radius for API call
   const apiFilters: EventFilters = {
     ...filters,
-    ...(hasLocation ? { lat, lng, radius: 150 } : {}),
+    ...(hasLocation ? { lat, lng, radius: 100 } : {}),
   };
 
   return (

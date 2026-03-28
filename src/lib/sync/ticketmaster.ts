@@ -9,7 +9,7 @@ import {
 } from "./normalize";
 
 const TM_BASE = "https://app.ticketmaster.com/discovery/v2/events.json";
-const MAX_PAGES = 5;
+const MAX_PAGES = 10;
 const PAGE_SIZE = 200;
 const DELAY_MS = 250; // Be polite to their API
 
@@ -48,7 +48,7 @@ export async function fetchTicketmasterEvents(
       const params = new URLSearchParams({
         apikey: apiKey,
         latlong: `${lat},${lng}`,
-        radius: "50",
+        radius: "100",
         unit: "miles",
         size: String(PAGE_SIZE),
         page: String(page),

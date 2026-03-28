@@ -31,11 +31,11 @@ function MapContent() {
   // Sync Ticketmaster events near user (runs once per area per 30 min)
   useLocalSync(lat, lng);
 
-  // 150 mi radius from user's current location (wider for map view)
+  // 100 mi radius from user's current location
   const apiFilters: EventFilters = {
     ...filters,
     ...(lat != null && lng != null
-      ? { lat, lng, radius: 150 }
+      ? { lat, lng, radius: 100 }
       : {}),
   };
 

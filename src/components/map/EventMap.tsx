@@ -170,14 +170,14 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                       style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
                     />
                     {matchup && (matchup.home || matchup.away) && (
-                      <div className="absolute inset-0 -mt-[13px] -mx-[1px] flex items-center justify-center gap-3 rounded-t-lg bg-gradient-to-t from-black/70 via-black/30 to-transparent" style={{ width: "calc(100% + 2px)" }}>
+                      <div className="absolute inset-0 -mt-[13px] -mx-[1px] flex items-center justify-center gap-3 rounded-t-lg" style={{ width: "calc(100% + 2px)" }}>
                         {matchup.home ? (
-                          <img src={matchup.home.logo} alt={matchup.home.name} className="h-10 w-10 object-contain drop-shadow-lg" />
-                        ) : <div className="h-10 w-10" />}
-                        <span className="text-sm font-bold text-white/90 drop-shadow-md">vs</span>
+                          <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+                        ) : <div className="h-12 w-12" />}
+                        <span className="text-sm font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
                         {matchup.away ? (
-                          <img src={matchup.away.logo} alt={matchup.away.name} className="h-10 w-10 object-contain drop-shadow-lg" />
-                        ) : <div className="h-10 w-10" />}
+                          <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+                        ) : <div className="h-12 w-12" />}
                       </div>
                     )}
                   </div>

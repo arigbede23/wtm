@@ -78,14 +78,14 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                   </div>
                 )}
                 {matchup && (matchup.home || matchup.away) && (
-                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+                  <div className="absolute inset-0 flex items-center justify-center gap-2">
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-10 w-10 object-contain drop-shadow-lg" />
-                    ) : <div className="h-10 w-10" />}
-                    <span className="text-sm font-bold text-white/90 drop-shadow-md">vs</span>
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+                    ) : <div className="h-12 w-12" />}
+                    <span className="text-sm font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-10 w-10 object-contain drop-shadow-lg" />
-                    ) : <div className="h-10 w-10" />}
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
+                    ) : <div className="h-12 w-12" />}
                   </div>
                 )}
                 <div className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">

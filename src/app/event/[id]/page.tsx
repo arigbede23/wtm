@@ -166,25 +166,25 @@ export default async function EventDetailPage({
 
         {/* Sports matchup logo overlay */}
         {matchup && (matchup.home || matchup.away) && (
-          <div className="absolute inset-0 flex items-center justify-center gap-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+          <div className="absolute inset-0 flex items-center justify-center gap-6">
             {matchup.home ? (
               <img
                 src={matchup.home.logo}
                 alt={matchup.home.name}
-                className="h-20 w-20 object-contain drop-shadow-lg"
+                className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
               />
             ) : (
-              <div className="h-20 w-20" />
+              <div className="h-28 w-28" />
             )}
-            <span className="text-2xl font-bold text-white/90 drop-shadow-md">vs</span>
+            <span className="text-2xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
             {matchup.away ? (
               <img
                 src={matchup.away.logo}
                 alt={matchup.away.name}
-                className="h-20 w-20 object-contain drop-shadow-lg"
+                className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
               />
             ) : (
-              <div className="h-20 w-20" />
+              <div className="h-28 w-28" />
             )}
           </div>
         )}

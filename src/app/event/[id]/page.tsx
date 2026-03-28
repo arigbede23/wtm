@@ -34,6 +34,7 @@ import { UserAvatar } from "@/components/social/UserAvatar";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
 import { InviteFriendsButton } from "@/components/events/InviteFriendsButton";
 import { MobileContainer } from "@/components/layout/MobileContainer";
+import { parseMatchup } from "@/lib/sportsTeams";
 
 // Generate dynamic Open Graph metadata so shared links show a branded card image.
 export async function generateMetadata({
@@ -145,6 +146,7 @@ export default async function EventDetailPage({
   const category = event.category as EventCategory;
   const past = isEventPast(event.startDate, event.endDate);
   const isExternal = !!event.source && event.source !== "USER";
+  const matchup = category === "SPORTS" ? parseMatchup(event.title) : null;
 
   return (
     <MobileContainer>
@@ -157,9 +159,33 @@ export default async function EventDetailPage({
             className="aspect-[16/9] w-full object-cover"
           />
         ) : (
-          // Fallback if no image — show category emoji
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-6xl dark:bg-neutral-800">
             {CATEGORY_EMOJI[category]}
+          </div>
+        )}
+
+        {/* Sports matchup logo overlay */}
+        {matchup && (matchup.home || matchup.away) && (
+          <div className="absolute inset-0 flex items-center justify-center gap-6 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+            {matchup.home ? (
+              <img
+                src={matchup.home.logo}
+                alt={matchup.home.name}
+                className="h-20 w-20 object-contain drop-shadow-lg"
+              />
+            ) : (
+              <div className="h-20 w-20" />
+            )}
+            <span className="text-2xl font-bold text-white/90 drop-shadow-md">vs</span>
+            {matchup.away ? (
+              <img
+                src={matchup.away.logo}
+                alt={matchup.away.name}
+                className="h-20 w-20 object-contain drop-shadow-lg"
+              />
+            ) : (
+              <div className="h-20 w-20" />
+            )}
           </div>
         )}
 

@@ -5,7 +5,8 @@
 import Link from "next/link";
 import { Calendar, MapPin } from "lucide-react";
 import { cn, formatEventDateTime, formatPrice, friendsGoingText, isEventPast } from "@/lib/utils";
-import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
+import { type EventWithCounts } from "@/types";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { parseMatchup } from "@/lib/sportsTeams";
 
@@ -54,8 +55,8 @@ export function EventCard({
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-4xl">
-              {CATEGORY_EMOJI[event.category]}
+            <div className="flex h-full items-center justify-center text-gray-300 dark:text-neutral-600">
+              <CategoryIcon category={event.category} className="h-12 w-12" />
             </div>
           )}
 
@@ -73,7 +74,7 @@ export function EventCard({
 
           {/* Category badge — top left corner */}
           <div className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-            {CATEGORY_EMOJI[event.category]} {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
+            <CategoryIcon category={event.category} className="h-3 w-3" /> {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
           </div>
 
           {/* Ended badge — bottom left corner */}

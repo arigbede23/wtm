@@ -7,7 +7,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
-import { CATEGORY_EMOJI, type EventWithCounts, type EventCategory } from "@/types";
+import { type EventWithCounts, type EventCategory } from "@/types";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { parseMatchup } from "@/lib/sportsTeams";
 
 export function SimilarEvents({ eventId }: { eventId: string }) {
@@ -86,7 +87,7 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-3xl">
-                    {CATEGORY_EMOJI[event.category as EventCategory]}
+                    <CategoryIcon category={event.category} className="h-8 w-8" />
                   </div>
                 )}
                 <div className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">

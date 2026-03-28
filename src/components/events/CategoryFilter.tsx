@@ -1,39 +1,10 @@
 // CategoryFilter — horizontal scrolling row of category filter pills.
-// Lets users filter events by type (Music, Food, Sports, etc.).
 
 "use client";
 
 import { cn } from "@/lib/utils";
 import type { EventCategory } from "@/types";
-import {
-  Music,
-  Trophy,
-  Palette,
-  UtensilsCrossed,
-  Monitor,
-  Users,
-  Laugh,
-  Heart,
-  TreePine,
-  Moon,
-  Handshake,
-  type LucideIcon,
-} from "lucide-react";
-
-const CATEGORY_ICONS: Record<EventCategory, LucideIcon> = {
-  MUSIC: Music,
-  SPORTS: Trophy,
-  ARTS: Palette,
-  FOOD: UtensilsCrossed,
-  TECH: Monitor,
-  SOCIAL: Users,
-  COMEDY: Laugh,
-  WELLNESS: Heart,
-  OUTDOORS: TreePine,
-  NIGHTLIFE: Moon,
-  COMMUNITY: Handshake,
-  OTHER: Music,
-};
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 const categories: { value: EventCategory | "ALL"; label: string }[] = [
   { value: "ALL", label: "All" },
@@ -60,7 +31,6 @@ export function CategoryFilter({
   return (
     <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 py-3">
       {categories.map((cat) => {
-        const Icon = cat.value !== "ALL" ? CATEGORY_ICONS[cat.value as EventCategory] : null;
         const isActive = selected === cat.value;
         return (
           <button
@@ -73,7 +43,7 @@ export function CategoryFilter({
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
             )}
           >
-            {Icon && <Icon className="h-3.5 w-3.5" />}
+            {cat.value !== "ALL" && <CategoryIcon category={cat.value} className="h-3.5 w-3.5" />}
             {cat.label}
           </button>
         );

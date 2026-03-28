@@ -5,8 +5,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CATEGORY_EMOJI } from "@/types";
 import { CATEGORIES } from "@/lib/constants";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -80,7 +80,7 @@ export default function OnboardingPage() {
                   : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600"
               }`}
             >
-              <span className="text-lg">{CATEGORY_EMOJI[value]}</span>
+              <CategoryIcon category={value} className="h-5 w-5" />
               {label}
             </button>
           );

@@ -13,8 +13,8 @@ import { EventCard } from "@/components/events/EventCard";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { CATEGORIES } from "@/lib/constants";
 import { PushNotificationToggle } from "@/components/settings/PushNotificationToggle";
-import { CATEGORY_EMOJI } from "@/types";
 import type { EventWithCounts, UserProfile, EventCategory } from "@/types";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 type ProfileTab = "my-events" | "saved" | "attending";
 
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                 key={cat}
                 className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-neutral-800 dark:text-neutral-300"
               >
-                {CATEGORY_EMOJI[cat as EventCategory]} {cat.charAt(0) + cat.slice(1).toLowerCase()}
+                <CategoryIcon category={cat} className="h-3.5 w-3.5" /> {cat.charAt(0) + cat.slice(1).toLowerCase()}
               </span>
             ))}
             <button
@@ -369,7 +369,7 @@ export default function ProfilePage() {
                         : "border-gray-200 text-gray-700 hover:border-gray-300 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-neutral-600"
                     }`}
                   >
-                    <span className="text-base">{CATEGORY_EMOJI[value]}</span>
+                    <CategoryIcon category={value} className="h-5 w-5" />
                     {label}
                   </button>
                 );

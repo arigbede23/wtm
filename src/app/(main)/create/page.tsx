@@ -11,7 +11,8 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { uploadEventImage } from "@/lib/uploadImage";
-import { CATEGORY_EMOJI, type EventCategory } from "@/types";
+import { type EventCategory } from "@/types";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import {
   ArrowLeft,
   ArrowRight,
@@ -249,7 +250,7 @@ export default function CreatePage() {
                       : "border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800"
                   }`}
                 >
-                  {CATEGORY_EMOJI[cat]} {cat.charAt(0) + cat.slice(1).toLowerCase()}
+                  <CategoryIcon category={cat} className="h-4 w-4" /> {cat.charAt(0) + cat.slice(1).toLowerCase()}
                 </button>
               ))}
             </div>

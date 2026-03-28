@@ -351,6 +351,7 @@ const TEAMS: SportTeam[] = [
   { name: "Hooks", city: "Corpus Christi", league: "milb", espnId: "482", logoUrl: "https://www.mlbstatic.com/team-logos/482.svg" },
   { name: "Redbirds", city: "Memphis", league: "milb", espnId: "235", logoUrl: "https://www.mlbstatic.com/team-logos/235.svg" },
   { name: "Knights", city: "Charlotte", league: "milb", espnId: "494", logoUrl: "https://www.mlbstatic.com/team-logos/494.svg" },
+  { name: "Wind Surge", city: "Wichita", league: "milb", espnId: "3898", logoUrl: "https://www.mlbstatic.com/team-logos/3898.svg" },
 ];
 
 // Build lookup maps for fast matching
@@ -422,7 +423,7 @@ const TEAM_COLORS: Record<string, string> = {
   "milb/1350": "#00843D", "milb/5368": "#1C2841", "milb/529": "#003DA5", "milb/540": "#C8102E",
   "milb/550": "#0E3386", "milb/4904": "#1C2841", "milb/556": "#CC0000", "milb/565": "#003DA5",
   "milb/574": "#C8102E", "milb/102": "#003DA5", "milb/105": "#00553E", "milb/431": "#003087",
-  "milb/482": "#002D62", "milb/235": "#C8102E", "milb/494": "#000000",
+  "milb/482": "#002D62", "milb/235": "#C8102E", "milb/494": "#000000", "milb/3898": "#0C2340",
 };
 
 // NCAA colors from localTeams.ts

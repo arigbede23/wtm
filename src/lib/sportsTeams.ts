@@ -177,6 +177,105 @@ const TEAMS: SportTeam[] = [
   { name: "St. Louis City", city: "St. Louis", league: "soccer", espnId: "st-louis-city-sc" },
   { name: "Toronto FC", city: "Toronto", league: "soccer", espnId: "toronto-fc" },
   { name: "Vancouver Whitecaps", city: "Vancouver", league: "soccer", espnId: "vancouver-whitecaps-fc" },
+
+  // NCAA — major programs (ESPN logo URL uses numeric team IDs for college)
+  // SEC
+  { name: "Crimson Tide", city: "Alabama", league: "ncaa", espnId: "333" },
+  { name: "Razorbacks", city: "Arkansas", league: "ncaa", espnId: "8" },
+  { name: "Tigers", city: "Auburn", league: "ncaa", espnId: "2" },
+  { name: "Gators", city: "Florida", league: "ncaa", espnId: "57" },
+  { name: "Bulldogs", city: "Georgia", league: "ncaa", espnId: "61" },
+  { name: "Wildcats", city: "Kentucky", league: "ncaa", espnId: "96" },
+  { name: "Tigers", city: "LSU", league: "ncaa", espnId: "99" },
+  { name: "Rebels", city: "Ole Miss", league: "ncaa", espnId: "145" },
+  { name: "Bulldogs", city: "Mississippi State", league: "ncaa", espnId: "344" },
+  { name: "Tigers", city: "Missouri", league: "ncaa", espnId: "142" },
+  { name: "Gamecocks", city: "South Carolina", league: "ncaa", espnId: "2579" },
+  { name: "Volunteers", city: "Tennessee", league: "ncaa", espnId: "2633" },
+  { name: "Aggies", city: "Texas A&M", league: "ncaa", espnId: "245" },
+  { name: "Commodores", city: "Vanderbilt", league: "ncaa", espnId: "238" },
+
+  // Big Ten
+  { name: "Hoosiers", city: "Indiana", league: "ncaa", espnId: "84" },
+  { name: "Hawkeyes", city: "Iowa", league: "ncaa", espnId: "2294" },
+  { name: "Terrapins", city: "Maryland", league: "ncaa", espnId: "120" },
+  { name: "Wolverines", city: "Michigan", league: "ncaa", espnId: "130" },
+  { name: "Spartans", city: "Michigan State", league: "ncaa", espnId: "127" },
+  { name: "Golden Gophers", city: "Minnesota", league: "ncaa", espnId: "135" },
+  { name: "Cornhuskers", city: "Nebraska", league: "ncaa", espnId: "158" },
+  { name: "Wildcats", city: "Northwestern", league: "ncaa", espnId: "77" },
+  { name: "Buckeyes", city: "Ohio State", league: "ncaa", espnId: "194" },
+  { name: "Ducks", city: "Oregon", league: "ncaa", espnId: "2483" },
+  { name: "Nittany Lions", city: "Penn State", league: "ncaa", espnId: "213" },
+  { name: "Boilermakers", city: "Purdue", league: "ncaa", espnId: "2509" },
+  { name: "Scarlet Knights", city: "Rutgers", league: "ncaa", espnId: "164" },
+  { name: "Trojans", city: "USC", league: "ncaa", espnId: "30" },
+  { name: "Bruins", city: "UCLA", league: "ncaa", espnId: "26" },
+  { name: "Huskies", city: "Washington", league: "ncaa", espnId: "264" },
+  { name: "Badgers", city: "Wisconsin", league: "ncaa", espnId: "275" },
+
+  // Big 12
+  { name: "Wildcats", city: "Arizona State", league: "ncaa", espnId: "9" },
+  { name: "Sun Devils", city: "Arizona State", league: "ncaa", espnId: "9" },
+  { name: "Wildcats", city: "Arizona", league: "ncaa", espnId: "12" },
+  { name: "Bears", city: "Baylor", league: "ncaa", espnId: "239" },
+  { name: "Cougars", city: "BYU", league: "ncaa", espnId: "252" },
+  { name: "Bearcats", city: "Cincinnati", league: "ncaa", espnId: "2132" },
+  { name: "Buffaloes", city: "Colorado", league: "ncaa", espnId: "38" },
+  { name: "Cyclones", city: "Iowa State", league: "ncaa", espnId: "66" },
+  { name: "Jayhawks", city: "Kansas", league: "ncaa", espnId: "2305" },
+  { name: "Wildcats", city: "Kansas State", league: "ncaa", espnId: "2306" },
+  { name: "Sooners", city: "Oklahoma", league: "ncaa", espnId: "201" },
+  { name: "Cowboys", city: "Oklahoma State", league: "ncaa", espnId: "197" },
+  { name: "Horned Frogs", city: "TCU", league: "ncaa", espnId: "2628" },
+  { name: "Red Raiders", city: "Texas Tech", league: "ncaa", espnId: "2641" },
+  { name: "Longhorns", city: "Texas", league: "ncaa", espnId: "251" },
+  { name: "Cougars", city: "Houston", league: "ncaa", espnId: "248" },
+  { name: "Mountaineers", city: "West Virginia", league: "ncaa", espnId: "277" },
+  { name: "Knights", city: "UCF", league: "ncaa", espnId: "2116" },
+
+  // ACC
+  { name: "Eagles", city: "Boston College", league: "ncaa", espnId: "103" },
+  { name: "Tigers", city: "Clemson", league: "ncaa", espnId: "228" },
+  { name: "Blue Devils", city: "Duke", league: "ncaa", espnId: "150" },
+  { name: "Seminoles", city: "Florida State", league: "ncaa", espnId: "52" },
+  { name: "Yellow Jackets", city: "Georgia Tech", league: "ncaa", espnId: "59" },
+  { name: "Cardinals", city: "Louisville", league: "ncaa", espnId: "97" },
+  { name: "Hurricanes", city: "Miami", league: "ncaa", espnId: "2390" },
+  { name: "Tar Heels", city: "North Carolina", league: "ncaa", espnId: "153" },
+  { name: "Wolfpack", city: "North Carolina State", league: "ncaa", espnId: "152" },
+  { name: "Wolfpack", city: "NC State", league: "ncaa", espnId: "152" },
+  { name: "Fighting Irish", city: "Notre Dame", league: "ncaa", espnId: "87" },
+  { name: "Panthers", city: "Pittsburgh", league: "ncaa", espnId: "221" },
+  { name: "Demon Deacons", city: "Wake Forest", league: "ncaa", espnId: "154" },
+  { name: "Orange", city: "Syracuse", league: "ncaa", espnId: "183" },
+  { name: "Cavaliers", city: "Virginia", league: "ncaa", espnId: "258" },
+  { name: "Hokies", city: "Virginia Tech", league: "ncaa", espnId: "259" },
+  { name: "Cardinals", city: "Stanford", league: "ncaa", espnId: "24" },
+  { name: "Golden Bears", city: "Cal", league: "ncaa", espnId: "25" },
+  { name: "Mustangs", city: "SMU", league: "ncaa", espnId: "2567" },
+
+  // Other notable programs
+  { name: "Bulldogs", city: "Gonzaga", league: "ncaa", espnId: "2250" },
+  { name: "Bluejays", city: "Creighton", league: "ncaa", espnId: "156" },
+  { name: "Villanova", city: "Villanova", league: "ncaa", espnId: "222" },
+  { name: "Bobcats", city: "Texas State", league: "ncaa", espnId: "326" },
+  { name: "Roadrunners", city: "UTSA", league: "ncaa", espnId: "2636" },
+  { name: "Roadrunners", city: "Texas San Antonio", league: "ncaa", espnId: "2636" },
+  { name: "Bearkats", city: "Sam Houston State", league: "ncaa", espnId: "2534" },
+  { name: "Bearkats", city: "Sam Houston", league: "ncaa", espnId: "2534" },
+  { name: "Patriots", city: "Dallas Baptist", league: "ncaa", espnId: "2166" },
+  { name: "Redhawks", city: "Seattle University", league: "ncaa", espnId: "2547" },
+  { name: "Cougars", city: "WSU", league: "ncaa", espnId: "265" },
+  { name: "Cougars", city: "Washington State", league: "ncaa", espnId: "265" },
+  { name: "Bears", city: "Missouri State", league: "ncaa", espnId: "2623" },
+  { name: "Thundering Herd", city: "Marshall", league: "ncaa", espnId: "276" },
+  { name: "Panthers", city: "Georgia State", league: "ncaa", espnId: "2247" },
+  { name: "Anteaters", city: "UC Irvine", league: "ncaa", espnId: "300" },
+  { name: "Beach", city: "Long Beach State", league: "ncaa", espnId: "299" },
+  { name: "Fightin Illini", city: "Illinois", league: "ncaa", espnId: "356" },
+  { name: "Fighting Illini", city: "Illinois", league: "ncaa", espnId: "356" },
+  { name: "Tarleton State", city: "Tarleton State", league: "ncaa", espnId: "2624" },
 ];
 
 // Build lookup maps for fast matching
@@ -200,15 +299,21 @@ export type MatchupTeams = {
   away: { name: string; logo: string } | null;
 };
 
+// Strip sport suffixes that Ticketmaster appends to college team names
+const SPORT_SUFFIXES = /\s+(?:Baseball|Softball|Basketball|Football|Soccer|Volleyball|Hockey|Lacrosse|Tennis|Track|Wrestling|Gymnastics|Swimming)$/i;
+
 // Parse a sports event title to extract two teams and their logos
 export function parseMatchup(title: string): MatchupTeams | null {
-  // Match patterns: "Team A vs. Team B", "Team A v. Team B", "Team A vs Team B"
+  // Match patterns: "Team A vs. Team B", "Team A v. Team B", "Team A Vs Team B"
   const match = title.match(/^(.+?)\s+(?:vs?\.?)\s+(.+?)(?:\s*[—\-:(\[].*)?$/i);
   if (!match) return null;
 
   const [, rawHome, rawAway] = match;
-  const home = findTeam(rawHome.trim());
-  const away = findTeam(rawAway.trim());
+  // Strip sport suffixes for college events (e.g. "Georgia Bulldogs Baseball" -> "Georgia Bulldogs")
+  const cleanHome = rawHome.trim().replace(SPORT_SUFFIXES, "");
+  const cleanAway = rawAway.trim().replace(SPORT_SUFFIXES, "");
+  const home = findTeam(cleanHome);
+  const away = findTeam(cleanAway);
 
   // Only return if we found at least one team
   if (!home && !away) return null;

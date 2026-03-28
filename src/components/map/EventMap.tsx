@@ -169,7 +169,7 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                     {matchup.home ? (
                       <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}
-                    <span className="text-sm font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
+                    <div className="h-8 w-[2px] rounded-full bg-white/30" />
                     {matchup.away ? (
                       <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
                     ) : <div className="h-12 w-12" />}

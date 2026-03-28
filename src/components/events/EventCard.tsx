@@ -41,7 +41,7 @@ export function EventCard({
               ) : (
                 <div className="h-20 w-20" />
               )}
-              <span className="text-lg font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
+              <div className="h-16 w-[2px] rounded-full bg-white/30" />
               {matchup.away ? (
                 <img src={matchup.away.logo} alt={matchup.away.name} className="h-20 w-20 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
               ) : (

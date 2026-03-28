@@ -164,7 +164,7 @@ export default async function EventDetailPage({
             ) : (
               <div className="h-28 w-28" />
             )}
-            <span className="text-2xl font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">vs</span>
+            <div className="h-20 w-[2px] rounded-full bg-white/30" />
             {matchup.away ? (
               <img src={matchup.away.logo} alt={matchup.away.name} className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
             ) : (

@@ -258,8 +258,9 @@ const TEAMS: SportTeam[] = [
   // Other notable programs
   { name: "Bulldogs", city: "Gonzaga", league: "ncaa", espnId: "2250" },
   { name: "Bluejays", city: "Creighton", league: "ncaa", espnId: "156" },
-  { name: "Villanova", city: "Villanova", league: "ncaa", espnId: "222" },
+  { name: "Wildcats", city: "Villanova", league: "ncaa", espnId: "222" },
   { name: "Bobcats", city: "Texas State", league: "ncaa", espnId: "326" },
+  { name: "Bobcats", city: "Texas State San Marcos", league: "ncaa", espnId: "326" },
   { name: "Roadrunners", city: "UTSA", league: "ncaa", espnId: "2636" },
   { name: "Roadrunners", city: "Texas San Antonio", league: "ncaa", espnId: "2636" },
   { name: "Bearkats", city: "Sam Houston State", league: "ncaa", espnId: "2534" },
@@ -273,25 +274,67 @@ const TEAMS: SportTeam[] = [
   { name: "Panthers", city: "Georgia State", league: "ncaa", espnId: "2247" },
   { name: "Anteaters", city: "UC Irvine", league: "ncaa", espnId: "300" },
   { name: "Beach", city: "Long Beach State", league: "ncaa", espnId: "299" },
+  { name: "Athletics", city: "Long Beach State", league: "ncaa", espnId: "299" },
   { name: "Fightin Illini", city: "Illinois", league: "ncaa", espnId: "356" },
   { name: "Fighting Illini", city: "Illinois", league: "ncaa", espnId: "356" },
-  { name: "Tarleton State", city: "Tarleton State", league: "ncaa", espnId: "2624" },
+  { name: "Texans", city: "Tarleton State", league: "ncaa", espnId: "2624" },
+  { name: "Owls", city: "Florida Atlantic", league: "ncaa", espnId: "2226" },
+  { name: "Eagles", city: "Florida Gulf Coast", league: "ncaa", espnId: "526" },
+  { name: "Panthers", city: "Florida International", league: "ncaa", espnId: "2229" },
+  { name: "Eagles", city: "Georgia Southern", league: "ncaa", espnId: "290" },
+  { name: "Pirates", city: "East Carolina", league: "ncaa", espnId: "151" },
+  { name: "Gamecocks", city: "Jacksonville State", league: "ncaa", espnId: "55" },
+  { name: "Titans", city: "Cal State Fullerton", league: "ncaa", espnId: "2239" },
+  { name: "Bulls", city: "South Florida", league: "ncaa", espnId: "58" },
+  { name: "Spartans", city: "South Carolina Upstate", league: "ncaa", espnId: "2908" },
+  { name: "Lions", city: "North Alabama", league: "ncaa", espnId: "2453" },
+  { name: "Cardinal", city: "Stanford", league: "ncaa", espnId: "24" },
+  { name: "Aggies", city: "UC Davis", league: "ncaa", espnId: "302" },
+  { name: "Islanders", city: "Texas A&M Corpus Christi", league: "ncaa", espnId: "357" },
+  { name: "Vaqueros", city: "Texas Rio Grande Valley", league: "ncaa", espnId: "2638" },
+  { name: "Rebels", city: "UNLV", league: "ncaa", espnId: "2439" },
+  { name: "UNLV", city: "UNLV", league: "ncaa", espnId: "2439" },
+  { name: "Trojans", city: "Little Rock", league: "ncaa", espnId: "2031" },
+  { name: "Trojans", city: "Arkansas Little Rock", league: "ncaa", espnId: "2031" },
+  { name: "Trojans", city: "Troy", league: "ncaa", espnId: "2653" },
+  { name: "Cardinals", city: "Lamar", league: "ncaa", espnId: "2320" },
+  { name: "Cardinals", city: "Lamar University", league: "ncaa", espnId: "2320" },
+  { name: "Mens", city: "Kennesaw State", league: "ncaa", espnId: "338" },
+  { name: "Owls", city: "Kennesaw State", league: "ncaa", espnId: "338" },
 ];
 
 // Build lookup maps for fast matching
-const teamByName = new Map<string, SportTeam>();
+// Map "city mascot" → team (e.g. "usc trojans", "boston celtics")
 const teamByCityName = new Map<string, SportTeam>();
+// Map mascot → team, but only for UNIQUE mascot names
+const uniqueMascots = new Map<string, SportTeam | null>();
 
 for (const team of TEAMS) {
-  const nameLower = team.name.toLowerCase();
   const cityNameLower = `${team.city} ${team.name}`.toLowerCase();
-  // Only set if not already present (first match wins for duplicates like "Rangers")
-  if (!teamByName.has(nameLower)) teamByName.set(nameLower, team);
   teamByCityName.set(cityNameLower, team);
+
+  // Track which mascot names are unique vs shared
+  const nameLower = team.name.toLowerCase();
+  if (uniqueMascots.has(nameLower)) {
+    // Seen before — mark as ambiguous (null)
+    uniqueMascots.set(nameLower, null);
+  } else {
+    uniqueMascots.set(nameLower, team);
+  }
+}
+
+// Only allow mascot-only matching for truly unique names
+const teamByUniqueName = new Map<string, SportTeam>();
+for (const [name, team] of uniqueMascots) {
+  if (team !== null) teamByUniqueName.set(name, team);
 }
 
 function getLogoUrl(team: SportTeam): string {
   return `https://a.espncdn.com/i/teamlogos/${team.league}/500/${team.espnId}.png`;
+}
+
+function makeResult(team: SportTeam): { name: string; logo: string } {
+  return { name: team.name, logo: getLogoUrl(team) };
 }
 
 export type MatchupTeams = {
@@ -300,7 +343,7 @@ export type MatchupTeams = {
 };
 
 // Strip sport suffixes that Ticketmaster appends to college team names
-const SPORT_SUFFIXES = /\s+(?:Baseball|Softball|Basketball|Football|Soccer|Volleyball|Hockey|Lacrosse|Tennis|Track|Wrestling|Gymnastics|Swimming)$/i;
+const SPORT_SUFFIXES = /\s+(?:Baseball|Softball|Basketball|Football|Soccer|Volleyball|Hockey|Lacrosse|Tennis|Track|Wrestling|Gymnastics|Swimming|Women's|Men's|Mens|Womens)$/i;
 
 // Parse a sports event title to extract two teams and their logos
 export function parseMatchup(title: string): MatchupTeams | null {
@@ -309,39 +352,49 @@ export function parseMatchup(title: string): MatchupTeams | null {
   if (!match) return null;
 
   const [, rawHome, rawAway] = match;
-  // Strip sport suffixes for college events (e.g. "Georgia Bulldogs Baseball" -> "Georgia Bulldogs")
-  const cleanHome = rawHome.trim().replace(SPORT_SUFFIXES, "");
-  const cleanAway = rawAway.trim().replace(SPORT_SUFFIXES, "");
+  // Strip sport suffixes (e.g. "Georgia Bulldogs Baseball" -> "Georgia Bulldogs")
+  const cleanHome = rawHome.trim().replace(SPORT_SUFFIXES, "").replace(SPORT_SUFFIXES, "");
+  const cleanAway = rawAway.trim().replace(SPORT_SUFFIXES, "").replace(SPORT_SUFFIXES, "");
   const home = findTeam(cleanHome);
   const away = findTeam(cleanAway);
 
-  // Only return if we found at least one team
   if (!home && !away) return null;
 
   return { home, away };
 }
 
 function findTeam(text: string): { name: string; logo: string } | null {
-  const lower = text.toLowerCase();
+  const lower = text.toLowerCase().trim();
 
-  // Try full "City Name" match first (most specific)
-  const fullMatch = teamByCityName.get(lower);
-  if (fullMatch) return { name: fullMatch.name, logo: getLogoUrl(fullMatch) };
+  // 1. Exact "City Mascot" match (e.g. "New York Knicks", "Georgia Tech Yellow Jackets")
+  const exactMatch = teamByCityName.get(lower);
+  if (exactMatch) return makeResult(exactMatch);
 
-  // Try just the team name (last word or known multi-word names)
-  for (const [key, team] of teamByCityName) {
-    if (lower.includes(key) || key.includes(lower)) {
-      return { name: team.name, logo: getLogoUrl(team) };
-    }
+  // 2. Check if input contains a known "City Mascot" combo
+  //    Handles cases like "2026 NCAA ... Iowa Hawkeyes" or extra words
+  for (const [cityName, team] of teamByCityName) {
+    // Input contains the full city+mascot (e.g. "Iowa Hawkeyes" found in text)
+    if (lower.includes(cityName)) return makeResult(team);
+    // The city+mascot contains the input (e.g. input "USC" matches "usc trojans")
+    // Only if input is long enough to be meaningful (>= 3 chars)
+    if (lower.length >= 3 && cityName === lower) return makeResult(team);
   }
 
-  // Try matching just the team name portion
-  const nameParts = lower.split(/\s+/);
-  // Try progressively shorter suffixes: "New York Rangers" -> "York Rangers" -> "Rangers"
-  for (let i = 0; i < nameParts.length; i++) {
-    const suffix = nameParts.slice(i).join(" ");
-    const nameMatch = teamByName.get(suffix);
-    if (nameMatch) return { name: nameMatch.name, logo: getLogoUrl(nameMatch) };
+  // 3. Check if input ends with a known "City Mascot"
+  //    e.g. "North Carolina State Wolfpack" — try progressively from start
+  const words = lower.split(/\s+/);
+  for (let i = 0; i < words.length - 1; i++) {
+    const suffix = words.slice(i).join(" ");
+    const suffixMatch = teamByCityName.get(suffix);
+    if (suffixMatch) return makeResult(suffixMatch);
+  }
+
+  // 4. Only for UNIQUE mascot names, match on mascot alone
+  //    e.g. "Hawkeyes" is unique, but "Trojans", "Eagles", "Panthers" are NOT
+  for (let i = 0; i < words.length; i++) {
+    const suffix = words.slice(i).join(" ");
+    const uniqueMatch = teamByUniqueName.get(suffix);
+    if (uniqueMatch) return makeResult(uniqueMatch);
   }
 
   return null;

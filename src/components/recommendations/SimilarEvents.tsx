@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts, type EventCategory } from "@/types";
+import { parseMatchup } from "@/lib/sportsTeams";
 
 export function SimilarEvents({ eventId }: { eventId: string }) {
   const [events, setEvents] = useState<EventWithCounts[]>([]);
@@ -55,7 +56,9 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
         You might also like
       </h2>
       <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
-        {events.map((event) => (
+        {events.map((event) => {
+          const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+          return (
           <Link
             key={event.id}
             href={`/event/${event.id}`}
@@ -74,6 +77,17 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                     {CATEGORY_EMOJI[event.category as EventCategory]}
                   </div>
                 )}
+                {matchup && (matchup.home || matchup.away) && (
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+                    {matchup.home ? (
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-10 w-10 object-contain drop-shadow-lg" />
+                    ) : <div className="h-10 w-10" />}
+                    <span className="text-sm font-bold text-white/90 drop-shadow-md">vs</span>
+                    {matchup.away ? (
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-10 w-10 object-contain drop-shadow-lg" />
+                    ) : <div className="h-10 w-10" />}
+                  </div>
+                )}
                 <div className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
                   {formatPrice(event.price, event.isFree)}
                 </div>
@@ -89,7 +103,8 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
               </div>
             </div>
           </Link>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

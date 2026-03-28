@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { formatDate, formatTime } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventCategory, type EventWithCounts } from "@/types";
+import { parseMatchup } from "@/lib/sportsTeams";
 
 // Category → brand color for pins
 const CATEGORY_COLORS: Record<EventCategory, string> = {
@@ -150,6 +151,7 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
       {/* Event markers */}
       {events.map((event) => {
         if (event.lat == null || event.lng == null) return null;
+        const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
         return (
           <Marker
             key={event.id}
@@ -160,12 +162,25 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
               <Link href={`/event/${event.id}`} className="block -m-1">
                 {/* Cover image */}
                 {event.coverImageUrl && (
-                  <img
-                    src={event.coverImageUrl}
-                    alt={event.title}
-                    className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
-                    style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
-                  />
+                  <div className="relative">
+                    <img
+                      src={event.coverImageUrl}
+                      alt={event.title}
+                      className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
+                      style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
+                    />
+                    {matchup && (matchup.home || matchup.away) && (
+                      <div className="absolute inset-0 -mt-[13px] -mx-[1px] flex items-center justify-center gap-3 rounded-t-lg bg-gradient-to-t from-black/70 via-black/30 to-transparent" style={{ width: "calc(100% + 2px)" }}>
+                        {matchup.home ? (
+                          <img src={matchup.home.logo} alt={matchup.home.name} className="h-10 w-10 object-contain drop-shadow-lg" />
+                        ) : <div className="h-10 w-10" />}
+                        <span className="text-sm font-bold text-white/90 drop-shadow-md">vs</span>
+                        {matchup.away ? (
+                          <img src={matchup.away.logo} alt={matchup.away.name} className="h-10 w-10 object-contain drop-shadow-lg" />
+                        ) : <div className="h-10 w-10" />}
+                      </div>
+                    )}
+                  </div>
                 )}
                 {/* Content */}
                 <div className="px-0.5 pb-1">

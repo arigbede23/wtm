@@ -128,6 +128,25 @@ export const LOCAL_TEAMS: LocalTeam[] = [
   // Other notable programs
   { city: "South Bend", team: "Fighting Irish", school: "Notre Dame", league: "ncaa", espnId: "87", colors: { primary: "#0C2340", secondary: "#C99700", primaryHSL: "213 68% 15%" }, lat: 41.7002, lng: -86.2380, radius: 30 },
   { city: "Tucson", team: "Wildcats", school: "Arizona", league: "ncaa", espnId: "12", colors: { primary: "#CC0033", secondary: "#003366", primaryHSL: "347 100% 40%" }, lat: 32.2226, lng: -110.9747, radius: 35 },
+
+  // HBCUs — smaller radii so they don't override nearby pro/P5 teams
+  { city: "Pine Bluff", team: "Golden Lions", school: "UAPB", league: "ncaa", espnId: "2029", colors: { primary: "#FFD700", secondary: "#000000", primaryHSL: "51 100% 50%" }, lat: 34.2284, lng: -92.0032, radius: 20 },
+  { city: "Jackson", team: "Tigers", school: "Jackson State", league: "ncaa", espnId: "2296", colors: { primary: "#1A2857", secondary: "#FFFFFF", primaryHSL: "228 53% 22%" }, lat: 32.2988, lng: -90.1848, radius: 20 },
+  { city: "Grambling", team: "Tigers", school: "Grambling State", league: "ncaa", espnId: "2755", colors: { primary: "#000000", secondary: "#FFD700", primaryHSL: "0 0% 0%" }, lat: 32.5265, lng: -92.7143, radius: 25 },
+  { city: "Baton Rouge", team: "Jaguars", school: "Southern", league: "ncaa", espnId: "2582", colors: { primary: "#0033A0", secondary: "#FFC72C", primaryHSL: "220 100% 31%" }, lat: 30.5270, lng: -91.1723, radius: 10 },
+  { city: "Prairie View", team: "Panthers", school: "Prairie View A&M", league: "ncaa", espnId: "2504", colors: { primary: "#4B0082", secondary: "#FFD700", primaryHSL: "275 100% 26%" }, lat: 30.0930, lng: -95.9865, radius: 15 },
+  { city: "Houston", team: "Tigers", school: "Texas Southern", league: "ncaa", espnId: "2640", colors: { primary: "#800000", secondary: "#C0C0C0", primaryHSL: "0 100% 25%" }, lat: 29.7252, lng: -95.3544, radius: 5 },
+  { city: "Hampton", team: "Pirates", school: "Hampton", league: "ncaa", espnId: "2272", colors: { primary: "#003DA5", secondary: "#FFFFFF", primaryHSL: "218 100% 32%" }, lat: 37.0198, lng: -76.3374, radius: 15 },
+  { city: "Norfolk", team: "Spartans", school: "Norfolk State", league: "ncaa", espnId: "2450", colors: { primary: "#007A33", secondary: "#FFD700", primaryHSL: "147 100% 24%" }, lat: 36.8508, lng: -76.2859, radius: 10 },
+  { city: "Baltimore", team: "Bears", school: "Morgan State", league: "ncaa", espnId: "2424", colors: { primary: "#FF4500", secondary: "#003399", primaryHSL: "16 100% 50%" }, lat: 39.3434, lng: -76.5844, radius: 5 },
+  { city: "Greensboro", team: "Aggies", school: "NC A&T", league: "ncaa", espnId: "2448", colors: { primary: "#003DA5", secondary: "#FFD700", primaryHSL: "218 100% 32%" }, lat: 36.0726, lng: -79.7920, radius: 15 },
+  { city: "Orangeburg", team: "Bulldogs", school: "SC State", league: "ncaa", espnId: "2569", colors: { primary: "#003DA5", secondary: "#800000", primaryHSL: "218 100% 32%" }, lat: 33.4918, lng: -80.8565, radius: 20 },
+  { city: "Tallahassee", team: "Rattlers", school: "Florida A&M", league: "ncaa", espnId: "50", colors: { primary: "#FF4500", secondary: "#006400", primaryHSL: "16 100% 50%" }, lat: 30.4243, lng: -84.2873, radius: 5 },
+  { city: "Washington", team: "Bison", school: "Howard", league: "ncaa", espnId: "47", colors: { primary: "#003DA5", secondary: "#E21833", primaryHSL: "218 100% 32%" }, lat: 38.9228, lng: -77.0196, radius: 5 },
+  { city: "Huntsville", team: "Bulldogs", school: "Alabama A&M", league: "ncaa", espnId: "2010", colors: { primary: "#800000", secondary: "#FFFFFF", primaryHSL: "0 100% 25%" }, lat: 34.7834, lng: -86.5716, radius: 20 },
+  { city: "Montgomery", team: "Hornets", school: "Alabama State", league: "ncaa", espnId: "2011", colors: { primary: "#000000", secondary: "#FFD700", primaryHSL: "0 0% 0%" }, lat: 32.3639, lng: -86.2817, radius: 20 },
+  { city: "Lorman", team: "Braves", school: "Alcorn State", league: "ncaa", espnId: "2016", colors: { primary: "#4B0082", secondary: "#FFD700", primaryHSL: "275 100% 26%" }, lat: 31.8499, lng: -91.1373, radius: 25 },
+  { city: "Daytona Beach", team: "Wildcats", school: "Bethune-Cookman", league: "ncaa", espnId: "2065", colors: { primary: "#800000", secondary: "#FFD700", primaryHSL: "0 100% 25%" }, lat: 29.1947, lng: -81.0483, radius: 15 },
 ];
 
 // Haversine distance in miles

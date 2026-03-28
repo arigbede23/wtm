@@ -87,6 +87,30 @@ export async function fetchTicketmasterEvents(
   return allEvents;
 }
 
+// Generic TM category placeholders all live under /dam/c/
+function isGenericImage(url: string): boolean {
+  return url.includes("/dam/c/") || url.includes("/dam/a/") && url.includes("SOURCE");
+}
+
+// Pick the best available image: attraction > non-generic event > generic event
+function pickBestImage(ev: any): string | null {
+  // 1. Try attraction/performer images (usually high quality artist photos)
+  const attractions = ev._embedded?.attractions;
+  if (attractions) {
+    for (const attr of attractions) {
+      const img = pickTicketmasterImage(attr.images);
+      if (img && !isGenericImage(img)) return img;
+    }
+  }
+
+  // 2. Try event images, preferring non-generic ones
+  const eventImg = pickTicketmasterImage(ev.images);
+  if (eventImg && !isGenericImage(eventImg)) return eventImg;
+
+  // 3. Fall back to whatever we have (may be generic)
+  return eventImg;
+}
+
 function normalizeTMEvent(ev: any): NormalizedEvent | null {
   const id = ev.id;
   const title = ev.name;
@@ -149,7 +173,7 @@ function normalizeTMEvent(ev: any): NormalizedEvent | null {
       : null,
     startDate,
     endDate,
-    coverImageUrl: pickTicketmasterImage(ev.images),
+    coverImageUrl: pickBestImage(ev),
     isFree,
     price: isFree ? null : minPrice,
     url: ev.url ?? null,

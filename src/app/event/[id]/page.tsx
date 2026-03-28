@@ -37,6 +37,11 @@ import { InviteFriendsButton } from "@/components/events/InviteFriendsButton";
 import { MobileContainer } from "@/components/layout/MobileContainer";
 import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 
+function isGenericCover(url?: string | null): boolean {
+  if (!url) return true;
+  return url.includes("/dam/c/") || (url.includes("/dam/a/") && url.includes("SOURCE"));
+}
+
 // Generate dynamic Open Graph metadata so shared links show a branded card image.
 export async function generateMetadata({
   params,
@@ -149,6 +154,7 @@ export default async function EventDetailPage({
   const isExternal = !!event.source && event.source !== "USER";
   const matchup = category === "SPORTS" ? parseMatchup(event.title) : null;
   const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
+  const hasRealImage = !isGenericCover(event.coverImageUrl);
 
   return (
     <MobileContainer>
@@ -179,15 +185,15 @@ export default async function EventDetailPage({
           >
             <img src={singleTeam.logo} alt={singleTeam.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
           </div>
-        ) : event.coverImageUrl ? (
+        ) : hasRealImage ? (
           <img
             src={event.coverImageUrl}
             alt={event.title}
             className="aspect-[16/9] w-full object-cover"
           />
         ) : (
-          <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-gray-300 dark:bg-neutral-800 dark:text-neutral-600">
-            <CategoryIcon category={category} className="h-16 w-16" />
+          <div className="flex aspect-[16/9] w-full items-center justify-center bg-gradient-to-br from-gray-800 via-gray-700 to-gray-600">
+            <CategoryIcon category={category} className="h-16 w-16 text-white/40" />
           </div>
         )}
 

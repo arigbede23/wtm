@@ -73,8 +73,9 @@ export function EventCard({
           </div>
 
           {/* Category badge — top left corner */}
-          <div className="absolute left-3 top-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
-            <CategoryIcon category={event.category} className="h-3 w-3" /> {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
+          <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+            <CategoryIcon category={event.category} className="h-3 w-3" />
+            {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
           </div>
 
           {/* Ended badge — bottom left corner */}

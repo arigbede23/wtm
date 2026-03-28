@@ -168,9 +168,8 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
       {/* Event markers */}
       {events.map((event) => {
         if (event.lat == null || event.lng == null) return null;
-        const isSport = event.category === "SPORTS";
-        const matchup = isSport ? parseMatchup(event.title) : null;
-        const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+        const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+        const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
         return (
           <Marker
             key={event.id}
@@ -192,13 +191,6 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                       <img src={matchup.away.logo} alt={matchup.away.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                   </div>
-                ) : event.coverImageUrl ? (
-                  <img
-                    src={event.coverImageUrl}
-                    alt={event.title}
-                    className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
-                    style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
-                  />
                 ) : singleTeam ? (
                   <div
                     className="flex h-28 items-center justify-center rounded-t-lg -mt-[13px] -mx-[1px]"
@@ -206,6 +198,13 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                   >
                     <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                   </div>
+                ) : event.coverImageUrl ? (
+                  <img
+                    src={event.coverImageUrl}
+                    alt={event.title}
+                    className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
+                    style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
+                  />
                 ) : null}
                 {/* Content */}
                 <div className="px-0.5 pb-1">

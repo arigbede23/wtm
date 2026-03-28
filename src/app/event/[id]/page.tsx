@@ -147,9 +147,8 @@ export default async function EventDetailPage({
   const category = event.category as EventCategory;
   const past = isEventPast(event.startDate, event.endDate);
   const isExternal = !!event.source && event.source !== "USER";
-  const isSport = category === "SPORTS";
-  const matchup = isSport ? parseMatchup(event.title) : null;
-  const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+  const matchup = category === "SPORTS" ? parseMatchup(event.title) : null;
+  const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
 
   return (
     <MobileContainer>
@@ -173,12 +172,6 @@ export default async function EventDetailPage({
               <div className="h-32 w-32" />
             )}
           </div>
-        ) : event.coverImageUrl ? (
-          <img
-            src={event.coverImageUrl}
-            alt={event.title}
-            className="aspect-[16/9] w-full object-cover"
-          />
         ) : singleTeam ? (
           <div
             className="flex aspect-[16/9] w-full items-center justify-center"
@@ -186,6 +179,12 @@ export default async function EventDetailPage({
           >
             <img src={singleTeam.logo} alt={singleTeam.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
           </div>
+        ) : event.coverImageUrl ? (
+          <img
+            src={event.coverImageUrl}
+            alt={event.title}
+            className="aspect-[16/9] w-full object-cover"
+          />
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-gray-300 dark:bg-neutral-800 dark:text-neutral-600">
             <CategoryIcon category={category} className="h-16 w-16" />

@@ -58,9 +58,8 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
       </h2>
       <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
         {events.map((event) => {
-          const isSport = event.category === "SPORTS";
-          const matchup = isSport ? parseMatchup(event.title) : null;
-          const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+          const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+          const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
           return (
           <Link
             key={event.id}
@@ -81,16 +80,16 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                       <img src={matchup.away.logo} alt={matchup.away.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                   </div>
+                ) : singleTeam ? (
+                  <div className="flex h-full items-center justify-center" style={{ background: singleTeam.color }}>
+                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                  </div>
                 ) : event.coverImageUrl ? (
                   <img
                     src={event.coverImageUrl}
                     alt={event.title}
                     className="h-full w-full object-cover"
                   />
-                ) : singleTeam ? (
-                  <div className="flex h-full items-center justify-center" style={{ background: singleTeam.color }}>
-                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
-                  </div>
                 ) : (
                   <div className="flex h-full items-center justify-center text-3xl">
                     <CategoryIcon category={event.category} className="h-8 w-8" />

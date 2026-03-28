@@ -23,9 +23,8 @@ export function EventCard({
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   const past = isEventPast(event.startDate, event.endDate);
-  const isSport = event.category === "SPORTS";
-  const matchup = isSport ? parseMatchup(event.title) : null;
-  const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
+  const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+  const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
 
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -50,12 +49,6 @@ export function EventCard({
                 <div className="h-24 w-24" />
               )}
             </div>
-          ) : event.coverImageUrl ? (
-            <img
-              src={event.coverImageUrl}
-              alt={event.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
           ) : singleTeam ? (
             <div
               className="flex h-full items-center justify-center"
@@ -63,6 +56,12 @@ export function EventCard({
             >
               <img src={singleTeam.logo} alt={singleTeam.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             </div>
+          ) : event.coverImageUrl ? (
+            <img
+              src={event.coverImageUrl}
+              alt={event.title}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-gray-300 dark:text-neutral-600">
               <CategoryIcon category={event.category} className="h-12 w-12" />

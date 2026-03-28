@@ -10,27 +10,6 @@ import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 
-// Generic Ticketmaster category placeholder images (not real event photos)
-function isGenericCover(url?: string | null): boolean {
-  if (!url) return true;
-  return url.includes("/dam/c/") || (url.includes("/dam/a/") && url.includes("SOURCE"));
-}
-
-// Category-based gradient backgrounds for events without real images
-const CATEGORY_GRADIENTS: Record<string, string> = {
-  MUSIC: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
-  SPORTS: "linear-gradient(135deg, #1a472a 0%, #2d6a4f 50%, #40916c 100%)",
-  ARTS: "linear-gradient(135deg, #3d0066 0%, #6a0572 50%, #ab83a1 100%)",
-  FOOD: "linear-gradient(135deg, #5f0a0a 0%, #a4133c 50%, #c9184a 100%)",
-  TECH: "linear-gradient(135deg, #0a1628 0%, #1a3a5c 50%, #2a6496 100%)",
-  SOCIAL: "linear-gradient(135deg, #1b2838 0%, #2d4059 50%, #547aa5 100%)",
-  COMEDY: "linear-gradient(135deg, #4a1942 0%, #6b2d5b 50%, #8b4789 100%)",
-  WELLNESS: "linear-gradient(135deg, #134e4a 0%, #115e59 50%, #0d9488 100%)",
-  OUTDOORS: "linear-gradient(135deg, #1a3c40 0%, #2d6a4f 50%, #52b788 100%)",
-  NIGHTLIFE: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
-  COMMUNITY: "linear-gradient(135deg, #1a1a2e 0%, #2d3561 50%, #4a5899 100%)",
-  OTHER: "linear-gradient(135deg, #1a1a2e 0%, #2d2d44 50%, #454566 100%)",
-};
 
 type FriendInfo = {
   id: string;
@@ -45,9 +24,8 @@ export function EventCard({
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   const past = isEventPast(event.startDate, event.endDate);
-  const hasRealImage = !isGenericCover(event.coverImageUrl);
   const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
-  const singleTeam = !matchup && !hasRealImage ? findTeamInTitle(event.title) : null;
+  const singleTeam = !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
 
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -79,23 +57,15 @@ export function EventCard({
             >
               <img src={singleTeam.logo} alt={singleTeam.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             </div>
-          ) : hasRealImage ? (
+          ) : event.coverImageUrl ? (
             <img
-              src={event.coverImageUrl!}
+              src={event.coverImageUrl}
               alt={event.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div
-              className="flex h-full items-center justify-center"
-              style={{ background: CATEGORY_GRADIENTS[event.category] ?? CATEGORY_GRADIENTS.OTHER }}
-            >
-              <div className="flex flex-col items-center gap-1.5">
-                <CategoryIcon category={event.category} className="h-10 w-10 text-white/60" />
-                <span className="max-w-[80%] text-center text-xs font-medium text-white/50 line-clamp-1">
-                  {event.category.charAt(0) + event.category.slice(1).toLowerCase()}
-                </span>
-              </div>
+            <div className="flex h-full items-center justify-center text-gray-300 dark:text-neutral-600">
+              <CategoryIcon category={event.category} className="h-12 w-12" />
             </div>
           )}
 

@@ -357,9 +357,9 @@ for (const team of TEAMS) {
 
 // Only allow mascot-only matching for truly unique names
 const teamByUniqueName = new Map<string, SportTeam>();
-for (const [name, team] of uniqueMascots) {
+uniqueMascots.forEach((team, name) => {
   if (team !== null) teamByUniqueName.set(name, team);
-}
+});
 
 function getLogoUrl(team: SportTeam): string {
   return `https://a.espncdn.com/i/teamlogos/${team.league}/500/${team.espnId}.png`;
@@ -406,13 +406,13 @@ function findTeam(text: string): { name: string; logo: string } | null {
 
   // 2. Check if input contains a known "City Mascot" combo
   //    Handles cases like "2026 NCAA ... Iowa Hawkeyes" or extra words
-  for (const [cityName, team] of teamByCityName) {
-    // Input contains the full city+mascot (e.g. "Iowa Hawkeyes" found in text)
-    if (lower.includes(cityName)) return makeResult(team);
-    // The city+mascot contains the input (e.g. input "USC" matches "usc trojans")
-    // Only if input is long enough to be meaningful (>= 3 chars)
-    if (lower.length >= 3 && cityName === lower) return makeResult(team);
-  }
+  let containsMatch: SportTeam | undefined;
+  teamByCityName.forEach((team, cityName) => {
+    if (containsMatch) return;
+    if (lower.includes(cityName)) containsMatch = team;
+    else if (lower.length >= 3 && cityName === lower) containsMatch = team;
+  });
+  if (containsMatch) return makeResult(containsMatch);
 
   // 3. Check if input ends with a known "City Mascot"
   //    e.g. "North Carolina State Wolfpack" — try progressively from start

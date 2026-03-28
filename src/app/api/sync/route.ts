@@ -34,12 +34,34 @@ function getSupabaseClient() {
   return createClient(url, key);
 }
 
+// Major US metros to always sync — ensures a baseline of events even without
+// user activity. Each entry: [city, lat, lng].
+const DEFAULT_METROS: [string, string, string][] = [
+  ["New York", "40.7128", "-74.0060"],
+  ["Los Angeles", "34.0522", "-118.2437"],
+  ["Chicago", "41.8781", "-87.6298"],
+  ["Houston", "29.7604", "-95.3698"],
+  ["Miami", "25.7617", "-80.1918"],
+  ["Atlanta", "33.7490", "-84.3880"],
+  ["Dallas", "32.7767", "-96.7970"],
+  ["San Francisco", "37.7749", "-122.4194"],
+  ["Seattle", "47.6062", "-122.3321"],
+  ["Boston", "42.3601", "-71.0589"],
+  ["Denver", "39.7392", "-104.9903"],
+  ["Nashville", "36.1627", "-86.7816"],
+  ["Austin", "30.2672", "-97.7431"],
+  ["Phoenix", "33.4484", "-112.0740"],
+  ["Philadelphia", "39.9526", "-75.1652"],
+];
+
 async function handleSync() {
   const supabase = getSupabaseClient();
 
-  // Look up distinct cities where users have RSVP'd or created events recently
-  // so we sync content for areas with actual active users.
+  // Look up distinct cities where users have created events or RSVP'd recently
+  // so we also sync content for areas with actual active users.
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Cities from user-created events
   const { data: activeEvents } = await supabase
     .from("events")
     .select("city, lat, lng")
@@ -48,13 +70,40 @@ async function handleSync() {
     .not("city", "is", null)
     .not("lat", "is", null);
 
+  // Cities from recent RSVPs
+  const { data: rsvpEvents } = await supabase
+    .from("rsvps")
+    .select("event:eventId(city, lat, lng)")
+    .gte("createdAt", thirtyDaysAgo);
+
   // De-duplicate cities and collect one coordinate per city
   const cityMap = new Map<string, { lat: string; lng: string }>();
+
+  // Add default metros first
+  for (const [city, lat, lng] of DEFAULT_METROS) {
+    cityMap.set(city, { lat, lng });
+  }
+
+  // Add SYNC_LAT/SYNC_LNG from env if set
+  if (process.env.SYNC_LAT && process.env.SYNC_LNG) {
+    cityMap.set("__env__", { lat: process.env.SYNC_LAT, lng: process.env.SYNC_LNG });
+  }
+
+  // Add cities from user-created events
   for (const ev of activeEvents ?? []) {
     if (ev.city && ev.lat != null && ev.lng != null && !cityMap.has(ev.city)) {
       cityMap.set(ev.city, { lat: String(ev.lat), lng: String(ev.lng) });
     }
   }
+
+  // Add cities from RSVPs
+  for (const rsvp of rsvpEvents ?? []) {
+    const ev = rsvp.event as any;
+    if (ev?.city && ev.lat != null && ev.lng != null && !cityMap.has(ev.city)) {
+      cityMap.set(ev.city, { lat: String(ev.lat), lng: String(ev.lng) });
+    }
+  }
+
   const activeCities = Array.from(cityMap.keys());
   const cityCoords = Array.from(cityMap.values());
 

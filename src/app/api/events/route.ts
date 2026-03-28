@@ -33,7 +33,8 @@ export async function GET(request: NextRequest) {
       .from("events")
       .select("*, rsvps(count)")
       .eq("status", "PUBLISHED")
-      .order("startDate", { ascending: true });
+      .order("startDate", { ascending: true })
+      .limit(2000);
 
     // Only filter by future dates when not fetching organizer's events
     if (!organizerId) {

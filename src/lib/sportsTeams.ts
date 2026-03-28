@@ -475,7 +475,7 @@ export function parseMatchup(title: string): MatchupTeams | null {
   return { home, away };
 }
 
-function findTeam(text: string): { name: string; logo: string } | null {
+function findTeam(text: string): TeamResult | null {
   const lower = text.toLowerCase().trim();
 
   // 1. Exact "City Mascot" match (e.g. "New York Knicks", "Georgia Tech Yellow Jackets")

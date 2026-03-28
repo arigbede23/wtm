@@ -28,7 +28,7 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
     if (lat != null && lng != null) {
       params.set("lat", String(lat));
       params.set("lng", String(lng));
-      params.set("radius", "50");
+      params.set("radius", "100");
     }
     fetch(`/api/feed/for-you?${params}`)
       .then((res) => {

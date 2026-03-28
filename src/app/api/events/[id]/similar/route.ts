@@ -16,16 +16,25 @@ export async function GET(
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Fetch the source event with its embedding and category
+  // Fetch the source event with its embedding, category, and location
   const { data: event, error } = await supabase
     .from("events")
-    .select("id, category, embedding")
+    .select("id, category, embedding, lat, lng")
     .eq("id", params.id)
     .single();
 
   if (error || !event) {
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
+
+  // Build a bounding box around the source event (100 mi)
+  const RADIUS = 100;
+  const hasLocation = event.lat != null && event.lng != null;
+  const latDelta = hasLocation ? RADIUS / 69 : null;
+  const lngDelta =
+    hasLocation
+      ? RADIUS / (69 * Math.cos((event.lat * Math.PI) / 180))
+      : null;
 
   // Strategy 1: pgvector similarity
   if (event.embedding) {
@@ -34,7 +43,7 @@ export async function GET(
       {
         event_id: event.id,
         query_embedding: event.embedding,
-        match_count: 6,
+        match_count: 20,
         match_threshold: 0.3,
       }
     );
@@ -42,31 +51,42 @@ export async function GET(
     if (!rpcError && matches && matches.length > 0) {
       const eventIds = matches.map((m: { id: string }) => m.id);
 
-      const { data: events } = await supabase
+      let query = supabase
         .from("events")
         .select("*, rsvps(count)")
         .in("id", eventIds)
         .eq("status", "PUBLISHED")
         .gte("startDate", new Date().toISOString());
 
+      // Filter to nearby events
+      if (hasLocation && latDelta && lngDelta) {
+        query = query
+          .gte("lat", event.lat - latDelta)
+          .lte("lat", event.lat + latDelta)
+          .gte("lng", event.lng - lngDelta)
+          .lte("lng", event.lng + lngDelta);
+      }
+
+      const { data: events } = await query;
+
       const shaped = (events ?? []).map((e: any) => ({
         ...e,
         _count: { rsvps: e.rsvps?.[0]?.count ?? 0 },
       }));
 
-      // Preserve similarity ordering
+      // Preserve similarity ordering, cap at 6
       const orderMap = new Map<string, number>(eventIds.map((id: string, i: number) => [id, i]));
       shaped.sort(
         (a: any, b: any) =>
           (orderMap.get(a.id) ?? 99) - (orderMap.get(b.id) ?? 99)
       );
 
-      return NextResponse.json(shaped);
+      return NextResponse.json(shaped.slice(0, 6));
     }
   }
 
-  // Strategy 2: same-category fallback
-  const { data: fallback } = await supabase
+  // Strategy 2: same-category fallback with location filter
+  let fallbackQuery = supabase
     .from("events")
     .select("*, rsvps(count)")
     .eq("category", event.category)
@@ -75,6 +95,16 @@ export async function GET(
     .gte("startDate", new Date().toISOString())
     .order("startDate", { ascending: true })
     .limit(6);
+
+  if (hasLocation && latDelta && lngDelta) {
+    fallbackQuery = fallbackQuery
+      .gte("lat", event.lat - latDelta)
+      .lte("lat", event.lat + latDelta)
+      .gte("lng", event.lng - lngDelta)
+      .lte("lng", event.lng + lngDelta);
+  }
+
+  const { data: fallback } = await fallbackQuery;
 
   const shaped = (fallback ?? []).map((e: any) => ({
     ...e,

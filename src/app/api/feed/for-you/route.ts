@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Strategy 2: category-based fallback
-  const { data: events } = await anonClient
+  let fallbackQuery = anonClient
     .from("events")
     .select("*, rsvps(count)")
     .in("category", interests)
@@ -99,6 +99,19 @@ export async function GET(request: NextRequest) {
     .gte("startDate", new Date().toISOString())
     .order("startDate", { ascending: true })
     .limit(20);
+
+  // Bounding box pre-filter so we get nearby events within the row limit
+  if (userLat != null && userLng != null && maxRadius != null) {
+    const latDelta = maxRadius / 69;
+    const lngDelta = maxRadius / (69 * Math.cos((userLat * Math.PI) / 180));
+    fallbackQuery = fallbackQuery
+      .gte("lat", userLat - latDelta)
+      .lte("lat", userLat + latDelta)
+      .gte("lng", userLng - lngDelta)
+      .lte("lng", userLng + lngDelta);
+  }
+
+  const { data: events } = await fallbackQuery;
 
   let shaped = (events ?? []).map((e: any) => ({
     ...e,

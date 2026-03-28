@@ -654,3 +654,19 @@ function findTeam(text: string): TeamResult | null {
 
   return null;
 }
+
+// Find a single team mentioned anywhere in a title (for non-matchup events)
+// e.g. "New York Knicks Premium Seating", "Arkansas Razorbacks Softball",
+//      "2026 NCAA Men's Basketball Championship"
+export function findTeamInTitle(title: string): TeamResult | null {
+  // Strip sport suffixes and common noise
+  let clean = title
+    .replace(SPORT_SUFFIXES, "")
+    .replace(SPORT_SUFFIXES, "")
+    .replace(/\s*(?:Premium|Seating|Parking|Suites?|Club Level|Tailgat\w*|Championship|Tournament|Regional|Session \d+|Resale|3PE Resale)\s*/gi, " ")
+    .replace(/\s*\d{4}\s*/g, " ")
+    .replace(/\s*NCAA\s*(DI|D1|Division I)?\s*/gi, " ")
+    .trim();
+
+  return findTeam(clean);
+}

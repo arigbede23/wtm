@@ -35,7 +35,7 @@ import { UserAvatar } from "@/components/social/UserAvatar";
 import { SimilarEvents } from "@/components/recommendations/SimilarEvents";
 import { InviteFriendsButton } from "@/components/events/InviteFriendsButton";
 import { MobileContainer } from "@/components/layout/MobileContainer";
-import { parseMatchup } from "@/lib/sportsTeams";
+import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 
 // Generate dynamic Open Graph metadata so shared links show a branded card image.
 export async function generateMetadata({
@@ -147,7 +147,9 @@ export default async function EventDetailPage({
   const category = event.category as EventCategory;
   const past = isEventPast(event.startDate, event.endDate);
   const isExternal = !!event.source && event.source !== "USER";
-  const matchup = category === "SPORTS" ? parseMatchup(event.title) : null;
+  const isSport = category === "SPORTS";
+  const matchup = isSport ? parseMatchup(event.title) : null;
+  const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
 
   return (
     <MobileContainer>
@@ -177,6 +179,13 @@ export default async function EventDetailPage({
             alt={event.title}
             className="aspect-[16/9] w-full object-cover"
           />
+        ) : singleTeam ? (
+          <div
+            className="flex aspect-[16/9] w-full items-center justify-center"
+            style={{ background: singleTeam.color }}
+          >
+            <img src={singleTeam.logo} alt={singleTeam.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+          </div>
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-gray-300 dark:bg-neutral-800 dark:text-neutral-600">
             <CategoryIcon category={category} className="h-16 w-16" />

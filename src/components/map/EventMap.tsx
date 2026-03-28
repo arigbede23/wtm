@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { formatDate, formatTime } from "@/lib/utils";
 import { type EventCategory, type EventWithCounts } from "@/types";
-import { parseMatchup } from "@/lib/sportsTeams";
+import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 // Category → brand color for pins
@@ -168,7 +168,9 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
       {/* Event markers */}
       {events.map((event) => {
         if (event.lat == null || event.lng == null) return null;
-        const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+        const isSport = event.category === "SPORTS";
+        const matchup = isSport ? parseMatchup(event.title) : null;
+        const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
         return (
           <Marker
             key={event.id}
@@ -197,6 +199,13 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                     className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
                     style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
                   />
+                ) : singleTeam ? (
+                  <div
+                    className="flex h-28 items-center justify-center rounded-t-lg -mt-[13px] -mx-[1px]"
+                    style={{ marginBottom: 8, width: "calc(100% + 2px)", background: singleTeam.color }}
+                  >
+                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                  </div>
                 ) : null}
                 {/* Content */}
                 <div className="px-0.5 pb-1">

@@ -8,7 +8,7 @@ import { cn, formatEventDateTime, formatPrice, friendsGoingText, isEventPast } f
 import { type EventWithCounts } from "@/types";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { UserAvatar } from "@/components/social/UserAvatar";
-import { parseMatchup } from "@/lib/sportsTeams";
+import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 
 type FriendInfo = {
   id: string;
@@ -23,7 +23,9 @@ export function EventCard({
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   const past = isEventPast(event.startDate, event.endDate);
-  const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+  const isSport = event.category === "SPORTS";
+  const matchup = isSport ? parseMatchup(event.title) : null;
+  const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
 
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -54,6 +56,13 @@ export function EventCard({
               alt={event.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
+          ) : singleTeam ? (
+            <div
+              className="flex h-full items-center justify-center"
+              style={{ background: singleTeam.color }}
+            >
+              <img src={singleTeam.logo} alt={singleTeam.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+            </div>
           ) : (
             <div className="flex h-full items-center justify-center text-gray-300 dark:text-neutral-600">
               <CategoryIcon category={event.category} className="h-12 w-12" />

@@ -9,7 +9,7 @@ import { Calendar } from "lucide-react";
 import { formatDate, formatTime, formatPrice } from "@/lib/utils";
 import { type EventWithCounts, type EventCategory } from "@/types";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
-import { parseMatchup } from "@/lib/sportsTeams";
+import { parseMatchup, findTeamInTitle } from "@/lib/sportsTeams";
 
 export function SimilarEvents({ eventId }: { eventId: string }) {
   const [events, setEvents] = useState<EventWithCounts[]>([]);
@@ -58,7 +58,9 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
       </h2>
       <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
         {events.map((event) => {
-          const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+          const isSport = event.category === "SPORTS";
+          const matchup = isSport ? parseMatchup(event.title) : null;
+          const singleTeam = isSport && !matchup && !event.coverImageUrl ? findTeamInTitle(event.title) : null;
           return (
           <Link
             key={event.id}
@@ -85,6 +87,10 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                     alt={event.title}
                     className="h-full w-full object-cover"
                   />
+                ) : singleTeam ? (
+                  <div className="flex h-full items-center justify-center" style={{ background: singleTeam.color }}>
+                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                  </div>
                 ) : (
                   <div className="flex h-full items-center justify-center text-3xl">
                     <CategoryIcon category={event.category} className="h-8 w-8" />

@@ -68,16 +68,15 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
               <div className="relative aspect-[3/2] overflow-hidden bg-gray-100 dark:bg-neutral-800">
                 {matchup && (matchup.home || matchup.away) ? (
                   <div
-                    className="flex h-full items-center justify-center gap-2"
-                    style={{ background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
+                    className="flex h-full items-center justify-center"
+                    style={{ background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)` }}
                   >
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
-                    ) : <div className="h-12 w-12" />}
-                    <div className="h-8 w-[2px] rounded-full bg-white/30" />
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                    ) : <div className="h-14 w-14" />}
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
-                    ) : <div className="h-12 w-12" />}
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                    ) : <div className="h-14 w-14" />}
                   </div>
                 ) : event.coverImageUrl ? (
                   <img

@@ -31,21 +31,20 @@ export function EventCard({
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-neutral-800">
           {matchup && (matchup.home || matchup.away) ? (
             <div
-              className="flex h-full items-center justify-center gap-5"
+              className="flex h-full items-center justify-center"
               style={{
-                background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)`,
+                background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)`,
               }}
             >
               {matchup.home ? (
-                <img src={matchup.home.logo} alt={matchup.home.name} className="h-20 w-20 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
+                <img src={matchup.home.logo} alt={matchup.home.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
               ) : (
-                <div className="h-20 w-20" />
+                <div className="h-24 w-24" />
               )}
-              <div className="h-16 w-[2px] rounded-full bg-white/30" />
               {matchup.away ? (
-                <img src={matchup.away.logo} alt={matchup.away.name} className="h-20 w-20 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
+                <img src={matchup.away.logo} alt={matchup.away.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
               ) : (
-                <div className="h-20 w-20" />
+                <div className="h-24 w-24" />
               )}
             </div>
           ) : event.coverImageUrl ? (

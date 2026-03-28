@@ -154,21 +154,20 @@ export default async function EventDetailPage({
       <div className="relative">
         {matchup && (matchup.home || matchup.away) ? (
           <div
-            className="flex aspect-[16/9] w-full items-center justify-center gap-8"
+            className="flex aspect-[16/9] w-full items-center justify-center"
             style={{
-              background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)`,
+              background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)`,
             }}
           >
             {matchup.home ? (
-              <img src={matchup.home.logo} alt={matchup.home.name} className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
+              <img src={matchup.home.logo} alt={matchup.home.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             ) : (
-              <div className="h-28 w-28" />
+              <div className="h-32 w-32" />
             )}
-            <div className="h-20 w-[2px] rounded-full bg-white/30" />
             {matchup.away ? (
-              <img src={matchup.away.logo} alt={matchup.away.name} className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
+              <img src={matchup.away.logo} alt={matchup.away.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             ) : (
-              <div className="h-28 w-28" />
+              <div className="h-32 w-32" />
             )}
           </div>
         ) : event.coverImageUrl ? (

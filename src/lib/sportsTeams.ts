@@ -7,6 +7,7 @@ export type SportTeam = {
   city: string; // City name (e.g. "Los Angeles")
   league: string;
   espnId: string;
+  logoUrl?: string; // Override for non-ESPN logo sources (e.g. MiLB)
 };
 
 // All major North American pro sports teams
@@ -333,6 +334,23 @@ const TEAMS: SportTeam[] = [
   { name: "Bulldogs", city: "Mississippi Valley State", league: "ncaa", espnId: "2400" },
   { name: "Delta Devils", city: "Mississippi Valley State", league: "ncaa", espnId: "2400" },
   { name: "Demons", city: "Northwestern State", league: "ncaa", espnId: "2466" },
+
+  // MiLB (Minor League Baseball) — uses MLB static CDN for logos
+  { name: "Naturals", city: "Northwest Arkansas", league: "milb", espnId: "1350", logoUrl: "https://www.mlbstatic.com/team-logos/1350.svg" },
+  { name: "Sod Poodles", city: "Amarillo", league: "milb", espnId: "5368", logoUrl: "https://www.mlbstatic.com/team-logos/5368.svg" },
+  { name: "Rainiers", city: "Tacoma", league: "milb", espnId: "529", logoUrl: "https://www.mlbstatic.com/team-logos/529.svg" },
+  { name: "RoughRiders", city: "Frisco", league: "milb", espnId: "540", logoUrl: "https://www.mlbstatic.com/team-logos/540.svg" },
+  { name: "Cubs", city: "South Bend", league: "milb", espnId: "550", logoUrl: "https://www.mlbstatic.com/team-logos/550.svg" },
+  { name: "Chihuahuas", city: "El Paso", league: "milb", espnId: "4904", logoUrl: "https://www.mlbstatic.com/team-logos/4904.svg" },
+  { name: "Sounds", city: "Nashville", league: "milb", espnId: "556", logoUrl: "https://www.mlbstatic.com/team-logos/556.svg" },
+  { name: "River Bandits", city: "Quad Cities", league: "milb", espnId: "565", logoUrl: "https://www.mlbstatic.com/team-logos/565.svg" },
+  { name: "Travelers", city: "Arkansas", league: "milb", espnId: "574", logoUrl: "https://www.mlbstatic.com/team-logos/574.svg" },
+  { name: "Express", city: "Round Rock", league: "milb", espnId: "102", logoUrl: "https://www.mlbstatic.com/team-logos/102.svg" },
+  { name: "River Cats", city: "Sacramento", league: "milb", espnId: "105", logoUrl: "https://www.mlbstatic.com/team-logos/105.svg" },
+  { name: "Stripers", city: "Gwinnett", league: "milb", espnId: "431", logoUrl: "https://www.mlbstatic.com/team-logos/431.svg" },
+  { name: "Hooks", city: "Corpus Christi", league: "milb", espnId: "482", logoUrl: "https://www.mlbstatic.com/team-logos/482.svg" },
+  { name: "Redbirds", city: "Memphis", league: "milb", espnId: "235", logoUrl: "https://www.mlbstatic.com/team-logos/235.svg" },
+  { name: "Knights", city: "Charlotte", league: "milb", espnId: "494", logoUrl: "https://www.mlbstatic.com/team-logos/494.svg" },
 ];
 
 // Build lookup maps for fast matching
@@ -438,6 +456,7 @@ function getTeamColor(team: SportTeam): string {
 }
 
 function getLogoUrl(team: SportTeam): string {
+  if (team.logoUrl) return team.logoUrl;
   return `https://a.espncdn.com/i/teamlogos/${team.league}/500/${team.espnId}.png`;
 }
 

@@ -154,9 +154,9 @@ export default async function EventDetailPage({
       <div className="relative">
         {matchup && (matchup.home || matchup.away) ? (
           <div
-            className="flex aspect-[16/9] w-full items-center justify-center"
+            className="flex aspect-[16/9] w-full items-center justify-center gap-10"
             style={{
-              background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)`,
+              background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)`,
             }}
           >
             {matchup.home ? (

@@ -31,9 +31,9 @@ export function EventCard({
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-neutral-800">
           {matchup && (matchup.home || matchup.away) ? (
             <div
-              className="flex h-full items-center justify-center"
+              className="flex h-full items-center justify-center gap-8"
               style={{
-                background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)`,
+                background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)`,
               }}
             >
               {matchup.home ? (

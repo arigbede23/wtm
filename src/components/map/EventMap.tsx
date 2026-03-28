@@ -163,8 +163,8 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                 {/* Cover image */}
                 {matchup && (matchup.home || matchup.away) ? (
                   <div
-                    className="flex h-28 items-center justify-center rounded-t-lg -mt-[13px] -mx-[1px]"
-                    style={{ marginBottom: 8, width: "calc(100% + 2px)", background: `linear-gradient(135deg, ${matchup.home?.color ?? "#333"} 0%, ${matchup.home?.color ?? "#333"} 40%, ${matchup.away?.color ?? "#333"} 60%, ${matchup.away?.color ?? "#333"} 100%)` }}
+                    className="flex h-28 items-center justify-center gap-4 rounded-t-lg -mt-[13px] -mx-[1px]"
+                    style={{ marginBottom: 8, width: "calc(100% + 2px)", background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
                   >
                     {matchup.home ? (
                       <img src={matchup.home.logo} alt={matchup.home.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />

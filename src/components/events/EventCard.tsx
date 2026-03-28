@@ -45,9 +45,9 @@ export function EventCard({
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   const past = isEventPast(event.startDate, event.endDate);
-  const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
-  const singleTeam = !matchup ? findTeamInTitle(event.title) : null;
   const hasRealImage = !isGenericCover(event.coverImageUrl);
+  const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
+  const singleTeam = !matchup && !hasRealImage ? findTeamInTitle(event.title) : null;
 
   return (
     <Link href={`/event/${event.id}`} className="block">

@@ -418,6 +418,11 @@ const TEAM_COLORS: Record<string, string> = {
   "nhl/sea": "#99D9D9", "nhl/stl": "#002F87", "nhl/tb": "#002868", "nhl/tor": "#00205B",
   "nhl/uta": "#69B3E7", "nhl/van": "#00205B", "nhl/vgk": "#B4975A", "nhl/wsh": "#041E42",
   "nhl/wpg": "#041E42",
+  // MiLB
+  "milb/1350": "#00843D", "milb/5368": "#1C2841", "milb/529": "#003DA5", "milb/540": "#C8102E",
+  "milb/550": "#0E3386", "milb/4904": "#1C2841", "milb/556": "#CC0000", "milb/565": "#003DA5",
+  "milb/574": "#C8102E", "milb/102": "#003DA5", "milb/105": "#00553E", "milb/431": "#003087",
+  "milb/482": "#002D62", "milb/235": "#C8102E", "milb/494": "#000000",
 };
 
 // NCAA colors from localTeams.ts

@@ -7,6 +7,7 @@ import { Calendar, MapPin } from "lucide-react";
 import { cn, formatEventDateTime, formatPrice, friendsGoingText, isEventPast } from "@/lib/utils";
 import { CATEGORY_EMOJI, type EventWithCounts } from "@/types";
 import { UserAvatar } from "@/components/social/UserAvatar";
+import { parseMatchup } from "@/lib/sportsTeams";
 
 type FriendInfo = {
   id: string;
@@ -21,6 +22,7 @@ export function EventCard({
   event: EventWithCounts & { distance?: number; friendsGoing?: FriendInfo[] };
 }) {
   const past = isEventPast(event.startDate, event.endDate);
+  const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
 
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -28,16 +30,39 @@ export function EventCard({
         {/* Cover Image */}
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-neutral-800">
           {event.coverImageUrl ? (
-            // "group-hover:scale-105" zooms the image slightly on hover
             <img
               src={event.coverImageUrl}
               alt={event.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            // Fallback: show the category emoji if there's no image
             <div className="flex h-full items-center justify-center text-4xl">
               {CATEGORY_EMOJI[event.category]}
+            </div>
+          )}
+
+          {/* Sports matchup logo overlay */}
+          {matchup && (matchup.home || matchup.away) && (
+            <div className="absolute inset-0 flex items-center justify-center gap-4 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+              {matchup.home ? (
+                <img
+                  src={matchup.home.logo}
+                  alt={matchup.home.name}
+                  className="h-14 w-14 object-contain drop-shadow-lg"
+                />
+              ) : (
+                <div className="h-14 w-14" />
+              )}
+              <span className="text-lg font-bold text-white/90 drop-shadow-md">vs</span>
+              {matchup.away ? (
+                <img
+                  src={matchup.away.logo}
+                  alt={matchup.away.name}
+                  className="h-14 w-14 object-contain drop-shadow-lg"
+                />
+              ) : (
+                <div className="h-14 w-14" />
+              )}
             </div>
           )}
 

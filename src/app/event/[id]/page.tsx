@@ -152,7 +152,21 @@ export default async function EventDetailPage({
     <MobileContainer>
       {/* Hero Image Section */}
       <div className="relative">
-        {event.coverImageUrl ? (
+        {matchup && (matchup.home || matchup.away) ? (
+          <div className="flex aspect-[16/9] w-full items-center justify-center gap-8 bg-white dark:bg-neutral-900">
+            {matchup.home ? (
+              <img src={matchup.home.logo} alt={matchup.home.name} className="h-28 w-28 object-contain" />
+            ) : (
+              <div className="h-28 w-28" />
+            )}
+            <span className="text-2xl font-bold text-gray-400 dark:text-neutral-500">vs</span>
+            {matchup.away ? (
+              <img src={matchup.away.logo} alt={matchup.away.name} className="h-28 w-28 object-contain" />
+            ) : (
+              <div className="h-28 w-28" />
+            )}
+          </div>
+        ) : event.coverImageUrl ? (
           <img
             src={event.coverImageUrl}
             alt={event.title}
@@ -161,31 +175,6 @@ export default async function EventDetailPage({
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-gray-100 text-6xl dark:bg-neutral-800">
             {CATEGORY_EMOJI[category]}
-          </div>
-        )}
-
-        {/* Sports matchup logo overlay */}
-        {matchup && (matchup.home || matchup.away) && (
-          <div className="absolute inset-0 flex items-center justify-center gap-6">
-            {matchup.home ? (
-              <img
-                src={matchup.home.logo}
-                alt={matchup.home.name}
-                className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-              />
-            ) : (
-              <div className="h-28 w-28" />
-            )}
-            <span className="text-2xl font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
-            {matchup.away ? (
-              <img
-                src={matchup.away.logo}
-                alt={matchup.away.name}
-                className="h-28 w-28 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-              />
-            ) : (
-              <div className="h-28 w-28" />
-            )}
           </div>
         )}
 

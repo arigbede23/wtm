@@ -161,27 +161,24 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
             <Popup className="modern-popup" maxWidth={260} minWidth={220}>
               <Link href={`/event/${event.id}`} className="block -m-1">
                 {/* Cover image */}
-                {event.coverImageUrl && (
-                  <div className="relative">
-                    <img
-                      src={event.coverImageUrl}
-                      alt={event.title}
-                      className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
-                      style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
-                    />
-                    {matchup && (matchup.home || matchup.away) && (
-                      <div className="absolute inset-0 -mt-[13px] -mx-[1px] flex items-center justify-center gap-3 rounded-t-lg" style={{ width: "calc(100% + 2px)" }}>
-                        {matchup.home ? (
-                          <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
-                        ) : <div className="h-12 w-12" />}
-                        <span className="text-sm font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
-                        {matchup.away ? (
-                          <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]" />
-                        ) : <div className="h-12 w-12" />}
-                      </div>
-                    )}
+                {matchup && (matchup.home || matchup.away) ? (
+                  <div className="flex h-28 items-center justify-center gap-3 bg-white rounded-t-lg -mt-[13px] -mx-[1px]" style={{ marginBottom: 8, width: "calc(100% + 2px)" }}>
+                    {matchup.home ? (
+                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-12 w-12 object-contain" />
+                    ) : <div className="h-12 w-12" />}
+                    <span className="text-sm font-bold text-gray-400">vs</span>
+                    {matchup.away ? (
+                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-12 w-12 object-contain" />
+                    ) : <div className="h-12 w-12" />}
                   </div>
-                )}
+                ) : event.coverImageUrl ? (
+                  <img
+                    src={event.coverImageUrl}
+                    alt={event.title}
+                    className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
+                    style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
+                  />
+                ) : null}
                 {/* Content */}
                 <div className="px-0.5 pb-1">
                   <div className="flex items-center gap-1.5">

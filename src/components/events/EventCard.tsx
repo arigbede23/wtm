@@ -29,7 +29,21 @@ export function EventCard({
       <article className={cn("group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900", past && "opacity-60")}>
         {/* Cover Image */}
         <div className="relative aspect-[2/1] overflow-hidden bg-gray-100 dark:bg-neutral-800">
-          {event.coverImageUrl ? (
+          {matchup && (matchup.home || matchup.away) ? (
+            <div className="flex h-full items-center justify-center gap-5 bg-white dark:bg-neutral-900">
+              {matchup.home ? (
+                <img src={matchup.home.logo} alt={matchup.home.name} className="h-20 w-20 object-contain" />
+              ) : (
+                <div className="h-20 w-20" />
+              )}
+              <span className="text-lg font-bold text-gray-400 dark:text-neutral-500">vs</span>
+              {matchup.away ? (
+                <img src={matchup.away.logo} alt={matchup.away.name} className="h-20 w-20 object-contain" />
+              ) : (
+                <div className="h-20 w-20" />
+              )}
+            </div>
+          ) : event.coverImageUrl ? (
             <img
               src={event.coverImageUrl}
               alt={event.title}
@@ -38,31 +52,6 @@ export function EventCard({
           ) : (
             <div className="flex h-full items-center justify-center text-4xl">
               {CATEGORY_EMOJI[event.category]}
-            </div>
-          )}
-
-          {/* Sports matchup logo overlay */}
-          {matchup && (matchup.home || matchup.away) && (
-            <div className="absolute inset-0 flex items-center justify-center gap-4">
-              {matchup.home ? (
-                <img
-                  src={matchup.home.logo}
-                  alt={matchup.home.name}
-                  className="h-20 w-20 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                />
-              ) : (
-                <div className="h-20 w-20" />
-              )}
-              <span className="text-lg font-bold text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]">vs</span>
-              {matchup.away ? (
-                <img
-                  src={matchup.away.logo}
-                  alt={matchup.away.name}
-                  className="h-20 w-20 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
-                />
-              ) : (
-                <div className="h-20 w-20" />
-              )}
             </div>
           )}
 

@@ -83,13 +83,16 @@ export async function fetchTicketmasterEvents(
     console.error("[Sync] Ticketmaster fetch error:", err);
   }
 
+  // Enrich generic placeholder images with real ones from iTunes/Wikipedia
+  await enrichImages(allEvents);
+
   console.log(`[Sync] Ticketmaster: fetched ${allEvents.length} events`);
   return allEvents;
 }
 
 // Generic TM category placeholders all live under /dam/c/
 function isGenericImage(url: string): boolean {
-  return url.includes("/dam/c/") || url.includes("/dam/a/") && url.includes("SOURCE");
+  return url.includes("/dam/c/") || (url.includes("/dam/a/") && url.includes("SOURCE"));
 }
 
 // Pick the best available image: attraction > non-generic event > generic event
@@ -109,6 +112,79 @@ function pickBestImage(ev: any): string | null {
 
   // 3. Fall back to whatever we have (may be generic)
   return eventImg;
+}
+
+// Search Deezer, iTunes, and Wikipedia for event/artist images
+async function findImageForTitle(title: string): Promise<string | null> {
+  // Clean title: remove "(Touring)", "VIP", dates, suffixes, etc.
+  const clean = title
+    .replace(/\s*\(.*?\)\s*/g, " ")
+    .replace(/\s*[-–—].*$/, "")
+    .replace(/\s*(VIP|M&G|add-on|Access Pass|Premium|Seating|Parking|Suite|Suites?)\s*/gi, "")
+    .trim();
+
+  if (!clean || clean.length < 3) return null;
+
+  try {
+    // 1. Deezer — free, no API key, great artist coverage
+    const deezerRes = await fetch(
+      `https://api.deezer.com/search/artist?q=${encodeURIComponent(clean)}`
+    );
+    if (deezerRes.ok) {
+      const data = await deezerRes.json();
+      const artist = data.data?.[0];
+      if (artist?.picture_xl) return artist.picture_xl;
+      if (artist?.picture_big) return artist.picture_big;
+    }
+  } catch {}
+
+  try {
+    // 2. iTunes — covers music, movies, TV shows, broadway
+    const itunesRes = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(clean)}&media=all&entity=musicArtist,album,movie,tvShow&limit=3`
+    );
+    if (itunesRes.ok) {
+      const data = await itunesRes.json();
+      for (const result of data.results ?? []) {
+        const art = result.artworkUrl100 ?? result.artworkUrl60;
+        if (art) return art.replace(/\d+x\d+/, "600x600");
+      }
+    }
+  } catch {}
+
+  try {
+    // 3. Wikipedia — fallback for shows, plays, festivals
+    const wikiRes = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(clean.replace(/\s+/g, "_"))}`
+    );
+    if (wikiRes.ok) {
+      const data = await wikiRes.json();
+      const img = data.originalimage?.source ?? data.thumbnail?.source;
+      if (img) return img;
+    }
+  } catch {}
+
+  return null;
+}
+
+// Enrich events that have generic images with better ones from iTunes/Wikipedia
+async function enrichImages(events: NormalizedEvent[]): Promise<void> {
+  const BATCH = 10;
+  const generics = events.filter(
+    (e) => e.coverImageUrl && isGenericImage(e.coverImageUrl)
+  );
+
+  // Process in small batches to avoid hammering APIs
+  for (let i = 0; i < generics.length; i += BATCH) {
+    const batch = generics.slice(i, i + BATCH);
+    const results = await Promise.all(
+      batch.map((e) => findImageForTitle(e.title))
+    );
+    for (let j = 0; j < batch.length; j++) {
+      if (results[j]) batch[j].coverImageUrl = results[j];
+    }
+    if (i + BATCH < generics.length) await sleep(300);
+  }
 }
 
 function normalizeTMEvent(ev: any): NormalizedEvent | null {

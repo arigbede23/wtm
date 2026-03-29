@@ -68,10 +68,23 @@ function MessageBubble({
 }) {
   const [showTime, setShowTime] = useState(false);
 
-  // iMessage-style radius: round the outer corners, flatten inner ones for groups
-  const radius = isSent
-    ? `1.125rem ${isFirst ? "1.125rem" : "0.25rem"} ${isLast ? "1.125rem" : "0.25rem"} 1.125rem`
-    : `${isFirst ? "1.125rem" : "0.25rem"} 1.125rem 1.125rem ${isLast ? "1.125rem" : "0.25rem"}`;
+  // iMessage-style radius — both sides use the same logic mirrored:
+  // top-left, top-right, bottom-right, bottom-left
+  const R = "1.25rem"; // fully rounded
+  const r = "0.25rem"; // flat (grouped edge)
+
+  let radius: string;
+  if (isSent) {
+    // Sent: left side always rounded, right side flat when grouped
+    const topRight = isFirst ? R : r;
+    const bottomRight = isLast ? R : r;
+    radius = `${R} ${topRight} ${bottomRight} ${R}`;
+  } else {
+    // Received: right side always rounded, left side flat when grouped
+    const topLeft = isFirst ? R : r;
+    const bottomLeft = isLast ? R : r;
+    radius = `${topLeft} ${R} ${R} ${bottomLeft}`;
+  }
 
   return (
     <>
@@ -85,10 +98,10 @@ function MessageBubble({
         onClick={() => setShowTime((s) => !s)}
       >
         <div
-          className={`max-w-[78%] px-3 py-[7px] text-[15px] leading-snug ${
+          className={`max-w-[78%] px-3.5 py-2 text-[15px] leading-snug ${
             isSent
               ? "bg-brand-600 text-white"
-              : "bg-gray-200/80 text-gray-900 dark:bg-neutral-700 dark:text-white"
+              : "bg-gray-200 text-gray-900 dark:bg-neutral-700 dark:text-white"
           }`}
           style={{ borderRadius: radius }}
         >

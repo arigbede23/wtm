@@ -18,9 +18,12 @@ export const metadata: Metadata = {
   description: "Discover events and things to do near you",
   manifest: "/manifest.json", // PWA manifest for install prompts
   appleWebApp: {
-    capable: true,             // Allows "Add to Home Screen" on iOS
+    capable: true,
     statusBarStyle: "default",
     title: "wtm?",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
   },
 };
 

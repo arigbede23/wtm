@@ -90,7 +90,7 @@ function MessageBubble({
               ? "bg-brand-600 text-white"
               : "bg-gray-200/80 text-gray-900 dark:bg-neutral-700 dark:text-white"
           }`}
-          style={{ borderRadius }}
+          style={{ borderRadius: radius }}
         >
           {message.text}
         </div>

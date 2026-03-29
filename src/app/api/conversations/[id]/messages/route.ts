@@ -89,7 +89,22 @@ export async function GET(
       console.error("Failed to update lastReadAt:", updateError);
     }
 
-    return NextResponse.json(messages ?? []);
+    // Fetch the other user's profile for the chat header
+    const otherUserId =
+      conversation.user1Id === user.id
+        ? conversation.user2Id
+        : conversation.user1Id;
+
+    const { data: otherUser } = await db
+      .from("users")
+      .select("id, displayName, username, avatarUrl")
+      .eq("id", otherUserId)
+      .single();
+
+    return NextResponse.json({
+      messages: messages ?? [],
+      otherUser: otherUser ?? null,
+    });
   } catch (error) {
     console.error("Messages GET error:", error);
     return NextResponse.json(

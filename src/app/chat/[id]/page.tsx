@@ -56,78 +56,50 @@ function formatMessageTime(date: string): string {
 function MessageBubble({
   message,
   isSent,
-  borderRadius,
+  isFirst,
+  isLast,
   showTimeGap,
-  addTopSpace,
 }: {
   message: Message;
   isSent: boolean;
-  borderRadius: string;
+  isFirst: boolean;
+  isLast: boolean;
   showTimeGap: boolean;
-  addTopSpace: boolean;
 }) {
   const [showTime, setShowTime] = useState(false);
-  const [swipeX, setSwipeX] = useState(0);
-  const touchStartX = useRef<number | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const delta = e.touches[0].clientX - touchStartX.current;
-    // Sent messages swipe left, received swipe right
-    if (isSent && delta < 0) setSwipeX(Math.max(delta * 0.4, -60));
-    if (!isSent && delta > 0) setSwipeX(Math.min(delta * 0.4, 60));
-  };
-
-  const handleTouchEnd = () => {
-    if (Math.abs(swipeX) > 20) {
-      setShowTime(true);
-      setTimeout(() => setShowTime(false), 2000);
-    }
-    setSwipeX(0);
-    touchStartX.current = null;
-  };
+  // iMessage-style radius: round the outer corners, flatten inner ones for groups
+  const radius = isSent
+    ? `1.125rem ${isFirst ? "1.125rem" : "0.25rem"} ${isLast ? "1.125rem" : "0.25rem"} 1.125rem`
+    : `${isFirst ? "1.125rem" : "0.25rem"} 1.125rem 1.125rem ${isLast ? "1.125rem" : "0.25rem"}`;
 
   return (
     <>
       {showTimeGap && (
-        <p className="py-2 text-center text-[11px] text-gray-400 dark:text-neutral-500">
+        <p className="pb-1 pt-3 text-center text-[11px] font-medium text-gray-400 dark:text-neutral-500">
           {formatMessageTime(message.createdAt)}
         </p>
       )}
-      <div className={`flex ${isSent ? "justify-end" : "justify-start"} ${addTopSpace ? "mt-2" : ""}`}>
-        <div className={`flex items-center gap-2 ${isSent ? "flex-row-reverse" : ""}`}>
-          <div
-            className={`max-w-[75%] px-3.5 py-2 text-sm transition-transform duration-150 ${
-              isSent
-                ? "bg-brand-600 text-white"
-                : "bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-white"
-            }`}
-            style={{
-              borderRadius,
-              transform: `translateX(${swipeX}px)`,
-            }}
-            onClick={() => setShowTime((s) => !s)}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {message.text}
-          </div>
-          <span
-            className={`text-[10px] text-gray-400 transition-all duration-200 ${
-              showTime || Math.abs(swipeX) > 10
-                ? "w-auto opacity-100"
-                : "w-0 overflow-hidden opacity-0"
-            }`}
-          >
-            {formatMessageTime(message.createdAt)}
-          </span>
+      <div
+        className={`flex ${isSent ? "justify-end" : "justify-start"} ${isFirst && !showTimeGap ? "mt-3" : ""}`}
+        onClick={() => setShowTime((s) => !s)}
+      >
+        <div
+          className={`max-w-[78%] px-3 py-[7px] text-[15px] leading-snug ${
+            isSent
+              ? "bg-brand-600 text-white"
+              : "bg-gray-200/80 text-gray-900 dark:bg-neutral-700 dark:text-white"
+          }`}
+          style={{ borderRadius }}
+        >
+          {message.text}
         </div>
       </div>
+      {showTime && (
+        <p className={`mt-0.5 text-[10px] text-gray-400 ${isSent ? "text-right pr-1" : "pl-1"}`}>
+          {formatMessageTime(message.createdAt)}
+        </p>
+      )}
     </>
   );
 }
@@ -283,7 +255,7 @@ export default function ChatPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="space-y-[3px]">
             {messages.map((message, idx) => {
               const isSent = message.senderId === user.id;
               const prev = messages[idx - 1];
@@ -291,21 +263,17 @@ export default function ChatPage() {
               const sameSenderPrev = prev?.senderId === message.senderId;
               const sameSenderNext = next?.senderId === message.senderId;
 
-              // Group bubbles: adjust border radius for consecutive messages
-              const radiusSent = `${sameSenderPrev ? "0.5rem" : "1.25rem"} 0.25rem 0.25rem ${sameSenderNext ? "0.5rem" : "1.25rem"}`;
-              const radiusRecv = `0.25rem ${sameSenderPrev ? "0.5rem" : "1.25rem"} ${sameSenderNext ? "0.5rem" : "1.25rem"} 0.25rem`;
-
-              // Show time gap between message groups (>5 min apart)
-              const showTimeGap = !prev || new Date(message.createdAt).getTime() - new Date(prev.createdAt).getTime() > 5 * 60 * 1000;
+              const parseTime = (d: string) => new Date(d.endsWith("Z") || d.includes("+") ? d : d + "Z").getTime();
+              const showTimeGap = !prev || parseTime(message.createdAt) - parseTime(prev.createdAt) > 15 * 60 * 1000;
 
               return (
                 <MessageBubble
                   key={message.id}
                   message={message}
                   isSent={isSent}
-                  borderRadius={isSent ? radiusSent : radiusRecv}
+                  isFirst={!sameSenderPrev}
+                  isLast={!sameSenderNext}
                   showTimeGap={showTimeGap}
-                  addTopSpace={!sameSenderPrev}
                 />
               );
             })}

@@ -28,11 +28,28 @@ type OtherUser = {
 
 function formatMessageTime(date: string): string {
   const d = new Date(date);
-  return d.toLocaleTimeString("en-US", {
+  const now = new Date();
+  const isToday =
+    d.getDate() === now.getDate() &&
+    d.getMonth() === now.getMonth() &&
+    d.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday =
+    d.getDate() === yesterday.getDate() &&
+    d.getMonth() === yesterday.getMonth() &&
+    d.getFullYear() === yesterday.getFullYear();
+
+  const time = d.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
-    hour12: false,
+    hour12: true,
   });
+
+  if (isToday) return time;
+  if (isYesterday) return `Yesterday ${time}`;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " + time;
 }
 
 export default function ChatPage() {

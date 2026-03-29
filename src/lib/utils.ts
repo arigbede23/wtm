@@ -101,7 +101,9 @@ export function getDistanceMiles(
 // Format a date as relative time: "just now", "2m ago", "3h ago", "5d ago"
 export function formatRelativeTime(date: Date | string): string {
   const now = Date.now();
-  const then = new Date(date).getTime();
+  // Supabase timestamps lack timezone suffix — treat as UTC
+  const dateStr = typeof date === "string" && !date.endsWith("Z") && !date.includes("+") ? date + "Z" : date;
+  const then = new Date(dateStr).getTime();
   const seconds = Math.floor((now - then) / 1000);
 
   if (seconds < 60) return "just now";

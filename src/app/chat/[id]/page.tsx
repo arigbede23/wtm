@@ -27,7 +27,8 @@ type OtherUser = {
 };
 
 function formatMessageTime(date: string): string {
-  const d = new Date(date);
+  // Supabase returns timestamps without timezone suffix — treat as UTC
+  const d = new Date(date.endsWith("Z") || date.includes("+") ? date : date + "Z");
   const now = new Date();
   const isToday =
     d.getDate() === now.getDate() &&

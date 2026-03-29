@@ -16,6 +16,12 @@ type GeoState = {
   error: string | null;
 };
 
+// Round to ~0.7 mile precision — prevents jitter re-renders while
+// still updating when the user moves a meaningful distance.
+function stabilize(val: number): number {
+  return Math.round(val * 100) / 100;
+}
+
 export function useGeolocation() {
   const [state, setState] = useState<GeoState>({
     lat: null,
@@ -24,6 +30,7 @@ export function useGeolocation() {
     error: null,
   });
   const watchId = useRef<number | null>(null);
+  const lastStable = useRef<{ lat: number; lng: number } | null>(null);
 
   // On mount: restore cache for instant display, then get a fresh position
   useEffect(() => {
@@ -46,8 +53,10 @@ export function useGeolocation() {
 
       // Try high accuracy first, fall back to low accuracy if it fails
       const onSuccess = (position: GeolocationPosition) => {
-        const { latitude: lat, longitude: lng } = position.coords;
+        const lat = stabilize(position.coords.latitude);
+        const lng = stabilize(position.coords.longitude);
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+        lastStable.current = { lat, lng };
         setState({ lat, lng, loading: false, error: null });
         startWatching();
       };
@@ -98,8 +107,12 @@ export function useGeolocation() {
 
     watchId.current = navigator.geolocation.watchPosition(
       (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
+        const lat = stabilize(position.coords.latitude);
+        const lng = stabilize(position.coords.longitude);
+        // Only update state if position actually changed (prevents re-renders)
+        if (lastStable.current?.lat === lat && lastStable.current?.lng === lng) return;
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+        lastStable.current = { lat, lng };
         setState({ lat, lng, loading: false, error: null });
       },
       (err) => {
@@ -127,10 +140,11 @@ export function useGeolocation() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
+        const lat = stabilize(position.coords.latitude);
+        const lng = stabilize(position.coords.longitude);
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ lat, lng }));
+        lastStable.current = { lat, lng };
         setState({ lat, lng, loading: false, error: null });
-        // Start continuous watching after first grant
         startWatching();
       },
       (err) => {

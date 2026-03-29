@@ -28,7 +28,10 @@ export async function fetchEvents(
 }
 
 // TanStack Query key factory — ensures both Feed and Map use the same cache
-// when filters are identical
+// when filters are identical. Rounds lat/lng to avoid cache misses from GPS jitter.
 export function eventsQueryKey(filters: EventFilters = {}) {
-  return ["events", filters] as const;
+  const stable = { ...filters };
+  if (stable.lat != null) stable.lat = Math.round(stable.lat * 100) / 100;
+  if (stable.lng != null) stable.lng = Math.round(stable.lng * 100) / 100;
+  return ["events", stable] as const;
 }

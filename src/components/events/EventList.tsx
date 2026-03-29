@@ -16,6 +16,7 @@ export function EventList({ filters = {} }: { filters?: EventFilters }) {
   } = useQuery({
     queryKey: eventsQueryKey(filters),
     queryFn: () => fetchEvents(filters),
+    staleTime: 5 * 60 * 1000, // 5 min — avoid re-fetching on minor state changes
   });
 
   // Loading state — show animated skeleton placeholders

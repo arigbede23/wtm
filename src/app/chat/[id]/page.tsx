@@ -53,6 +53,85 @@ function formatMessageTime(date: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " + time;
 }
 
+function MessageBubble({
+  message,
+  isSent,
+  borderRadius,
+  showTimeGap,
+  addTopSpace,
+}: {
+  message: Message;
+  isSent: boolean;
+  borderRadius: string;
+  showTimeGap: boolean;
+  addTopSpace: boolean;
+}) {
+  const [showTime, setShowTime] = useState(false);
+  const [swipeX, setSwipeX] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = e.touches[0].clientX - touchStartX.current;
+    // Sent messages swipe left, received swipe right
+    if (isSent && delta < 0) setSwipeX(Math.max(delta * 0.4, -60));
+    if (!isSent && delta > 0) setSwipeX(Math.min(delta * 0.4, 60));
+  };
+
+  const handleTouchEnd = () => {
+    if (Math.abs(swipeX) > 20) {
+      setShowTime(true);
+      setTimeout(() => setShowTime(false), 2000);
+    }
+    setSwipeX(0);
+    touchStartX.current = null;
+  };
+
+  return (
+    <>
+      {showTimeGap && (
+        <p className="py-2 text-center text-[11px] text-gray-400 dark:text-neutral-500">
+          {formatMessageTime(message.createdAt)}
+        </p>
+      )}
+      <div className={`flex ${isSent ? "justify-end" : "justify-start"} ${addTopSpace ? "mt-2" : ""}`}>
+        <div className={`flex items-center gap-2 ${isSent ? "flex-row-reverse" : ""}`}>
+          <div
+            className={`max-w-[75%] px-3.5 py-2 text-sm transition-transform duration-150 ${
+              isSent
+                ? "bg-brand-600 text-white"
+                : "bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-white"
+            }`}
+            style={{
+              borderRadius,
+              transform: `translateX(${swipeX}px)`,
+            }}
+            onClick={() => setShowTime((s) => !s)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {message.text}
+          </div>
+          <span
+            className={`text-[10px] text-gray-400 transition-all duration-200 ${
+              showTime || Math.abs(swipeX) > 10
+                ? "w-auto opacity-100"
+                : "w-0 overflow-hidden opacity-0"
+            }`}
+          >
+            {formatMessageTime(message.createdAt)}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function ChatPage() {
   const params = useParams();
   const router = useRouter();
@@ -204,33 +283,30 @@ export default function ChatPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {messages.map((message) => {
+          <div className="space-y-1">
+            {messages.map((message, idx) => {
               const isSent = message.senderId === user.id;
+              const prev = messages[idx - 1];
+              const next = messages[idx + 1];
+              const sameSenderPrev = prev?.senderId === message.senderId;
+              const sameSenderNext = next?.senderId === message.senderId;
+
+              // Group bubbles: adjust border radius for consecutive messages
+              const radiusSent = `${sameSenderPrev ? "0.5rem" : "1.25rem"} 0.25rem 0.25rem ${sameSenderNext ? "0.5rem" : "1.25rem"}`;
+              const radiusRecv = `0.25rem ${sameSenderPrev ? "0.5rem" : "1.25rem"} ${sameSenderNext ? "0.5rem" : "1.25rem"} 0.25rem`;
+
+              // Show time gap between message groups (>5 min apart)
+              const showTimeGap = !prev || new Date(message.createdAt).getTime() - new Date(prev.createdAt).getTime() > 5 * 60 * 1000;
+
               return (
-                <div
+                <MessageBubble
                   key={message.id}
-                  className={`flex ${isSent ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                      isSent
-                        ? "bg-brand-600 text-white"
-                        : "bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-white"
-                    }`}
-                  >
-                    <p className="text-sm">{message.text}</p>
-                    <p
-                      className={`mt-1 text-[10px] ${
-                        isSent
-                          ? "text-white/70"
-                          : "text-gray-400 dark:text-neutral-500"
-                      }`}
-                    >
-                      {formatMessageTime(message.createdAt)}
-                    </p>
-                  </div>
-                </div>
+                  message={message}
+                  isSent={isSent}
+                  borderRadius={isSent ? radiusSent : radiusRecv}
+                  showTimeGap={showTimeGap}
+                  addTopSpace={!sameSenderPrev}
+                />
               );
             })}
             <div ref={messagesEndRef} />

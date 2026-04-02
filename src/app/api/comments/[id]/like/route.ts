@@ -1,6 +1,7 @@
 // Comment Like API — toggle like on a comment.
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ export async function POST(
       // Like
       await supabase
         .from("comment_likes")
-        .insert({ commentId, userId: user.id });
+        .insert({ id: randomUUID(), commentId, userId: user.id });
     }
 
     // Get updated count

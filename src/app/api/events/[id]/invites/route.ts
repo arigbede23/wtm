@@ -1,6 +1,7 @@
 // Event Invites API — send and list invites for an event.
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/pushNotifications";
 
@@ -50,6 +51,7 @@ export async function POST(
     if (newRecipients.length > 0) {
       // Insert new invites
       const inviteRows = newRecipients.map((recipientId) => ({
+        id: randomUUID(),
         eventId,
         senderId: user.id,
         recipientId,
@@ -70,6 +72,7 @@ export async function POST(
 
       // Create EVENT_INVITE notifications
       const notifications = newRecipients.map((recipientId) => ({
+        id: randomUUID(),
         userId: recipientId,
         actorId: user.id,
         type: "EVENT_INVITE" as const,

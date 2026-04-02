@@ -3,6 +3,7 @@
 // GET:  list user's saved events with full event details
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
       // Not saved → save (insert)
       const { error } = await supabase
         .from("saved_events")
-        .insert({ userId: user.id, eventId });
+        .insert({ id: randomUUID(), userId: user.id, eventId });
 
       if (error) throw error;
       return NextResponse.json({ saved: true });

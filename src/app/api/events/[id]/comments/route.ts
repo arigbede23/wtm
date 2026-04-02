@@ -1,6 +1,7 @@
 // Comments API — GET and POST comments for an event.
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -100,8 +101,8 @@ export async function POST(
 
   const { data: comment, error } = await supabase
     .from("comments")
-    .insert({ eventId: params.id, userId: user.id, text })
-    .select("id, text, createdAt, userId, user:userId(id, displayName, username, avatarUrl)")
+    .insert({ id: randomUUID(), eventId: params.id, userId: user.id, text })
+    .select("id, text, createdAt, pinned, userId, user:userId(id, displayName, username, avatarUrl)")
     .single();
 
   if (error) {

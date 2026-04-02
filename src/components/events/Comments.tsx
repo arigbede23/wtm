@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Heart, Pin } from "lucide-react";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { formatRelativeTime } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 type Comment = {
   id: string;
@@ -30,12 +31,14 @@ type CommentsProps = {
 };
 
 export function Comments({ eventId, organizerId }: CommentsProps) {
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  const isLoggedIn = !!user;
+  const currentUserId = user?.id ?? null;
 
   useEffect(() => {
     fetch(`/api/events/${eventId}/comments`)
@@ -45,10 +48,6 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-
-    // Check auth status by looking for supabase auth cookie
-    const loggedIn = document.cookie.includes("sb-");
-    setIsLoggedIn(loggedIn);
   }, [eventId]);
 
   async function handlePost() {

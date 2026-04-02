@@ -3,6 +3,7 @@
 // DELETE: delete event (creator-only)
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/pushNotifications";
 
@@ -104,6 +105,7 @@ export async function PATCH(
         const notifications = rsvps
           .filter((r) => r.userId !== user.id)
           .map((r) => ({
+            id: randomUUID(),
             type: "EVENT_UPDATED" as const,
             userId: r.userId,
             actorId: user.id,

@@ -3,6 +3,7 @@
 // GET:  get current user's RSVP for a specific event
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/pushNotifications";
 
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
       .from("rsvps")
       .upsert(
         {
+          id: randomUUID(),
           userId: user.id,
           eventId,
           status,
@@ -81,6 +83,7 @@ export async function POST(request: NextRequest) {
 
       if (followers && followers.length > 0) {
         const notifications = followers.map((f) => ({
+          id: randomUUID(),
           userId: f.followerId,
           actorId: user.id,
           type: notificationType,

@@ -3,6 +3,7 @@
 // POST creates a new event (requires auth).
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { haversineDistance } from "@/lib/geo";
@@ -255,6 +256,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from("events")
       .insert({
+        id: randomUUID(),
         title,
         description: body.description || null,
         category,

@@ -65,7 +65,11 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
-    if (Object.keys(updates).length === 0) {
+    // Always set updatedAt (Prisma's @updatedAt doesn't create a DB default)
+    updates.updatedAt = new Date().toISOString();
+
+    if (Object.keys(updates).length === 1) {
+      // Only updatedAt — no real changes
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 

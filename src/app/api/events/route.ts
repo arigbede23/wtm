@@ -274,6 +274,8 @@ export async function POST(request: NextRequest) {
         organizerId: user.id,
         source: "USER",
         status: "PUBLISHED",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       })
       .select()
       .single();

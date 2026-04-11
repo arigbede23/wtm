@@ -98,7 +98,7 @@ export function EventCard({
 
         {/* Card body — text content below the image */}
         <div className="p-4">
-          <h3 className="text-base font-semibold leading-tight text-gray-900 dark:text-white">
+          <h3 className="line-clamp-2 text-base font-semibold leading-tight text-gray-900 dark:text-white">
             {event.title}
           </h3>
 

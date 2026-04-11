@@ -1,4 +1,4 @@
-// Comments API — GET and POST comments for an event.
+// Comments API — GET, POST, DELETE comments for an event.
 
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
@@ -99,6 +99,21 @@ export async function POST(
     return NextResponse.json({ error: "Text is required" }, { status: 400 });
   }
 
+  if (text.length > 2000) {
+    return NextResponse.json({ error: "Comment is too long (max 2000 characters)" }, { status: 400 });
+  }
+
+  // Verify event exists before inserting
+  const { data: event, error: eventError } = await supabase
+    .from("events")
+    .select("id")
+    .eq("id", params.id)
+    .single();
+
+  if (eventError || !event) {
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+  }
+
   const { data: comment, error } = await supabase
     .from("comments")
     .insert({ id: randomUUID(), eventId: params.id, userId: user.id, text })
@@ -114,4 +129,57 @@ export async function POST(
   }
 
   return NextResponse.json(comment, { status: 201 });
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const commentId = searchParams.get("commentId");
+
+  if (!commentId) {
+    return NextResponse.json({ error: "commentId is required" }, { status: 400 });
+  }
+
+  // Verify the comment exists and belongs to the user
+  const { data: comment, error: fetchError } = await supabase
+    .from("comments")
+    .select("id, userId")
+    .eq("id", commentId)
+    .eq("eventId", params.id)
+    .single();
+
+  if (fetchError || !comment) {
+    return NextResponse.json({ error: "Comment not found" }, { status: 404 });
+  }
+
+  if (comment.userId !== user.id) {
+    return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+  }
+
+  // Delete associated likes first, then the comment
+  await supabase.from("comment_likes").delete().eq("commentId", commentId);
+
+  const { error: deleteError } = await supabase
+    .from("comments")
+    .delete()
+    .eq("id", commentId);
+
+  if (deleteError) {
+    console.error("Comment delete error:", deleteError);
+    return NextResponse.json({ error: "Failed to delete comment" }, { status: 500 });
+  }
+
+  return NextResponse.json({ deleted: true });
 }

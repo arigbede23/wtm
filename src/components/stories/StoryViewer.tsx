@@ -141,6 +141,7 @@ export function StoryViewer({
 
   const handleDelete = async () => {
     if (!currentStory || deleting) return;
+    if (!confirm("Delete this story? This can't be undone.")) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/stories/${currentStory.id}`, { method: "DELETE" });

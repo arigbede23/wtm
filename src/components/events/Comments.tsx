@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Heart, Pin } from "lucide-react";
+import { Heart, Pin, Trash2 } from "lucide-react";
 import { UserAvatar } from "@/components/social/UserAvatar";
 import { formatRelativeTime } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,6 +36,8 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
+  const [likingId, setLikingId] = useState<string | null>(null);
+  const [postError, setPostError] = useState(false);
 
   const isLoggedIn = !!user;
   const currentUserId = user?.id ?? null;
@@ -67,15 +69,21 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
         const comment = await res.json();
         setComments((prev) => [...prev, { ...comment, likeCount: 0, likedByMe: false, pinned: false }]);
         setText("");
+        setPostError(false);
+      } else {
+        setPostError(true);
       }
     } catch {
-      // Silently fail — user can retry
+      setPostError(true);
     } finally {
       setPosting(false);
     }
   }
 
   async function handleLike(commentId: string) {
+    if (likingId) return; // Prevent concurrent likes
+    setLikingId(commentId);
+
     // Optimistic update
     setComments((prev) =>
       prev.map((c) =>
@@ -102,7 +110,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
         );
       }
     } catch {
-      // Revert on error — refetch
+      // Revert on error
       setComments((prev) =>
         prev.map((c) =>
           c.id === commentId
@@ -114,6 +122,8 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
             : c
         )
       );
+    } finally {
+      setLikingId(null);
     }
   }
 
@@ -135,6 +145,20 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
             return 0;
           });
         });
+      }
+    } catch {
+      // Silently fail
+    }
+  }
+
+  async function handleDelete(commentId: string) {
+    if (!confirm("Delete this comment?")) return;
+    try {
+      const res = await fetch(`/api/events/${eventId}/comments?commentId=${commentId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setComments((prev) => prev.filter((c) => c.id !== commentId));
       }
     } catch {
       // Silently fail
@@ -217,7 +241,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
                         {comment.likeCount}
                       </span>
                     )}
-                    {organizerId && isLoggedIn && (
+                    {isOrganizer && (
                       <button
                         onClick={() => handlePin(comment.id)}
                         className={`flex items-center gap-1 text-xs transition-colors ${
@@ -230,6 +254,15 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
                         {comment.pinned ? "Unpin" : "Pin"}
                       </button>
                     )}
+                    {isLoggedIn && comment.user.id === currentUserId && (
+                      <button
+                        onClick={() => handleDelete(comment.id)}
+                        className="flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-red-500"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -240,6 +273,7 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
 
       {/* Post form — only shown if logged in */}
       {isLoggedIn && (
+        <>
         <div className="mt-4 flex gap-2">
           <input
             type="text"
@@ -254,9 +288,13 @@ export function Comments({ eventId, organizerId }: CommentsProps) {
             disabled={!text.trim() || posting}
             className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
           >
-            Post
+            {posting ? "Posting..." : "Post"}
           </button>
         </div>
+        {postError && (
+          <p className="mt-1 text-xs text-red-500">Failed to post comment. Please try again.</p>
+        )}
+        </>
       )}
     </div>
   );

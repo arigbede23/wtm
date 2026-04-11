@@ -165,6 +165,13 @@ export async function POST(
       );
     }
 
+    if (text.length > 5000) {
+      return NextResponse.json(
+        { error: "Message is too long (max 5000 characters)" },
+        { status: 400 }
+      );
+    }
+
     // Insert the message
     const now = new Date().toISOString();
 

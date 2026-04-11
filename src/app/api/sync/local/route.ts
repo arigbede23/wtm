@@ -34,9 +34,16 @@ export async function POST(request: NextRequest) {
   const lat = parseFloat(body.lat);
   const lng = parseFloat(body.lng);
 
-  if (isNaN(lat) || isNaN(lng)) {
+  if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
     return NextResponse.json(
       { error: "lat and lng are required" },
+      { status: 400 }
+    );
+  }
+
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return NextResponse.json(
+      { error: "lat must be -90..90 and lng must be -180..180" },
       { status: 400 }
     );
   }

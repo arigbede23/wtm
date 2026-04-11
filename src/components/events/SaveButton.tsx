@@ -56,9 +56,14 @@ export default function SaveButton({ eventId }: SaveButtonProps) {
     <button
       onClick={handleToggle}
       disabled={loading}
-      className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+      className="flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm transition-colors hover:bg-black/60 disabled:opacity-50"
+      aria-label={saved ? "Unsave event" : "Save event"}
     >
-      <Bookmark className={`h-5 w-5 ${saved ? "fill-white" : ""}`} />
+      {loading ? (
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+      ) : (
+        <Bookmark className={`h-5 w-5 ${saved ? "fill-white" : ""}`} />
+      )}
     </button>
   );
 }

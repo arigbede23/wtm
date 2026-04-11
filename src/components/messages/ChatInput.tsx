@@ -29,11 +29,13 @@ export function ChatInput({ onSend }: ChatInputProps) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder="Message..."
+            aria-label="Type a message"
             className="flex-1 rounded-full border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-white"
           />
           <button
             type="submit"
             disabled={!value.trim()}
+            aria-label="Send message"
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
           >
             <Send className="h-4 w-4" />

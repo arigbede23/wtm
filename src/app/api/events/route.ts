@@ -83,9 +83,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Text search — matches title or description
+    // Escape LIKE special characters to prevent wildcard injection
     if (search) {
+      const escaped = search.replace(/[%_\\]/g, (ch) => `\\${ch}`);
       query = query.or(
-        `title.ilike.%${search}%,description.ilike.%${search}%`
+        `title.ilike.%${escaped}%,description.ilike.%${escaped}%`
       );
     }
 

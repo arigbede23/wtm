@@ -93,6 +93,32 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
           Something went wrong
         </p>
         <p className="mt-1 text-sm text-gray-500">{error}</p>
+        <button
+          onClick={() => {
+            setError("");
+            setLoading(true);
+            const params = new URLSearchParams();
+            if (lat != null && lng != null) {
+              params.set("lat", String(lat));
+              params.set("lng", String(lng));
+              params.set("radius", "100");
+            }
+            fetch(`/api/feed/for-you?${params}`)
+              .then((res) => {
+                if (!res.ok) throw new Error(`API returned ${res.status}`);
+                return res.json();
+              })
+              .then((data) => {
+                if (data.events) setEvents(data.events);
+                setStrategy(data.strategy ?? data.error ?? "");
+              })
+              .catch((err) => setError(err.message))
+              .finally(() => setLoading(false));
+          }}
+          className="mt-4 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

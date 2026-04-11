@@ -190,6 +190,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [lastFailedText, setLastFailedText] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -278,10 +280,12 @@ export default function ChatPage() {
           );
         }
       } catch {
-        // Remove optimistic message on failure
+        // Remove optimistic message and show error
         setMessages((prev) =>
           prev.filter((m) => m.id !== optimisticMessage.id)
         );
+        setSendError("Message failed to send. Tap to retry.");
+        setLastFailedText(text);
       }
     },
     [user, conversationId]
@@ -359,8 +363,26 @@ export default function ChatPage() {
         )}
       </div>
 
+      {/* Send error banner */}
+      {sendError && (
+        <div className="fixed bottom-16 left-0 right-0 z-20 mx-auto max-w-md px-4">
+          <button
+            onClick={() => {
+              if (lastFailedText) {
+                handleSend(lastFailedText);
+                setSendError(null);
+                setLastFailedText(null);
+              }
+            }}
+            className="w-full rounded-xl bg-red-500 px-4 py-2.5 text-center text-sm font-medium text-white shadow-lg transition-colors hover:bg-red-600"
+          >
+            {sendError}
+          </button>
+        </div>
+      )}
+
       {/* Input */}
-      <ChatInput onSend={handleSend} />
+      <ChatInput onSend={(text) => { setSendError(null); setLastFailedText(null); handleSend(text); }} />
     </div>
   );
 }

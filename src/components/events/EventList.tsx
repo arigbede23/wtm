@@ -13,6 +13,7 @@ export function EventList({ filters = {} }: { filters?: EventFilters }) {
     data: events,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: eventsQueryKey(filters),
     queryFn: () => fetchEvents(filters),
@@ -49,6 +50,12 @@ export function EventList({ filters = {} }: { filters?: EventFilters }) {
         <p className="mt-1 text-sm text-gray-500">
           Could not load events. Please try again.
         </p>
+        <button
+          onClick={() => refetch()}
+          className="mt-4 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+        >
+          Try Again
+        </button>
       </div>
     );
   }

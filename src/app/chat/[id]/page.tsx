@@ -10,6 +10,7 @@ import { UserAvatar } from "@/components/social/UserAvatar";
 import { ChatInput } from "@/components/messages/ChatInput";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { EventLinkPreview } from "@/components/messages/EventLinkPreview";
 
 type Message = {
   id: string;
@@ -53,6 +54,53 @@ function formatMessageTime(date: string): string {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " + time;
 }
 
+// Match URLs in message text — used to make links clickable
+const URL_REGEX = /https?:\/\/[^\s]+/g;
+
+// Extract event ID from an event page URL (e.g. https://domain.com/event/uuid or /event/uuid)
+const EVENT_PATH_REGEX = /\/event\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+
+function extractEventId(url: string): string | null {
+  const match = url.match(EVENT_PATH_REGEX);
+  return match ? match[1] : null;
+}
+
+// Render message text with clickable links
+function MessageText({ text, isSent }: { text: string; isSent: boolean }) {
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  const regex = new RegExp(URL_REGEX.source, "g");
+
+  while ((match = regex.exec(text)) !== null) {
+    // Text before this URL
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    const url = match[0];
+    parts.push(
+      <a
+        key={match.index}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`underline break-all ${isSent ? "text-white/90 hover:text-white" : "text-brand-600 hover:text-brand-700 dark:text-brand-400"}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {url}
+      </a>
+    );
+    lastIndex = match.index + url.length;
+  }
+
+  // Remaining text after last URL
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? <>{parts}</> : <>{text}</>;
+}
+
 function MessageBubble({
   message,
   isSent,
@@ -67,6 +115,15 @@ function MessageBubble({
   showTimeGap: boolean;
 }) {
   const [showTime, setShowTime] = useState(false);
+
+  // Find event IDs from any event links in the message
+  const eventIds: string[] = [];
+  let urlMatch: RegExpExecArray | null;
+  const urlScan = new RegExp(URL_REGEX.source, "g");
+  while ((urlMatch = urlScan.exec(message.text)) !== null) {
+    const eid = extractEventId(urlMatch[0]);
+    if (eid && !eventIds.includes(eid)) eventIds.push(eid);
+  }
 
   // iMessage-style radius — both sides use the same logic mirrored:
   // top-left, top-right, bottom-right, bottom-left
@@ -97,15 +154,22 @@ function MessageBubble({
         className={`flex ${isSent ? "justify-end" : "justify-start"} ${isFirst && !showTimeGap ? "mt-3" : ""}`}
         onClick={() => setShowTime((s) => !s)}
       >
-        <div
-          className={`max-w-[78%] px-3.5 py-2 text-[15px] leading-snug ${
-            isSent
-              ? "bg-brand-600 text-white"
-              : "bg-gray-200 text-gray-900 dark:bg-neutral-700 dark:text-white"
-          }`}
-          style={{ borderRadius: radius }}
-        >
-          {message.text}
+        <div className="max-w-[78%]">
+          <div
+            className={`px-3.5 py-2 text-[15px] leading-snug ${
+              isSent
+                ? "bg-brand-600 text-white"
+                : "bg-gray-200 text-gray-900 dark:bg-neutral-700 dark:text-white"
+            }`}
+            style={{ borderRadius: radius }}
+          >
+            <MessageText text={message.text} isSent={isSent} />
+          </div>
+
+          {/* Event link previews */}
+          {eventIds.map((eid) => (
+            <EventLinkPreview key={eid} eventId={eid} isSent={isSent} />
+          ))}
         </div>
       </div>
       {showTime && (

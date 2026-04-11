@@ -181,7 +181,7 @@ export default async function EventDetailPage({
           >
             <img src={singleTeam.logo} alt={singleTeam.name} className="h-32 w-32 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
           </div>
-        ) : event.coverImageUrl ? (
+        ) : event.coverImageUrl && !isGenericImage ? (
           <img
             src={event.coverImageUrl}
             alt={event.title}

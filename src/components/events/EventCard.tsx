@@ -58,7 +58,7 @@ export function EventCard({
             >
               <img src={singleTeam.logo} alt={singleTeam.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             </div>
-          ) : event.coverImageUrl ? (
+          ) : event.coverImageUrl && !isGenericImage ? (
             <img
               src={event.coverImageUrl}
               alt={event.title}

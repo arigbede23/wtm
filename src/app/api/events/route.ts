@@ -48,15 +48,14 @@ export async function GET(request: NextRequest) {
       query = query.gte("startDate", new Date().toISOString());
     }
 
-    // Bounding box filter — narrow rows at the DB level before JS distance calc
+    // Bounding box filter — narrow rows at the DB level before JS distance calc.
+    // Use .or() so user-created events without coordinates are still included.
     if (userLat != null && userLng != null && maxRadius != null) {
       const latDelta = maxRadius / 69;
       const lngDelta = maxRadius / (69 * Math.cos((userLat * Math.PI) / 180));
-      query = query
-        .gte("lat", userLat - latDelta)
-        .lte("lat", userLat + latDelta)
-        .gte("lng", userLng - lngDelta)
-        .lte("lng", userLng + lngDelta);
+      query = query.or(
+        `and(lat.gte.${userLat - latDelta},lat.lte.${userLat + latDelta},lng.gte.${userLng - lngDelta},lng.lte.${userLng + lngDelta}),lat.is.null`
+      );
     }
 
     // Organizer filter (for "My Events" on profile)
@@ -121,13 +120,14 @@ export async function GET(request: NextRequest) {
       // When searching, skip radius filtering and distance-based sorting —
       // just return search matches in chronological order (already sorted by startDate).
       if (!search) {
-        // Always filter out events that have no coordinates — they can't be
-        // distance-ranked and may be from an unrelated region.
-        // Then apply the radius cap if one was requested.
+        // Filter out imported events without coordinates (can't distance-rank them
+        // and they may be from an unrelated region). Keep user-created events
+        // without coordinates so they always appear in the feed.
         shaped = shaped.filter(
           (event: any) =>
-            event.distance != null &&
-            (maxRadius == null || event.distance <= maxRadius)
+            event.source === "USER" ||
+            (event.distance != null &&
+              (maxRadius == null || event.distance <= maxRadius))
         );
 
         // Combined sort: closer + sooner events rank higher.

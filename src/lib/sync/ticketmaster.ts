@@ -95,27 +95,56 @@ function isGenericImage(url: string): boolean {
   return url.includes("/dam/c/") || (url.includes("/dam/a/") && url.includes("SOURCE"));
 }
 
-// Pick the best available image: attraction > non-generic event > generic event
+// Pick the best available image for the event.
+// For music events, attraction/artist photos are usually the best cover.
+// For other categories (arts, sports, theatre, etc.), the event's own images
+// are more accurate — attraction images may belong to unrelated performers
+// sharing the same venue listing.
 function pickBestImage(ev: any): string | null {
-  // 1. Try attraction/performer images (usually high quality artist photos)
+  const segment = ev.classifications?.[0]?.segment?.name?.toLowerCase();
+  const isMusic = segment === "music";
   const attractions = ev._embedded?.attractions;
-  if (attractions) {
-    for (const attr of attractions) {
-      const img = pickTicketmasterImage(attr.images);
-      if (img && !isGenericImage(img)) return img;
+
+  if (isMusic) {
+    // Music: prefer artist/attraction images (high-quality photos)
+    if (attractions) {
+      for (const attr of attractions) {
+        const img = pickTicketmasterImage(attr.images);
+        if (img && !isGenericImage(img)) return img;
+      }
     }
+    // Then try event images
+    const eventImg = pickTicketmasterImage(ev.images);
+    if (eventImg && !isGenericImage(eventImg)) return eventImg;
+    return eventImg;
   }
 
-  // 2. Try event images, preferring non-generic ones
+  // Non-music: prefer event images (show posters, game graphics, etc.)
   const eventImg = pickTicketmasterImage(ev.images);
   if (eventImg && !isGenericImage(eventImg)) return eventImg;
 
-  // 3. Fall back to whatever we have (may be generic)
+  // Fall back to attraction images only if the attraction name matches the event title,
+  // to avoid picking images from unrelated performers at the same venue.
+  if (attractions) {
+    const titleLower = (ev.name ?? "").toLowerCase();
+    for (const attr of attractions) {
+      const attrName = (attr.name ?? "").toLowerCase();
+      if (titleLower.includes(attrName) || attrName.includes(titleLower)) {
+        const img = pickTicketmasterImage(attr.images);
+        if (img && !isGenericImage(img)) return img;
+      }
+    }
+  }
+
+  // Fall back to whatever we have (may be generic)
   return eventImg;
 }
 
-// Search Deezer, iTunes, and Wikipedia for event/artist images
-async function findImageForTitle(title: string): Promise<string | null> {
+// Search external APIs for a better cover image.
+// For music events, Deezer artist photos are a great match.
+// For non-music (theatre, sports, etc.), Deezer would return unrelated artists
+// with similar names, so we skip it and go straight to iTunes/Wikipedia.
+async function findImageForTitle(title: string, category: string): Promise<string | null> {
   // Clean title: remove "(Touring)", "VIP", dates, suffixes, etc.
   const clean = title
     .replace(/\s*\(.*?\)\s*/g, " ")
@@ -125,18 +154,22 @@ async function findImageForTitle(title: string): Promise<string | null> {
 
   if (!clean || clean.length < 3) return null;
 
-  try {
-    // 1. Deezer — free, no API key, great artist coverage
-    const deezerRes = await fetch(
-      `https://api.deezer.com/search/artist?q=${encodeURIComponent(clean)}`
-    );
-    if (deezerRes.ok) {
-      const data = await deezerRes.json();
-      const artist = data.data?.[0];
-      if (artist?.picture_xl) return artist.picture_xl;
-      if (artist?.picture_big) return artist.picture_big;
-    }
-  } catch {}
+  const isMusic = category === "MUSIC";
+
+  // 1. Deezer — only for music events (artist search returns wrong results for shows/plays)
+  if (isMusic) {
+    try {
+      const deezerRes = await fetch(
+        `https://api.deezer.com/search/artist?q=${encodeURIComponent(clean)}`
+      );
+      if (deezerRes.ok) {
+        const data = await deezerRes.json();
+        const artist = data.data?.[0];
+        if (artist?.picture_xl) return artist.picture_xl;
+        if (artist?.picture_big) return artist.picture_big;
+      }
+    } catch {}
+  }
 
   try {
     // 2. iTunes — covers music, movies, TV shows, broadway
@@ -178,7 +211,7 @@ async function enrichImages(events: NormalizedEvent[]): Promise<void> {
   for (let i = 0; i < generics.length; i += BATCH) {
     const batch = generics.slice(i, i + BATCH);
     const results = await Promise.all(
-      batch.map((e) => findImageForTitle(e.title))
+      batch.map((e) => findImageForTitle(e.title, e.category))
     );
     for (let j = 0; j < batch.length; j++) {
       if (results[j]) batch[j].coverImageUrl = results[j];

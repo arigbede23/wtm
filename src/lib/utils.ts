@@ -13,7 +13,7 @@ export function cn(...inputs: ClassValue[]) {
 
 // Ensure a date string is treated as UTC — some stored dates are missing
 // the trailing "Z", which causes JS to parse them as local time.
-function toUTC(date: Date | string): Date {
+export function toUTC(date: Date | string): Date {
   if (typeof date === "string" && !date.endsWith("Z") && !date.includes("+")) {
     return new Date(date + "Z");
   }

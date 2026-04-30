@@ -19,7 +19,7 @@ import {
   MapPin,
   Navigation,
 } from "lucide-react";
-import { buildDirectionsUrl } from "@/lib/utils";
+import { buildDirectionsUrl, toUTC } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
@@ -56,10 +56,12 @@ type FormData = {
   url: string;
 };
 
-// Convert ISO date string to datetime-local input format
+// Convert ISO date string to datetime-local input format.
+// Uses toUTC() so naive timestamps (no trailing "Z") are treated as UTC,
+// then displayed in the browser's local timezone.
 function toDatetimeLocal(iso: string): string {
   if (!iso) return "";
-  const d = new Date(iso);
+  const d = toUTC(iso);
   const pad = (n: number) => n.toString().padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }

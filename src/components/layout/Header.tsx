@@ -232,6 +232,7 @@ export function Header() {
                   height={32}
                   className="h-8 w-8 object-contain"
                   unoptimized
+                  priority
                 />
               )}
               <div className="flex flex-col">

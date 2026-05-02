@@ -186,10 +186,10 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                     style={{ marginBottom: 8, width: "calc(100% + 2px)", background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
                   >
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                      <img src={matchup.home.logo} alt={matchup.home.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                      <img src={matchup.away.logo} alt={matchup.away.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                   </div>
                 ) : singleTeam ? (
@@ -197,12 +197,14 @@ export default function EventMap({ events, userLat, userLng }: EventMapProps) {
                     className="flex h-28 items-center justify-center rounded-t-lg -mt-[13px] -mx-[1px]"
                     style={{ marginBottom: 8, width: "calc(100% + 2px)", background: singleTeam.color }}
                   >
-                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                    <img src={singleTeam.logo} alt={singleTeam.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                   </div>
                 ) : event.coverImageUrl ? (
                   <img
                     src={event.coverImageUrl}
                     alt={event.title}
+                    loading="lazy"
+                    decoding="async"
                     className="h-28 w-full rounded-t-lg object-cover -mt-[13px] -mx-[1px]"
                     style={{ marginBottom: 8, width: "calc(100% + 2px)" }}
                   />

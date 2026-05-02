@@ -75,20 +75,22 @@ export function SimilarEvents({ eventId }: { eventId: string }) {
                     style={{ background: `linear-gradient(to right, ${matchup.home?.color ?? "#333"} 50%, ${matchup.away?.color ?? "#333"} 50%)` }}
                   >
                     {matchup.home ? (
-                      <img src={matchup.home.logo} alt={matchup.home.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                      <img src={matchup.home.logo} alt={matchup.home.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                     {matchup.away ? (
-                      <img src={matchup.away.logo} alt={matchup.away.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                      <img src={matchup.away.logo} alt={matchup.away.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                     ) : <div className="h-14 w-14" />}
                   </div>
                 ) : singleTeam ? (
                   <div className="flex h-full items-center justify-center" style={{ background: singleTeam.color }}>
-                    <img src={singleTeam.logo} alt={singleTeam.name} className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                    <img src={singleTeam.logo} alt={singleTeam.name} loading="lazy" decoding="async" className="h-14 w-14 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
                   </div>
                 ) : event.coverImageUrl ? (
                   <img
                     src={event.coverImageUrl}
                     alt={event.title}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 ) : (

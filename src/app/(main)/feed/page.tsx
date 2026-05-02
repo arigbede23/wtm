@@ -4,6 +4,7 @@
 "use client";
 
 import { Suspense, useState, useRef, useCallback } from "react";
+import Image from "next/image";
 import { useQueryClient } from "@tanstack/react-query";
 import { MapPin, Loader2 } from "lucide-react";
 import { EventList } from "@/components/events/EventList";
@@ -127,10 +128,14 @@ function FeedContent() {
           </p>
         </div>
         {team && (
-          <img
+          <Image
             src={getTeamLogoUrl(team)}
             alt={`${team.city} ${team.team}`}
+            width={48}
+            height={48}
             className="h-12 w-12 object-contain opacity-80"
+            unoptimized
+            priority
           />
         )}
       </div>

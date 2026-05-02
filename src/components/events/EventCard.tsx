@@ -2,7 +2,10 @@
 // Shows the cover image, category badge, price, title, date, and location.
 // The whole card is a link to the event detail page.
 
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { cn, formatEventDateTime, formatPrice, friendsGoingText, isEventPast } from "@/lib/utils";
 import { type EventWithCounts } from "@/types";
@@ -27,6 +30,8 @@ export function EventCard({
   const isGenericImage = !event.coverImageUrl || event.coverImageUrl.includes("/dam/c/");
   const matchup = event.category === "SPORTS" ? parseMatchup(event.title) : null;
   const singleTeam = !matchup && isGenericImage ? findTeamInTitle(event.title) : null;
+  const [coverFailed, setCoverFailed] = useState(false);
+  const showCover = event.coverImageUrl && !isGenericImage && !coverFailed;
 
   return (
     <Link href={`/event/${event.id}`} className="block">
@@ -41,12 +46,12 @@ export function EventCard({
               }}
             >
               {matchup.home ? (
-                <img src={matchup.home.logo} alt={matchup.home.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                <img src={matchup.home.logo} alt={matchup.home.name} loading="lazy" decoding="async" className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
               ) : (
                 <div className="h-24 w-24" />
               )}
               {matchup.away ? (
-                <img src={matchup.away.logo} alt={matchup.away.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+                <img src={matchup.away.logo} alt={matchup.away.name} loading="lazy" decoding="async" className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
               ) : (
                 <div className="h-24 w-24" />
               )}
@@ -56,12 +61,15 @@ export function EventCard({
               className="flex h-full items-center justify-center"
               style={{ background: singleTeam.color }}
             >
-              <img src={singleTeam.logo} alt={singleTeam.name} className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
+              <img src={singleTeam.logo} alt={singleTeam.name} loading="lazy" decoding="async" className="h-24 w-24 object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]" />
             </div>
-          ) : event.coverImageUrl && !isGenericImage ? (
+          ) : showCover ? (
             <img
-              src={event.coverImageUrl}
+              src={event.coverImageUrl as string}
               alt={event.title}
+              loading="lazy"
+              decoding="async"
+              onError={() => setCoverFailed(true)}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (

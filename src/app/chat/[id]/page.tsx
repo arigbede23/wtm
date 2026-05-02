@@ -190,6 +190,8 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherUser, setOtherUser] = useState<OtherUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
   const [sendError, setSendError] = useState<string | null>(null);
   const [lastFailedText, setLastFailedText] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -202,15 +204,20 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user) return;
 
+    setLoading(true);
+    setLoadError(null);
     fetch(`/api/conversations/${conversationId}/messages`)
-      .then((res) => res.json())
-      .then((data) => {
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`API returned ${res.status}`);
+        const data = await res.json();
         if (data.messages) setMessages(data.messages);
         if (data.otherUser) setOtherUser(data.otherUser);
       })
-      .catch(() => {})
+      .catch((err) => {
+        setLoadError(err?.message ?? "Could not load messages");
+      })
       .finally(() => setLoading(false));
-  }, [user, conversationId]);
+  }, [user, conversationId, reloadToken]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -272,13 +279,17 @@ export default function ChatPage() {
             body: JSON.stringify({ text }),
           }
         );
-        const data = await res.json();
-        if (data.id) {
-          // Replace optimistic message with the real one
-          setMessages((prev) =>
-            prev.map((m) => (m.id === optimisticMessage.id ? data : m))
-          );
+        if (!res.ok) {
+          throw new Error(`POST returned ${res.status}`);
         }
+        const data = await res.json();
+        if (!data?.id) {
+          throw new Error("Send response missing id");
+        }
+        // Replace optimistic message with the real one
+        setMessages((prev) =>
+          prev.map((m) => (m.id === optimisticMessage.id ? data : m))
+        );
       } catch {
         // Remove optimistic message and show error
         setMessages((prev) =>
@@ -329,7 +340,20 @@ export default function ChatPage() {
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 pb-24">
-        {messages.length === 0 ? (
+        {loadError ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <p className="text-sm font-medium text-gray-900 dark:text-white">
+              Could not load messages
+            </p>
+            <p className="mt-1 text-sm text-gray-500">{loadError}</p>
+            <button
+              onClick={() => setReloadToken((t) => t + 1)}
+              className="mt-4 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-sm text-gray-500">
               No messages yet. Say hello!

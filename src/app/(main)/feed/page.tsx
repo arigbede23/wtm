@@ -237,7 +237,7 @@ function FeedContent() {
         </>
       )}
 
-      {tab === "foryou" && <ForYouFeed lat={lat} lng={lng} />}
+      {tab === "foryou" && <ForYouFeed lat={lat} lng={lng} onBrowseAll={() => setTab("discover")} />}
 
       {tab === "friends" && <FriendsFeed lat={lat} lng={lng} />}
     </div>

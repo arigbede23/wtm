@@ -10,7 +10,15 @@ import type { EventWithCounts } from "@/types";
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
-export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | null }) {
+export function ForYouFeed({
+  lat,
+  lng,
+  onBrowseAll,
+}: {
+  lat?: number | null;
+  lng?: number | null;
+  onBrowseAll?: () => void;
+}) {
   const { user, loading: authLoading } = useAuth();
   const [events, setEvents] = useState<EventWithCounts[]>([]);
   const [strategy, setStrategy] = useState<string>("");
@@ -144,17 +152,25 @@ export function ForYouFeed({ lat, lng }: { lat?: number | null; lng?: number | n
     );
   }
 
-  // No events found
+  // No events found — point the user back to Discover so they don't dead-end
   if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-4xl">🎉</p>
-        <p className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-          No recommendations yet
+        <Sparkles className="h-12 w-12 text-brand-300" />
+        <p className="mt-3 text-lg font-medium text-gray-900 dark:text-white">
+          Nothing to recommend yet
         </p>
         <p className="mt-1 text-sm text-gray-500">
-          Check back soon — we&apos;re finding events for you!
+          We&apos;ll learn what you like as you save and RSVP. In the meantime, browse what&apos;s happening near you.
         </p>
+        {onBrowseAll && (
+          <button
+            onClick={onBrowseAll}
+            className="mt-4 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+          >
+            Browse all events
+          </button>
+        )}
       </div>
     );
   }

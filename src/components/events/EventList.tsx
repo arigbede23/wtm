@@ -8,7 +8,18 @@ import { EventCard } from "./EventCard";
 import { fetchEvents, eventsQueryKey } from "@/lib/fetchEvents";
 import type { EventFilters } from "@/types";
 
-export function EventList({ filters = {} }: { filters?: EventFilters }) {
+// User-applied filters (excludes lat/lng/radius which are derived from geolocation, not user choice)
+function hasActiveFilters(f: EventFilters) {
+  return Boolean(f.category || f.search || f.isFree || f.dateFrom || f.dateTo || f.datePreset);
+}
+
+export function EventList({
+  filters = {},
+  onClearFilters,
+}: {
+  filters?: EventFilters;
+  onClearFilters?: () => void;
+}) {
   const {
     data: events,
     isLoading,
@@ -60,17 +71,28 @@ export function EventList({ filters = {} }: { filters?: EventFilters }) {
     );
   }
 
-  // Empty state — no events found
+  // Empty state — branch on whether filters are restricting the result
   if (!events?.length) {
+    const filtered = hasActiveFilters(filters);
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-4xl">🎉</p>
+        <p className="text-4xl">{filtered ? "🔍" : "🎉"}</p>
         <p className="mt-2 text-lg font-medium text-gray-900 dark:text-white">
-          No events found
+          {filtered ? "No events match your filters" : "No events nearby"}
         </p>
         <p className="mt-1 text-sm text-gray-500">
-          Try adjusting your filters or check back soon!
+          {filtered
+            ? "Try widening your search or clearing filters."
+            : "We'll have something for you soon — check back later."}
         </p>
+        {filtered && onClearFilters && (
+          <button
+            onClick={onClearFilters}
+            className="mt-4 rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
     );
   }

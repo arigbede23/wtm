@@ -24,7 +24,7 @@ type FeedTab = "discover" | "foryou" | "friends";
 
 function FeedContent() {
   const [tab, setTab] = useState<FeedTab>("discover");
-  const { filters, setFilters } = useEventFilters();
+  const { filters, setFilters, clearFilters } = useEventFilters();
   const { lat, lng, loading: geoLoading, error: geoError, requestLocation } = useGeolocation();
   const team = useLocalTeamContext();
   const queryClient = useQueryClient();
@@ -228,7 +228,7 @@ function FeedContent() {
           {/* Event list — only fetch once we have location so we don't show
               irrelevant events from other cities */}
           {hasLocation ? (
-            <EventList filters={apiFilters} />
+            <EventList filters={apiFilters} onClearFilters={clearFilters} />
           ) : !geoLoading ? (
             <div className="px-4 pt-6 text-center text-sm text-gray-400 dark:text-neutral-400">
               Grant location access above to discover events near you

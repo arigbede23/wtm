@@ -194,7 +194,10 @@ export default function EditEventPage({
           lng: form.lng,
           coverImageUrl: coverImageUrl || null,
           isFree: form.isFree,
-          price: form.isFree ? null : parseFloat(form.price) || null,
+          price: form.isFree ? null : (() => {
+            const p = parseFloat(form.price);
+            return Number.isFinite(p) && p >= 0 ? p : null;
+          })(),
           url: form.url ? (form.url.match(/^https?:\/\//) ? form.url : `https://${form.url}`) : null,
         }),
       });
@@ -282,10 +285,18 @@ export default function EditEventPage({
 
   return (
     <div className="p-4">
-      {/* Header */}
-      <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-        Edit Event
-      </h1>
+      {/* Header — title plus a cancel escape hatch back to the event */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          Edit Event
+        </h1>
+        <Link
+          href={`/event/${params.id}`}
+          className="text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+        >
+          Cancel
+        </Link>
+      </div>
 
       {/* Progress dots */}
       <div className="mt-3 flex items-center gap-2">

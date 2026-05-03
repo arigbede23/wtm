@@ -254,6 +254,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Validate price (if provided non-null, must be finite, non-negative number)
+  if (body.price !== undefined && body.price !== null) {
+    const p = body.price;
+    if (typeof p !== "number" || !Number.isFinite(p) || p < 0) {
+      return NextResponse.json(
+        { error: "price must be a non-negative number" },
+        { status: 400 }
+      );
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from("events")

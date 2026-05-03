@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { sendPushToUser } from "@/lib/pushNotifications";
 
@@ -65,6 +66,17 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
+    // Validate price (if provided non-null, must be finite, non-negative number)
+    if (updates.price !== undefined && updates.price !== null) {
+      const p = updates.price as number;
+      if (typeof p !== "number" || !Number.isFinite(p) || p < 0) {
+        return NextResponse.json(
+          { error: "price must be a non-negative number" },
+          { status: 400 }
+        );
+      }
+    }
+
     // Always set updatedAt (Prisma's @updatedAt doesn't create a DB default)
     updates.updatedAt = new Date().toISOString();
 
@@ -73,12 +85,18 @@ export async function PATCH(
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
+    // Use maybeSingle() because RLS on events may hide the row from the
+    // authenticated SELECT after UPDATE (the update itself is allowed because
+    // the user is the organizer, but SELECT-after-RETURNING runs through the
+    // SELECT policy which can return 0 rows). When that happens we read the
+    // row back via the anon client — events are publicly readable, the GET
+    // route already uses anon for the same reason.
     const { data: updated, error: updateError } = await supabase
       .from("events")
       .update(updates)
       .eq("id", params.id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (updateError) {
       console.error("Event update error:", updateError);
@@ -86,6 +104,20 @@ export async function PATCH(
         { error: updateError.message || "Failed to update event" },
         { status: 500 }
       );
+    }
+
+    let updatedRow = updated;
+    if (!updatedRow) {
+      const anon = createAnonClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+      const { data: readBack } = await anon
+        .from("events")
+        .select("*")
+        .eq("id", params.id)
+        .maybeSingle();
+      updatedRow = readBack;
     }
 
     // Fire-and-forget re-embed if title or description changed
@@ -125,7 +157,7 @@ export async function PATCH(
             .eq("id", user.id)
             .single();
           const actorName = actor?.displayName ?? actor?.username ?? "Someone";
-          const eventTitle = updated?.title ?? "an event";
+          const eventTitle = updatedRow?.title ?? "an event";
 
           for (const n of notifications) {
             sendPushToUser(supabase, n.userId, {
@@ -140,7 +172,7 @@ export async function PATCH(
       }
     })();
 
-    return NextResponse.json(updated);
+    return NextResponse.json(updatedRow ?? { id: params.id });
   } catch (error) {
     console.error("Event PATCH error:", error);
     return NextResponse.json(

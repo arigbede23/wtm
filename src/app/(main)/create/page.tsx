@@ -135,7 +135,10 @@ export default function CreatePage() {
           lng: form.lng,
           coverImageUrl: coverImageUrl || null,
           isFree: form.isFree,
-          price: form.isFree ? null : parseFloat(form.price) || null,
+          price: form.isFree ? null : (() => {
+            const p = parseFloat(form.price);
+            return Number.isFinite(p) && p >= 0 ? p : null;
+          })(),
           url: form.url ? (form.url.match(/^https?:\/\//) ? form.url : `https://${form.url}`) : null,
         }),
       });

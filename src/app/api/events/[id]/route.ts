@@ -3,6 +3,7 @@
 // DELETE: delete event (creator-only)
 
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { createClient as createAnonClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
@@ -111,6 +112,10 @@ export async function PATCH(
         { status: 500 }
       );
     }
+
+    // Invalidate the server-rendered detail page so the next navigation gets
+    // fresh data instead of a cached render.
+    revalidatePath(`/event/${params.id}`);
 
     // Fire-and-forget re-embed if title or description changed
     if (updates.title !== undefined || updates.description !== undefined) {
@@ -224,6 +229,8 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    revalidatePath(`/event/${params.id}`);
 
     return NextResponse.json({ deleted: true });
   } catch (error) {

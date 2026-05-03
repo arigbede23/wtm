@@ -2,7 +2,7 @@
 // It caches pages so the app can work offline (or load faster on slow connections).
 // This file lives in /public so the browser can access it directly.
 
-const CACHE_NAME = "wtm-v3"; // Change this version to bust the cache on updates
+const CACHE_NAME = "wtm-v4"; // Change this version to bust the cache on updates
 const OFFLINE_URL = "/feed"; // Fallback page when user is offline
 
 // Files to cache immediately when the service worker is installed
@@ -86,10 +86,24 @@ self.addEventListener("fetch", (event) => {
   // For page navigations (clicking links, typing URLs)
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request).catch(() =>
-        // If offline, try to serve the cached feed page
-        caches.match(OFFLINE_URL).then((response) => response || caches.match(event.request))
-      )
+      (async () => {
+        try {
+          return await fetch(event.request);
+        } catch {
+          // Offline — fall back through cached offline page, cached request, then 503.
+          // Whatever we return must be a real Response or respondWith throws
+          // "Failed to convert value to 'Response'".
+          const offline = await caches.match(OFFLINE_URL);
+          if (offline) return offline;
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          return new Response("Offline", {
+            status: 503,
+            statusText: "Offline",
+            headers: { "Content-Type": "text/plain" },
+          });
+        }
+      })()
     );
     return;
   }
@@ -97,17 +111,33 @@ self.addEventListener("fetch", (event) => {
   // For static assets (CSS, JS, images):
   // Serve from cache if available, but also update the cache in the background
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const fetched = fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200 && response.type === "basic") {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || fetched;
-    })
+    (async () => {
+      const cached = await caches.match(event.request);
+      if (cached) {
+        // Update in background but don't block the response
+        fetch(event.request)
+          .then((response) => {
+            if (response && response.status === 200 && response.type === "basic") {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            }
+          })
+          .catch(() => {});
+        return cached;
+      }
+      try {
+        const response = await fetch(event.request);
+        if (response && response.status === 200 && response.type === "basic") {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      } catch {
+        return new Response("", {
+          status: 504,
+          statusText: "Gateway Timeout",
+        });
+      }
+    })()
   );
 });

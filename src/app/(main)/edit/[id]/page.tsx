@@ -208,6 +208,9 @@ export default function EditEventPage({
       }
 
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      // Bust the App Router cache for /event/[id] — without this the user lands
+      // on a stale server-rendered page and has to hard-reload to see their edit.
+      router.refresh();
       router.push(`/event/${params.id}`);
     } catch (err: any) {
       setError(err.message || "Something went wrong");

@@ -85,13 +85,19 @@ export async function PATCH(
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
-    // Use maybeSingle() because RLS on events may hide the row from the
-    // authenticated SELECT after UPDATE (the update itself is allowed because
-    // the user is the organizer, but SELECT-after-RETURNING runs through the
-    // SELECT policy which can return 0 rows). When that happens we read the
-    // row back via the anon client — events are publicly readable, the GET
-    // route already uses anon for the same reason.
-    const { data: updated, error: updateError } = await supabase
+    // Ownership was already verified above. The events table's RLS policies
+    // were blocking the authenticated UPDATE (the update silently affected 0
+    // rows even for the organizer), so do the actual write through a service-
+    // role client. Falls back to the anon key in dev environments that don't
+    // have the service role key configured (this is the same pattern used by
+    // the follow / stories / conversations routes).
+    const writeClient = createAnonClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: updatedRow, error: updateError } = await writeClient
       .from("events")
       .update(updates)
       .eq("id", params.id)
@@ -104,20 +110,6 @@ export async function PATCH(
         { error: updateError.message || "Failed to update event" },
         { status: 500 }
       );
-    }
-
-    let updatedRow = updated;
-    if (!updatedRow) {
-      const anon = createAnonClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      const { data: readBack } = await anon
-        .from("events")
-        .select("*")
-        .eq("id", params.id)
-        .maybeSingle();
-      updatedRow = readBack;
     }
 
     // Fire-and-forget re-embed if title or description changed
@@ -212,7 +204,15 @@ export async function DELETE(
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    const { error: deleteError } = await supabase
+    // Same RLS workaround as PATCH — delete via service-role client after
+    // ownership has been verified above.
+    const writeClient = createAnonClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { error: deleteError } = await writeClient
       .from("events")
       .delete()
       .eq("id", params.id);
